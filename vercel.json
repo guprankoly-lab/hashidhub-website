@@ -1,7 +1,0 @@
-{
-  "functions": {
-    "upload.js": {
-      "maxDuration": 60
-    }
-  }
-}
