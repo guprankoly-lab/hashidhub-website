@@ -675,8 +675,10 @@ var MEDIA_MAX_SRC = 50 * 1024 * 1024; // أقصى حجم لفيديو يختار
 var MEDIA_MAX_OUT = 19 * 1024 * 1024; // أقصى حجم يُخزَّن (حد تحميل Bot API هو 20MB)
 function mediaErr(msg){ return Object.assign(new Error(msg), {code: "media"}); }
 function mediaApi(){
-  var u = String(window.HH_MEDIA_API || "").replace(/\/+$/, "");
+  var u = String(window.HH_MEDIA_API || "").trim();
   if(!u || /YOUR-SUBDOMAIN/.test(u)) throw mediaErr("خدمة الوسائط غير مضبوطة بعد: عدّل media-config.js");
+  if(!/^https?:\/\//i.test(u)) u = "https://" + u;
+  try{ u = new URL(u).origin; }catch(e){ throw mediaErr("عنوان Worker في media-config.js غير صالح"); }
   return u;
 }
 
@@ -797,7 +799,9 @@ async function testStorage(force){
     return false;
   }catch(e){
     storageTested = false;
-    toast(e && e.code === "media" ? e.message : "❌ تعذّر الوصول إلى خدمة الوسائط. تحقق من عنوان Worker", 6000);
+    var host = ""; try{ host = mediaApi(); }catch(x){}
+    console.warn("Media health check failed:", host, e);
+    toast(e && e.code === "media" ? e.message : "❌ تعذّر الوصول إلى " + (host || "Worker") + " — افتح " + host + "/health في المتصفح: إن لم يظهر ok فالرابط خطأ أو الـ Worker غير منشور", 9000);
     return false;
   }
 }
