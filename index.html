@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#0d7a5f">
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://esm.sh" crossorigin>
+<script src="media-config.js"></script>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -449,7 +450,6 @@ setTimeout(function(){
 </script>
 <script type="module">
 import {firebaseConfig} from "./firebase-config.js";
-import {upload as upstashBrowserUpload} from "https://esm.sh/@upstash/blob@0.0.11/browser?bundle";
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {getMessaging, getToken, onMessage, isSupported as messagingIsSupported} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
@@ -670,56 +670,140 @@ async function compressImage(file, maxBytes){
 }
 
 
-async function upUpload(file, folder){
-  if(!me || !auth.currentUser) throw Object.assign(new Error("يجب تسجيل الدخول أولاً"), {code:"auth-required"});
-  var isVideo = file.type.indexOf("video/") === 0;
-  var isImage = file.type.indexOf("image/") === 0;
-  if(!isImage && !isVideo) throw Object.assign(new Error("نوع الملف غير مدعوم"), {code:"badtype"});
-  if(isImage){
-    uploadNotice(true, "نضغط الصورة تلقائياً…");
-    file = await compressImage(file, 1500 * 1024);
-    uploadNotice(false);
-    if(file.size > 4 * 1024 * 1024){
-      throw Object.assign(new Error("تعذّر ضغط الصورة بما يكفي. جرّب صورة أصغر."), {code: "image-compress"});
-    }
-  }
-  if(isVideo && file.size > 100 * 1000 * 1000) throw Object.assign(new Error("الفيديو يتجاوز 100 ميغابايت. اضغطه إلى 720p بصيغة MP4 (H.264/AAC) ثم أعد المحاولة."), {code:"big"});
-  if(!/^(avatars|videos|posts|pages|groups|stories|reels)$/.test(folder)) throw new Error("مسار رفع غير مسموح");
-  uploadNotice(true,"يتم تحميل منشورك…");
-  try{
-    var idToken = await auth.currentUser.getIdToken();
-    var task = upstashBrowserUpload(file, {
-      route: "/api/upload",
-      headers: async function(){ return { Authorization: "Bearer " + idToken, "x-upload-folder": folder }; }
-    });
-    var result = await task.done;
-    var url = result && (result.url || result.versionedUrl || (result.blob && (result.blob.url || result.blob.versionedUrl)));
-    if(!url) throw new Error("اكتمل الرفع دون إرجاع رابط الملف؛ تحقق من إعدادات حاوية التخزين");
-    return url;
-  }finally{ uploadNotice(false); }
+/* ============ رفع الوسائط: Worker تيليجرام (بث مباشر عبر Cloudflare، لا يمرّ بـ Vercel) ============ */
+var MEDIA_MAX_SRC = 50 * 1024 * 1024; // أقصى حجم لفيديو يختاره المستخدم
+var MEDIA_MAX_OUT = 19 * 1024 * 1024; // أقصى حجم يُخزَّن (حد تحميل Bot API هو 20MB)
+function mediaErr(msg){ return Object.assign(new Error(msg), {code: "media"}); }
+function mediaApi(){
+  var u = String(window.HH_MEDIA_API || "").replace(/\/+$/, "");
+  if(!u || /YOUR-SUBDOMAIN/.test(u)) throw mediaErr("خدمة الوسائط غير مضبوطة بعد: عدّل media-config.js");
+  return u;
 }
 
-/* فحص حقيقي لنقطة الرفع الخلفية؛ لا يكشف التوكن للمتصفح */
+/* ضغط الفيديو داخل المتصفح (إعادة ترميز بـ MediaRecorder بزمن التشغيل الحقيقي) */
+async function compressVideo(file, onProgress){
+  if(typeof MediaRecorder === "undefined" || !HTMLCanvasElement.prototype.captureStream)
+    throw mediaErr("متصفحك لا يدعم ضغط الفيديو. اختر فيديو أصغر من 19MB.");
+  var url = URL.createObjectURL(file), v = document.createElement("video"), actx = null, stream = null, stopped = false;
+  function cleanup(){
+    stopped = true;
+    try{ v.pause(); }catch(e){}
+    try{ if(stream) stream.getTracks().forEach(function(t){ t.stop(); }); }catch(e){}
+    try{ if(actx) actx.close(); }catch(e){}
+    URL.revokeObjectURL(url); v.removeAttribute("src");
+  }
+  try{
+    v.playsInline = true; v.preload = "auto"; v.src = url;
+    await new Promise(function(res, rej){ v.onloadedmetadata = res; v.onerror = function(){ rej(mediaErr("تعذّر قراءة الفيديو")); }; });
+    var dur = v.duration;
+    if(!isFinite(dur) || dur <= 0) throw mediaErr("تعذّر معرفة مدة الفيديو");
+    if(dur > 300) throw mediaErr("الفيديو أطول من 5 دقائق. قصّه أو اختر فيديو أصغر من 19MB.");
+    var vw = v.videoWidth, vh = v.videoHeight;
+    var sc = Math.min(1, 1280 / Math.max(vw, vh), 720 / Math.min(vw, vh));
+    var cw = Math.max(2, Math.round(vw * sc / 2) * 2), ch = Math.max(2, Math.round(vh * sc / 2) * 2);
+    var audioBps = 96000;
+    var vbps = Math.min(2500000, Math.floor((MEDIA_MAX_OUT * 0.88 * 8) / dur - audioBps));
+    if(vbps < 300000) throw mediaErr("الفيديو طويل جداً بالنسبة لحجمه. قصّه أو اختر فيديو أصغر.");
+    var canvas = document.createElement("canvas"); canvas.width = cw; canvas.height = ch;
+    var ctx = canvas.getContext("2d", {alpha: false});
+    stream = canvas.captureStream(30);
+    try{
+      var AC = window.AudioContext || window.webkitAudioContext;
+      actx = new AC();
+      var node = actx.createMediaElementSource(v), dest = actx.createMediaStreamDestination();
+      node.connect(dest); // لا نوصله بالسماعات: التسجيل صامت للمستخدم
+      dest.stream.getAudioTracks().forEach(function(t){ stream.addTrack(t); });
+      if(actx.state === "suspended") await actx.resume();
+    }catch(e){ actx = null; v.muted = true; }
+    var mime = ["video/mp4;codecs=avc1.42E01E,mp4a.40.2", "video/mp4", "video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm"].filter(function(m){ return MediaRecorder.isTypeSupported(m); })[0];
+    var rec = new MediaRecorder(stream, mime ? {mimeType: mime, videoBitsPerSecond: vbps, audioBitsPerSecond: audioBps} : {videoBitsPerSecond: vbps});
+    var chunks = [];
+    rec.ondataavailable = function(e){ if(e.data && e.data.size) chunks.push(e.data); };
+    var finished = new Promise(function(res){ rec.onstop = res; });
+    v.onended = function(){ stopped = true; try{ rec.stop(); }catch(e){} };
+    v.onerror = function(){ stopped = true; try{ rec.stop(); }catch(e){} };
+    function loop(){
+      if(stopped) return;
+      ctx.drawImage(v, 0, 0, cw, ch);
+      onProgress(Math.min(99, v.currentTime / dur * 100));
+      if(v.requestVideoFrameCallback) v.requestVideoFrameCallback(loop); else requestAnimationFrame(loop);
+    }
+    rec.start(1000);
+    try{ await v.play(); }
+    catch(e){ try{ rec.stop(); }catch(x){} throw mediaErr("منع المتصفح التشغيل اللازم للضغط. اختر فيديو أصغر من 19MB أو أعد المحاولة."); }
+    loop();
+    await finished;
+    var type = ((rec.mimeType || mime || "video/webm").split(";")[0]);
+    var blob = new Blob(chunks, {type: type});
+    if(!blob.size) throw mediaErr("فشل ضغط الفيديو");
+    return new File([blob], (file.name || "video").replace(/\.\w+$/, "") + (type.indexOf("mp4") > -1 ? ".mp4" : ".webm"), {type: type});
+  } finally { cleanup(); }
+}
+
+function xhrUpload(url, file, folder, token, onPct){
+  return new Promise(function(resolve, reject){
+    var x = new XMLHttpRequest();
+    x.open("POST", url);
+    x.setRequestHeader("Authorization", "Bearer " + token);
+    x.timeout = 5 * 60 * 1000;
+    x.upload.onprogress = function(e){ if(e.lengthComputable) onPct(Math.round(e.loaded / e.total * 100)); };
+    x.onload = function(){
+      var j = {}; try{ j = JSON.parse(x.responseText); }catch(e){}
+      if(x.status >= 200 && x.status < 300 && j.url) resolve(j.url);
+      else reject(mediaErr(j.message || ("فشل الرفع (" + x.status + ")")));
+    };
+    x.onerror = function(){ reject(mediaErr("تعذّر الاتصال بخدمة الوسائط. تحقق من الشبكة ومن media-config.js")); };
+    x.ontimeout = function(){ reject(mediaErr("انتهت مهلة الرفع. جرّب شبكة أقوى.")); };
+    var fd = new FormData(); fd.append("folder", folder); fd.append("file", file, file.name || "media");
+    x.send(fd);
+  });
+}
+
+async function upUpload(file, folder){
+  if(!me || !auth.currentUser) throw Object.assign(new Error("يجب تسجيل الدخول أولاً"), {code: "auth-required"});
+  var isVideo = file.type.indexOf("video/") === 0, isImage = file.type.indexOf("image/") === 0;
+  if(!isImage && !isVideo) throw Object.assign(new Error("نوع الملف غير مدعوم"), {code: "badtype"});
+  if(!/^(avatars|videos|posts|pages|groups|stories|reels)$/.test(folder)) throw new Error("مسار رفع غير مسموح");
+  var base = mediaApi();
+  if(isImage){
+    uploadNotice(true, "نضغط الصورة تلقائياً…");
+    try{ file = await compressImage(file, 1500 * 1024); } finally { uploadNotice(false); }
+    if(file.size > 4 * 1024 * 1024) throw mediaErr("تعذّر ضغط الصورة بما يكفي. جرّب صورة أصغر.");
+  } else {
+    if(file.size > MEDIA_MAX_SRC) throw mediaErr("الحد الأقصى للفيديو 50 ميجابايت.");
+    if(file.size > MEDIA_MAX_OUT || !/^video\/(mp4|webm|quicktime)$/.test(file.type)){
+      try{
+        file = await compressVideo(file, function(p){ uploadNotice(true, "نضغط الفيديو تلقائياً… " + Math.round(p) + "%"); });
+      } finally { uploadNotice(false); }
+      if(file.size > MEDIA_MAX_OUT) throw mediaErr("تعذّر ضغط الفيديو إلى أقل من 19MB. قصّه أو اختر فيديو أقصر.");
+    }
+  }
+  uploadNotice(true, "يتم رفع الملف…");
+  try{
+    var idToken = await auth.currentUser.getIdToken();
+    return await xhrUpload(base + "/upload", file, folder, idToken, function(p){ uploadNotice(true, "يتم رفع الملف… " + p + "%"); });
+  } finally { uploadNotice(false); }
+}
+
+/* فحص حقيقي لخدمة الوسائط */
 var storageTested = false;
 async function testStorage(force){
   if(storageTested && !force) return true;
   try{
-    var r = await fetch("/api/upload", { method: "GET", cache: "no-store" });
-    if(r.ok){ storageTested = true; toast("✅ خدمة التخزين جاهزة للرفع"); return true; }
-    var tx = await r.text().catch(function(){ return ""; });
-    storageTested = false;
-    toast("⚠️ خدمة التخزين غير جاهزة (" + r.status + ")", 5000);
-    console.warn("Storage route:", r.status, tx.slice(0,200));
+    var r = await fetch(mediaApi() + "/health", {cache: "no-store"});
+    var j = await r.json().catch(function(){ return {}; });
+    if(r.ok && j.ok && j.configured){ storageTested = true; toast("✅ خدمة الوسائط جاهزة (حتى " + j.maxMB + "MB)"); return true; }
+    toast("⚠️ خدمة الوسائط تعمل لكن أسرارها غير مضبوطة (BOT_TOKEN / CHAT_ID)", 6000);
     return false;
   }catch(e){
     storageTested = false;
-    toast("❌ تعذر الوصول إلى خدمة الرفع الخلفية. تحقق من نشر مجلد api وإعدادات الاستضافة", 6000);
-    console.warn("Storage route error:", e && e.message);
+    toast(e && e.code === "media" ? e.message : "❌ تعذّر الوصول إلى خدمة الوسائط. تحقق من عنوان Worker", 6000);
     return false;
   }
 }
 
 function errMsg(e){
+  if(e && e.code === "media" && e.message) return e.message;
   var map = {
     "auth/invalid-credential":"البيانات غير صحيحة",
     "auth/email-already-in-use":"الحساب مسجل، اضغط دخول",
@@ -1367,7 +1451,7 @@ function homeView(){
     '<textarea id="tx" placeholder="بماذا تفكر يا ' + esc((prof.name||"").split(" ")[0]) + '؟" maxlength="5000"></textarea></div>';
   if(draft.file) composer += '<div class="note" style="margin-top:6px">مرفق: ' + esc(draft.file.name) + ' <button class="mini" data-a="cleardraft">إزالة</button></div>';
   composer += '<div class="tools"><label>صورة<input type="file" id="fm" accept="image/*" hidden></label>' +
-    '<label>فيديو<input type="file" id="fv" accept="video/*" hidden></label>';
+    '<label title="الحد الأقصى 50 ميجا ويُضغط تلقائياً">فيديو <small style="opacity:.65">≤50MB</small><input type="file" id="fv" accept="video/*" hidden></label>';
   if(mps.length){
     composer += '<select id="aspage" style="margin-top:0;max-width:150px"><option value="">انشر باسمك</option>';
     mps.forEach(function(p){ composer += '<option value="' + p.id + '">صفحة: ' + esc(p.name) + '</option>'; });
@@ -2061,7 +2145,7 @@ function pageView(){
       '<textarea id="tx" placeholder="انشر باسم ' + esc(p.name) + '…" maxlength="5000"></textarea></div>' +
       (draft.file ? '<div class="note">مرفق: ' + esc(draft.file.name) + '</div>' : "") +
       '<div class="tools"><label>صورة<input type="file" id="fm" accept="image/*" hidden></label>' +
-      '<label>فيديو<input type="file" id="fv" accept="video/*" hidden></label>' +
+      '<label title="الحد الأقصى 50 ميجا ويُضغط تلقائياً">فيديو <small style="opacity:.65">≤50MB</small><input type="file" id="fv" accept="video/*" hidden></label>' +
       '<button class="btn" id="pub" style="margin-inline-start:auto">نشر</button></div></div>';
   }
   var pp = posts.filter(function(x){ return x.pageId === p.id; });
@@ -2114,7 +2198,7 @@ function groupView(){
       '<textarea id="tx" placeholder="اكتب للمجموعة…" maxlength="5000"></textarea></div>' +
       (draft.file ? '<div class="note">مرفق: ' + esc(draft.file.name) + '</div>' : "") +
       '<div class="tools"><label>صورة<input type="file" id="fm" accept="image/*" hidden></label>' +
-      '<label>فيديو<input type="file" id="fv" accept="video/*" hidden></label>' +
+      '<label title="الحد الأقصى 50 ميجا ويُضغط تلقائياً">فيديو <small style="opacity:.65">≤50MB</small><input type="file" id="fv" accept="video/*" hidden></label>' +
       '<button class="btn" id="pub" style="margin-inline-start:auto">نشر</button></div></div>';
   } else {
     h += '<div class="card note">انضم للمجموعة لتتمكن من النشر والمشاركة.</div>';
@@ -3397,7 +3481,8 @@ if(a === "adlike"){
     inp4.onchange = async function(){
       var vf = inp4.files[0];
       if(!vf) return;
-      if(vf.size > 100 * 1000 * 1000) return toast("الفيديو يتجاوز 100 ميغابايت. ننصح بضغطه إلى 720p بصيغة MP4 ثم إعادة المحاولة.",6000);
+      if(vf.size > 50 * 1024 * 1024) return toast("الفيديو أكبر من 50 ميجا. اختر فيديو أصغر أو قصّه.",5000);
+      if(vf.size > 19 * 1024 * 1024) toast("📉 سيُضغط الفيديو تلقائياً قبل الرفع (الحد الأقصى 50MB)",4000);
       var duration=await new Promise(function(resolve){var vv=document.createElement('video');vv.preload='metadata';vv.onloadedmetadata=function(){var d=vv.duration;URL.revokeObjectURL(vv.src);resolve(d);};vv.onerror=function(){resolve(0);};vv.src=URL.createObjectURL(vf);});
       var isLongReel=duration>60;
       if(isLongReel && !confirm("مدة المقطع "+Math.round(duration)+" ثانية، وتتجاوز حد الريلز (60 ثانية). سننشره كفيديو عادي في الموجز بدلاً من رفضه. متابعة؟")) return;
@@ -3671,6 +3756,7 @@ document.addEventListener("change", function(e){
   if(e.target.id === "fv"){
     if(f.type.indexOf("video/") !== 0) return toast("فيديو فقط");
     if(f.size > 50 * 1024 * 1024) return toast("الفيديو أكبر من 50MB");
+    if(f.size > 19 * 1024 * 1024) toast("📉 سيُضغط الفيديو تلقائياً عند النشر (الحد الأقصى 50MB)",4000);
     draft.file = f;
     draw();
   }

@@ -1,13 +1,6 @@
 {
   "name": "hashidhub-social",
-  "version": "1.2.0",
+  "version": "1.4.0",
   "private": true,
-  "description": "HashidHub social platform with Firebase and Upstash Blob media uploads",
-  "engines": {
-    "node": ">=20"
-  },
-  "dependencies": {
-    "@upstash/blob": "^0.0.11",
-    "firebase-admin": "^13.0.0"
-  }
+  "description": "HashidHub — static frontend (Vercel) + Firebase + Telegram media Worker (Cloudflare)"
 }
