@@ -674,13 +674,30 @@ async function compressImage(file, maxBytes){
 var MEDIA_MAX_SRC = 50 * 1024 * 1024; // أقصى حجم لفيديو يختاره المستخدم
 var MEDIA_MAX_OUT = 19 * 1024 * 1024; // أقصى حجم يُخزَّن (حد تحميل Bot API هو 20MB)
 function mediaErr(msg){ return Object.assign(new Error(msg), {code: "media"}); }
-function mediaApi(){
-  var u = String(window.HH_MEDIA_API || "").trim();
+function mediaResolve(raw){
+  var u = String(raw || "").trim();
   if(!u || /YOUR-SUBDOMAIN/.test(u)) throw mediaErr("خدمة الوسائط غير مضبوطة بعد: عدّل media-config.js");
+  if(u.charAt(0) === "/") return location.origin + u.replace(/\/+$/, ""); // مسار على نطاق الموقع نفسه (يتجاوز الحجب)
   if(!/^https?:\/\//i.test(u)) u = "https://" + u;
-  try{ u = new URL(u).origin; }catch(e){ throw mediaErr("عنوان Worker في media-config.js غير صالح"); }
-  return u;
+  try{ return new URL(u).origin; }catch(e){ throw mediaErr("عنوان الوسائط في media-config.js غير صالح"); }
 }
+function mediaApi(){ return mediaResolve(window.HH_MEDIA_API); }                       // للرفع والفحص
+function mediaPublic(){ return mediaResolve(window.HH_MEDIA_PUBLIC || window.HH_MEDIA_API); } // لعرض الملفات
+/* إعادة كتابة روابط workers.dev المحفوظة سابقاً إلى العنوان العام الحالي (تدعم الانتقال لأي نطاق لاحقاً) */
+var MEDIA_OLD = /https?:\/\/[a-z0-9-]+(?:\.[a-z0-9-]+)*\.workers\.dev\/f\//gi;
+function fixMedia(str){ var pb; try{ pb = mediaPublic(); }catch(e){ return str; } return String(str).replace(MEDIA_OLD, pb + "/f/"); }
+function fixMediaNode(n){
+  if(!n || n.nodeType !== 1) return;
+  var list = (n.matches && n.matches("img,video,source")) ? [n] : [];
+  if(n.querySelectorAll) list = list.concat(Array.prototype.slice.call(n.querySelectorAll("img,video,source")));
+  list.forEach(function(el){
+    var v = el.getAttribute("src");
+    if(v && v.indexOf(".workers.dev/f/") > -1){ MEDIA_OLD.lastIndex = 0; el.setAttribute("src", fixMedia(v)); }
+  });
+}
+try{
+  new MutationObserver(function(ms){ ms.forEach(function(m){ m.addedNodes.forEach(fixMediaNode); }); }).observe(document.documentElement, {childList: true, subtree: true});
+}catch(e){}
 
 /* ضغط الفيديو داخل المتصفح (إعادة ترميز بـ MediaRecorder بزمن التشغيل الحقيقي) */
 async function compressVideo(file, onProgress){
@@ -751,7 +768,7 @@ function xhrUpload(url, file, folder, token, onPct){
     x.upload.onprogress = function(e){ if(e.lengthComputable) onPct(Math.round(e.loaded / e.total * 100)); };
     x.onload = function(){
       var j = {}; try{ j = JSON.parse(x.responseText); }catch(e){}
-      if(x.status >= 200 && x.status < 300 && j.url) resolve(j.url);
+      if(x.status >= 200 && x.status < 300 && (j.path || j.url)) resolve(j);
       else reject(mediaErr(j.message || ("فشل الرفع (" + x.status + ")")));
     };
     x.onerror = function(){ reject(mediaErr("تعذّر الاتصال بخدمة الوسائط. تحقق من الشبكة ومن media-config.js")); };
@@ -783,7 +800,8 @@ async function upUpload(file, folder){
   uploadNotice(true, "يتم رفع الملف…");
   try{
     var idToken = await auth.currentUser.getIdToken();
-    return await xhrUpload(base + "/upload", file, folder, idToken, function(p){ uploadNotice(true, "يتم رفع الملف… " + p + "%"); });
+    var out = await xhrUpload(base + "/upload", file, folder, idToken, function(p){ uploadNotice(true, "يتم رفع الملف… " + p + "%"); });
+    return out.path ? mediaPublic() + out.path : fixMedia(out.url);
   } finally { uploadNotice(false); }
 }
 
@@ -1244,7 +1262,7 @@ function render(){
   if(!m || !me) return;
   var tx = $("#tx") ? $("#tx").value : "";
   var mv = $("#mi") ? $("#mi").value : "";
-  m.innerHTML = view().replace(/<img (?![^>]*loading=)/g, '<img loading="lazy" decoding="async" ');
+  m.innerHTML = fixMedia(view()).replace(/<img (?![^>]*loading=)/g, '<img loading="lazy" decoding="async" ');
   if($("#mi")) $("#mi").value = mv;
   if($("#tx")) $("#tx").value = tx;
   if(tab === "notif"){ seenN = Date.now(); sv("hn_n", seenN); }
@@ -1886,7 +1904,7 @@ function openReelPlayer(id){
   h += '</div></div></div>';
 
   var holder = document.createElement("div");
-  holder.innerHTML = h;
+  holder.innerHTML = fixMedia(h);
   var viewer = holder.firstElementChild;
   document.body.appendChild(viewer);
   document.body.style.overflow = "hidden";

@@ -1,4 +1,4 @@
-var CACHE = "hashidhub-v14";
+var CACHE = "hashidhub-v15";
 var ASSETS = ["./index.html", "./manifest.json", "./icon.svg", "./firebase-config.js"];
 
 self.addEventListener("install", function(e){
@@ -17,7 +17,7 @@ self.addEventListener("fetch", function(e){
   var req = e.request;
   if(req.method !== "GET") return;
   var url = new URL(req.url);
-  if(url.pathname.indexOf("/api/") === 0) return;
+  if(url.pathname.indexOf("/api/") === 0 || url.pathname.indexOf("/media/") === 0) return; // الوسائط لا تُخزَّن في SW
   if(req.url.indexOf("firestore") > -1 || req.url.indexOf("googleapis") > -1) return;
   if(url.origin !== location.origin) return; // CDN والوسائط: كاش المتصفح
   // الصفحة والسكربتات: الشبكة أولاً (تحديثات فورية) ثم الكاش دون اتصال

@@ -1,1 +1,5 @@
-{}
+{
+  "rewrites": [
+    { "source": "/media/:path*", "destination": "https://hashid-media.guprankoly.workers.dev/:path*" }
+  ]
+}
