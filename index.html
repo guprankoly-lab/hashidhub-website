@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0d7a5f">
+<meta name="description" content="HashidHub — تواصل · شارك · انطلق">
+<meta property="og:site_name" content="HashidHub">
+<meta property="og:title" content="HashidHub">
+<meta property="og:description" content="منصة تواصل اجتماعي: منشورات، ريلز، قصص، صفحات ومجموعات.">
+<meta property="og:type" content="website">
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://esm.sh" crossorigin>
 <script src="media-config.js"></script>
@@ -429,6 +434,56 @@ html[dir="rtl"] .reel-top .flip{transform:scaleX(-1)}
 article.card{content-visibility:auto;contain-intrinsic-size:auto 420px}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
+
+/* ================= v1.6 ================= */
+/* نص المنشور المختصر + المزيد */
+.body.clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+.more-btn{display:block;margin:2px 0 6px;padding:4px 2px;color:var(--brand);font-weight:700;font-size:.9rem;text-align:start}
+
+/* مشغّل الفيديو في الموجز: حجم ثابت وغلاف واضح */
+.vplayer{position:relative;width:100%;aspect-ratio:var(--ar,1.7778);max-height:78vh;background:#0b1220;border-radius:12px;overflow:hidden;margin-top:8px;user-select:none;-webkit-user-select:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.vplayer video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:none}
+.vplayer.started video{display:block}
+.vplayer .vp-poster,.vplayer .vp-fallback{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.vplayer.started .vp-poster,.vplayer.started .vp-fallback{display:none}
+.vp-fallback{background:linear-gradient(135deg,#0f9a75,#16324f);display:flex;align-items:center;justify-content:center}
+.vp-fallback img{width:76px;height:76px;border-radius:50%;object-fit:cover;opacity:.92;border:3px solid rgba(255,255,255,.7)}
+.vp-big{position:absolute;inset:0;margin:auto;width:68px;height:68px;border-radius:50%;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:3;transition:transform .15s}
+.vp-big:active{transform:scale(.92)}
+.vplayer.playing .vp-big,.vplayer.loading .vp-big{display:none}
+.vp-spin{position:absolute;inset:0;display:none;align-items:center;justify-content:center;z-index:2;pointer-events:none}
+.vplayer.loading .vp-spin{display:flex}
+.vp-ctrl{position:absolute;inset-inline:0;bottom:0;z-index:4;display:none;align-items:center;gap:6px;padding:22px 8px 6px;background:linear-gradient(0deg,rgba(0,0,0,.7),transparent);color:#fff;direction:ltr;font-size:.78rem;font-variant-numeric:tabular-nums}
+.vplayer.started .vp-ctrl{display:flex;opacity:0;transition:opacity .2s}
+.vplayer.started.show .vp-ctrl,.vplayer.started:not(.playing) .vp-ctrl{opacity:1}
+.vp-ctrl button{width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:#fff;flex:none}
+.vp-ctrl button svg{width:22px;height:22px}
+.vp-bar{position:relative;flex:1;height:26px;cursor:pointer;touch-action:none}
+.vp-bar::before{content:"";position:absolute;left:0;right:0;top:11px;height:4px;border-radius:2px;background:rgba(255,255,255,.3)}
+.vp-bar i{position:absolute;left:0;top:11px;height:4px;width:0;border-radius:2px;background:#fff}
+.vplayer:fullscreen{max-height:none;border-radius:0;aspect-ratio:auto;width:100%;height:100%;background:#000}
+.vplayer:-webkit-full-screen{max-height:none;border-radius:0;aspect-ratio:auto;width:100%;height:100%;background:#000}
+
+/* بطاقة الريل في الموجز */
+.reel-card .vcover{position:relative;display:block;width:100%;aspect-ratio:4/5;max-height:70vh;border-radius:12px;overflow:hidden;background:#0b1220;margin-top:8px;padding:0;border:0}
+.vcover .rc-img,.vcover .rc-fallback{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.vp-big-s{position:absolute;inset:0;margin:auto;width:68px;height:68px;border-radius:50%;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center}
+.vc-views{position:absolute;bottom:10px;inset-inline-start:10px;padding:3px 9px;border-radius:12px;background:rgba(0,0,0,.55);color:#fff;font-size:.78rem}
+
+/* أغلفة الريلز بدل الشاشة السوداء */
+.rc-img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.rc-fallback{position:absolute;inset:0;background:linear-gradient(160deg,#0f9a75,#16324f);display:flex;align-items:center;justify-content:center}
+.rc-fallback img{width:64px;height:64px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.7)}
+.reel-cell,.reel-tile{position:relative;overflow:hidden;background:#0b1220}
+.reel-cell .rc-img,.reel-cell .rc-fallback{position:absolute;inset:0}
+.reel-cell .reel-meta{position:absolute;z-index:2;bottom:0;inset-inline:0;background:linear-gradient(0deg,rgba(0,0,0,.7),transparent)}
+.ri-menu{margin-inline-start:auto;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.35);color:#fff;font-size:1.3rem;line-height:1}
+.ri-user{align-items:center}
+
+/* غلاف الصفحة */
+.pg-cover{width:100%;height:150px;border-radius:14px 14px 0 0;overflow:hidden;margin-bottom:-8px;background:linear-gradient(135deg,#0f9a75,#16324f)}
+.pg-cover img{width:100%;height:100%;object-fit:cover;display:block}
+
 </style>
 </head>
 <body>
@@ -700,7 +755,7 @@ try{
 }catch(e){}
 
 /* ضغط الفيديو داخل المتصفح (إعادة ترميز بـ MediaRecorder بزمن التشغيل الحقيقي) */
-async function compressVideo(file, onProgress){
+async function compressVideo(file, onProgress, target){
   if(typeof MediaRecorder === "undefined" || !HTMLCanvasElement.prototype.captureStream)
     throw mediaErr("متصفحك لا يدعم ضغط الفيديو. اختر فيديو أصغر من 19MB.");
   var url = URL.createObjectURL(file), v = document.createElement("video"), actx = null, stream = null, stopped = false;
@@ -721,7 +776,7 @@ async function compressVideo(file, onProgress){
     var sc = Math.min(1, 1280 / Math.max(vw, vh), 720 / Math.min(vw, vh));
     var cw = Math.max(2, Math.round(vw * sc / 2) * 2), ch = Math.max(2, Math.round(vh * sc / 2) * 2);
     var audioBps = 96000;
-    var vbps = Math.min(2500000, Math.floor((MEDIA_MAX_OUT * 0.88 * 8) / dur - audioBps));
+    var vbps = Math.min(2500000, Math.floor(((target || MEDIA_MAX_OUT) * 0.88 * 8) / dur - audioBps));
     if(vbps < 300000) throw mediaErr("الفيديو طويل جداً بالنسبة لحجمه. قصّه أو اختر فيديو أصغر.");
     var canvas = document.createElement("canvas"); canvas.width = cw; canvas.height = ch;
     var ctx = canvas.getContext("2d", {alpha: false});
@@ -790,9 +845,10 @@ async function upUpload(file, folder){
     if(file.size > 4 * 1024 * 1024) throw mediaErr("تعذّر ضغط الصورة بما يكفي. جرّب صورة أصغر.");
   } else {
     if(file.size > MEDIA_MAX_SRC) throw mediaErr("الحد الأقصى للفيديو 50 ميجابايت.");
-    if(file.size > MEDIA_MAX_OUT || !/^video\/(mp4|webm|quicktime)$/.test(file.type)){
+    var lim = folder === "reels" ? MEDIA_REEL_OUT : MEDIA_MAX_OUT;
+    if(file.size > lim || !/^video\/(mp4|webm|quicktime)$/.test(file.type)){
       try{
-        file = await compressVideo(file, function(p){ uploadNotice(true, "نضغط الفيديو تلقائياً… " + Math.round(p) + "%"); });
+        file = await compressVideo(file, function(p){ uploadNotice(true, "نضغط الفيديو تلقائياً… " + Math.round(p) + "%"); }, lim);
       } finally { uploadNotice(false); }
       if(file.size > MEDIA_MAX_OUT) throw mediaErr("تعذّر ضغط الفيديو إلى أقل من 19MB. قصّه أو اختر فيديو أقصر.");
     }
@@ -906,8 +962,11 @@ function reelScore(r){
   return ((r.views || 0) + (r.likes || 0) * 3 + (r.comments || 0) * 4 + 1) / Math.pow(age / 24 + 2, 1.3);
 }
 function sortedReels(){
-  return reels.filter(function(r){ return !blocks.has(r.uid) && (r.videoUrl || r.media || r.url); })
-    .sort(function(a, b){ return reelScore(b) - reelScore(a); });
+  var now = Date.now(), FRESH = 48 * 3600 * 1000;
+  var ok = reels.filter(function(r){ return !blocks.has(r.uid) && (r.videoUrl || r.media || r.url); });
+  var fresh = ok.filter(function(r){ return now - (r.ts || 0) < FRESH; }).sort(function(a, b){ return (b.ts || 0) - (a.ts || 0); });
+  var rest = ok.filter(function(r){ return now - (r.ts || 0) >= FRESH; }).sort(function(a, b){ return reelScore(b) - reelScore(a); });
+  return fresh.concat(rest); // الجديد أولاً ثم الأعلى مشاهدة/تفاعلاً
 }
 function notify(to, type, extra){
   if(!to || to === me.uid) return;
@@ -1186,6 +1245,292 @@ function menuHtml(){
 }
 function refreshMenu(){ var dd = document.getElementById("hdr-dd"); if(dd) dd.innerHTML = menuHtml(); }
 function closeMenu(){ var dd = document.getElementById("hdr-dd"); if(dd) dd.classList.remove("open"); }
+/* ============ v1.6: وسائط (غلاف/ذاكرة مؤقتة) ============ */
+var MEDIA_REEL_OUT = 8 * 1024 * 1024; // الريلز تُضغط لحجم أصغر ليبدأ تشغيلها أسرع على الشبكات البطيئة
+
+/* التقاط غلاف (صورة) من الفيديو + أبعاده قبل الرفع */
+function videoPoster(file){
+  return new Promise(function(resolve){
+    var url = URL.createObjectURL(file), v = document.createElement("video"), done = false;
+    function fin(r){ if(done) return; done = true; try{ URL.revokeObjectURL(url); }catch(e){} v.removeAttribute("src"); resolve(r); }
+    setTimeout(function(){ fin(null); }, 9000);
+    v.muted = true; v.playsInline = true; v.preload = "auto";
+    v.onerror = function(){ fin(null); };
+    v.onloadedmetadata = function(){ try{ v.currentTime = Math.min(1, (v.duration || 1) * 0.1); }catch(e){ fin(null); } };
+    v.onseeked = function(){
+      try{
+        var w = v.videoWidth, h = v.videoHeight;
+        if(!w || !h) return fin(null);
+        var sc = Math.min(1, 640 / w), c = document.createElement("canvas");
+        c.width = Math.round(w * sc); c.height = Math.round(h * sc);
+        c.getContext("2d").drawImage(v, 0, 0, c.width, c.height);
+        c.toBlob(function(b){
+          fin({file: b ? new File([b], "poster.jpg", {type: "image/jpeg"}) : null, w: w, h: h, dur: v.duration || 0});
+        }, "image/jpeg", 0.78);
+      }catch(e){ fin(null); }
+    };
+    v.src = url;
+  });
+}
+/* يرفع الفيديو مع غلافه ويعيد {url, poster, w, h} */
+async function uploadVideoWithPoster(file, folder){
+  var vm = await videoPoster(file);
+  var url = await upUpload(file, folder);
+  var poster = "";
+  if(vm && vm.file){ try{ poster = await upUpload(vm.file, "posts"); }catch(e){} }
+  return {url: url, poster: poster, w: vm ? vm.w : 0, h: vm ? vm.h : 0};
+}
+
+/* ذاكرة مؤقتة للفيديو (Cache Storage + Blob) لتشغيل فوري عند الإعادة */
+var _mc = {mem: {}, order: [], inflight: {}};
+function mediaCacheable(u){ return !!u && (u.charAt(0) === "/" || u.indexOf(location.origin) === 0) && u.indexOf("/media/f/") > -1; }
+function mcRemember(u, obj){
+  _mc.mem[u] = obj; _mc.order.push(u);
+  while(_mc.order.length > 5){ var o = _mc.order.shift(); try{ URL.revokeObjectURL(_mc.mem[o]); }catch(e){} delete _mc.mem[o]; }
+  return obj;
+}
+async function mediaCachedUrl(u, fetchIfMissing){
+  if(!mediaCacheable(u) || !window.caches) return null;
+  if(_mc.mem[u]) return _mc.mem[u];
+  try{
+    var cache = await caches.open("hh-media-v1");
+    var hit = await cache.match(u);
+    if(hit){ return mcRemember(u, URL.createObjectURL(await hit.blob())); }
+    if(!fetchIfMissing) return null;
+    if(_mc.inflight[u]) return _mc.inflight[u];
+    _mc.inflight[u] = (async function(){
+      try{
+        var r = await fetch(u);
+        if(!r.ok || r.status !== 200) return null;
+        cache.put(u, r.clone()).then(function(){ return cache.keys(); }).then(function(ks){ if(ks.length > 24) cache.delete(ks[0]); }).catch(function(){});
+        return mcRemember(u, URL.createObjectURL(await r.blob()));
+      }catch(e){ return null; } finally { delete _mc.inflight[u]; }
+    })();
+    return _mc.inflight[u];
+  }catch(e){ return null; }
+}
+
+/* ============ مشاركة بمعاينة (صورة + وصف) ============ */
+async function shareContent(kind, id, copyOnly){
+  var src = null, i;
+  if(kind === "reel"){ for(i = 0; i < reels.length; i++) if(reels[i].id === id){ src = reels[i]; break; } }
+  else { for(i = 0; i < posts.length; i++) if(posts[i].id === id){ src = posts[i]; break; } }
+  var title = "HashidHub", desc = "";
+  if(src){
+    var img = kind === "reel" ? (src.poster || "") : (src.type === "video" ? (src.poster || "") : (src.media || ""));
+    if(!img && /^https?:|^\//.test(src.photo || "")) img = src.photo;
+    if(img.charAt(0) === "/") img = location.origin + img;
+    var txt = String(kind === "reel" ? (src.caption || "") : (src.t || "")).replace(/\s+/g, " ").trim();
+    title = ((src.name || "HashidHub") + (kind === "reel" ? " • ريل" : "")).slice(0, 110);
+    desc = (txt || "شاهد هذا المحتوى على HashidHub").slice(0, 280);
+    try{ await setDoc(doc(db, "shares", id), {uid: me.uid, kind: kind, title: title, desc: desc, image: /^https:/.test(img) ? img : "", ts: Date.now()}); }catch(e){}
+  }
+  var url = location.origin + "/s/" + id;
+  if(copyOnly || !navigator.share){
+    try{ await navigator.clipboard.writeText(url); toast("تم نسخ الرابط"); }catch(e){ prompt("انسخ الرابط", url); }
+    return;
+  }
+  navigator.share({title: title, text: desc, url: url}).catch(function(){});
+}
+
+/* ============ الريلز: غلاف وبطاقات وقائمة ============ */
+function reelCoverHtml(r){
+  if(r.poster) return '<img class="rc-img" src="' + esc(r.poster) + '" alt="" loading="lazy">';
+  return '<div class="rc-fallback"><img src="' + (esc(r.photo) || DEF) + '" alt=""></div>';
+}
+function reelTileHtml(r){
+  return '<button type="button" class="reel-tile" data-a="openreel" data-i="' + r.id + '" aria-label="' + esc(r.name || "") + '">' + reelCoverHtml(r) +
+    '<div class="rt-play"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M8 5v14l11-7z" fill="#fff"/></svg></div>' +
+    '<div class="rt-meta"><div class="rt-name">' + esc(r.name || t("عضو","Member")) + '</div><div class="rt-views">▶ ' + fmtN(r.views) + '</div></div></button>';
+}
+function shelfReels(){
+  var all = sortedReels(), seen = {}, out = [];
+  all.forEach(function(r){ if(!seen[r.id]){ seen[r.id] = 1; out.push(r); } });
+  return out;
+}
+function reelsSection(uid){
+  var rs = reels.filter(function(r){ return r.uid === uid && (r.videoUrl || r.media || r.url); }).sort(function(a, b){ return (b.ts || 0) - (a.ts || 0); });
+  if(!rs.length) return "";
+  return '<div class="shelf-head"><h3>🎬 ريلز (' + rs.length + ')</h3></div><div class="reel-shelf">' + rs.map(reelTileHtml).join("") + '</div>';
+}
+function reelCardHtml(r){
+  var own = r.uid === me.uid || isAdmin, liked = !!(window._reelLiked && window._reelLiked[r.id]);
+  var cap = String(r.caption || "");
+  var h = '<article class="card reel-card" data-reel-card="' + r.id + '"><div class="row">' +
+    '<img class="av" src="' + (esc(r.photo) || DEF) + '" alt="">' +
+    '<div style="flex:1"><button class="name" data-a="prof" data-u="' + esc(r.uid) + '">' + esc(r.name || "") + pBadge(r.uid) + '</button>' +
+    '<div class="time">' + ago(r.ts) + ' · 🎬 ريل</div></div>' +
+    (own ? '<button class="mini" data-a="reelmenu" data-i="' + r.id + '" aria-label="خيارات الريل">⋯</button>' : '') + '</div>';
+  if(cap) h += '<div class="body clamp">' + renderText(cap) + '</div>';
+  h += '<button type="button" class="vcover" data-a="openreel" data-i="' + r.id + '" aria-label="تشغيل الريل">' + reelCoverHtml(r) +
+    '<span class="vp-big-s"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>' +
+    '<span class="vc-views">▶ ' + fmtN(r.views) + '</span></button>';
+  h += '<div class="acts">' +
+    '<button type="button" data-a="reellike" data-i="' + r.id + '" class="' + (liked ? "on" : "") + '">' + LIKE_SVG + '<span class="act-n">' + (r.likes || "") + '</span></button>' +
+    '<button type="button" data-a="reelcomment" data-i="' + r.id + '"><span class="act-ico">💬</span><span class="act-n">' + (r.comments || "") + '</span></button>' +
+    '<button type="button" data-a="reelshare" data-i="' + r.id + '"><span class="act-ico share-ico">↗</span><span class="act-n"></span></button></div></article>';
+  return h;
+}
+function reelMenu(rid){
+  var r = null, i;
+  for(i = 0; i < reels.length; i++) if(reels[i].id === rid){ r = reels[i]; break; }
+  if(!r || (r.uid !== me.uid && !isAdmin)) return;
+  openSheet("خيارات الريل", [
+    {label: "✏️ تعديل الوصف", action: async function(){
+      var nv = prompt("وصف الريل", r.caption || ""); if(nv === null) return;
+      nv = nv.trim().slice(0, 500);
+      try{
+        await updateDoc(doc(db, "reels", rid), {caption: nv}); r.caption = nv;
+        var el = document.querySelector('#reelplayer [data-reel-item="' + rid + '"] .ri-cap'); if(el) el.textContent = nv;
+        toast("تم تعديل الوصف"); draw();
+      }catch(e){ toast(friendlyErr(e)); }
+    }},
+    {label: "🖼️ تغيير الغلاف", action: function(){
+      var inp = document.createElement("input"); inp.type = "file"; inp.accept = "image/*";
+      inp.onchange = async function(){
+        var f = inp.files[0]; if(!f) return;
+        try{
+          var u = await upUpload(f, "posts");
+          await updateDoc(doc(db, "reels", rid), {poster: u}); r.poster = u;
+          var vv = document.querySelector('#reelplayer [data-reel-item="' + rid + '"] video'); if(vv) vv.poster = u;
+          toast("تم تغيير الغلاف"); draw();
+        }catch(e){ toast(e.message || friendlyErr(e), 5000); }
+      };
+      inp.click();
+    }},
+    {label: "🗑️ حذف الريل", danger: true, action: async function(){
+      if(!confirm("حذف هذا الريل نهائياً؟")) return;
+      try{ await deleteDoc(doc(db, "reels", rid)); closeReelPlayer(false); toast("تم الحذف"); draw(); }
+      catch(e){ toast(friendlyErr(e)); }
+    }}
+  ]);
+}
+
+/* ============ مشغّل الفيديو في الموجز (ثابت الحجم، لا تشغيل تلقائي) ============ */
+var VPI = {
+  play: '<svg viewBox="0 0 24 24" width="30" height="30"><path d="M8 5v14l11-7z" fill="#fff"/></svg>',
+  playSm: '<svg viewBox="0 0 24 24" width="22" height="22"><path d="M8 5v14l11-7z" fill="#fff"/></svg>',
+  pause: '<svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>',
+  fs: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>'
+};
+function vpHtml(p){
+  var ar = (p.vw && p.vh) ? Math.min(1.91, Math.max(0.8, p.vw / p.vh)) : 1.7778;
+  var cover = p.poster ? '<img class="vp-poster" src="' + esc(p.poster) + '" alt="" loading="lazy">'
+    : '<div class="vp-fallback"><img src="' + (esc(p.photo) || DEF) + '" alt=""></div>';
+  return '<div class="vplayer" data-pid="' + p.id + '" data-src="' + esc(p.media) + '" style="--ar:' + ar.toFixed(3) + '">' + cover +
+    '<video playsinline webkit-playsinline preload="none"></video>' +
+    '<div class="vp-spin"><span class="spinner"></span></div>' +
+    '<button type="button" class="vp-big" data-vp="play" aria-label="تشغيل">' + VPI.play + '</button>' +
+    '<div class="vp-ctrl"><button type="button" data-vp="toggle" aria-label="تشغيل أو إيقاف"><span class="vp-tg">' + VPI.pause + '</span></button>' +
+    '<span class="vp-t">0:00</span><div class="vp-bar" data-vp="seek"><i></i></div>' +
+    '<button type="button" data-vp="mute" aria-label="الصوت"><span class="vp-mu">' + RIC.volOn + '</span></button>' +
+    '<button type="button" data-vp="fs" aria-label="ملء الشاشة">' + VPI.fs + '</button></div></div>';
+}
+function vpFmt(s){ s = Math.max(0, Math.floor(s || 0)); return Math.floor(s / 60) + ":" + ("0" + (s % 60)).slice(-2); }
+function vpShow(el){ el.classList.add("show"); clearTimeout(el._ht); el._ht = setTimeout(function(){ el.classList.remove("show"); }, 2600); }
+function vpMuteIcon(el){ var v = el.querySelector("video"), m = el.querySelector(".vp-mu"); if(m) m.innerHTML = v.muted ? RIC.volOff : RIC.volOn; }
+function vpBind(el){
+  if(el._b) return; el._b = true;
+  var v = el.querySelector("video"), bar = el.querySelector(".vp-bar i"), tt = el.querySelector(".vp-t"), tg = el.querySelector(".vp-tg");
+  function icon(){ tg.innerHTML = v.paused ? VPI.playSm : VPI.pause; }
+  v.addEventListener("playing", function(){ el.classList.add("playing"); el.classList.remove("ended", "loading"); icon(); });
+  v.addEventListener("pause", function(){ el.classList.remove("playing"); icon(); });
+  v.addEventListener("ended", function(){ el.classList.remove("playing"); el.classList.add("ended"); icon(); });
+  v.addEventListener("waiting", function(){ if(!v.paused) el.classList.add("loading"); });
+  v.addEventListener("canplay", function(){ el.classList.remove("loading"); });
+  v.addEventListener("loadedmetadata", function(){ if(isFinite(v.duration)) tt.textContent = "0:00 / " + vpFmt(v.duration); });
+  v.addEventListener("timeupdate", function(){
+    if(el._seek) return;
+    var d = v.duration;
+    if(d && isFinite(d)){ bar.style.width = (v.currentTime / d * 100) + "%"; tt.textContent = vpFmt(v.currentTime) + " / " + vpFmt(d); }
+    else tt.textContent = vpFmt(v.currentTime);
+  });
+  v.addEventListener("error", function(){ el.classList.remove("loading", "playing", "started"); try{ v.removeAttribute("src"); }catch(e){} toast("تعذّر تشغيل الفيديو، حاول مجدداً"); });
+}
+function vpPlay(el){
+  var v = el.querySelector("video"); vpBind(el);
+  document.querySelectorAll(".vplayer.playing").forEach(function(o){ if(o !== el){ var ov = o.querySelector("video"); if(ov) ov.pause(); } });
+  if(v.getAttribute("src") !== el.dataset.src) v.src = el.dataset.src;
+  if(el.classList.contains("ended")){ try{ v.currentTime = 0; }catch(e){} }
+  el.classList.add("started", "loading");
+  v.muted = !!window._hhFeedMuted; vpMuteIcon(el);
+  var p = v.play();
+  if(p && p.catch) p.catch(function(err){
+    if(err && err.name === "NotAllowedError"){
+      v.muted = true; window._hhFeedMuted = true; vpMuteIcon(el);
+      var p2 = v.play(); if(p2 && p2.catch) p2.catch(function(){ el.classList.remove("loading"); });
+    } else el.classList.remove("loading");
+  });
+  vpShow(el);
+}
+function vpHandle(el, kind){
+  var v = el.querySelector("video");
+  if(kind === "play"){ vpPlay(el); return; }
+  vpBind(el);
+  if(kind === "tap" || kind === "toggle"){ if(v.paused) vpPlay(el); else v.pause(); vpShow(el); return; }
+  if(kind === "mute"){ v.muted = !v.muted; window._hhFeedMuted = v.muted; vpMuteIcon(el); vpShow(el); return; }
+  if(kind === "fs"){
+    var f = el.requestFullscreen || el.webkitRequestFullscreen;
+    if(f){ try{ f.call(el); }catch(e){} } else if(v.webkitEnterFullscreen){ try{ v.webkitEnterFullscreen(); }catch(e){} }
+  }
+}
+function vpSeek(el, e){
+  var bar = el.querySelector(".vp-bar"), r = bar.getBoundingClientRect(), v = el.querySelector("video");
+  var f = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+  if(v.duration && isFinite(v.duration)){ v.currentTime = f * v.duration; el.querySelector(".vp-bar i").style.width = (f * 100) + "%"; }
+}
+(function initFeedPlayers(){
+  document.addEventListener("click", function(e){
+    var el = e.target.closest && e.target.closest(".vplayer"); if(!el) return;
+    e.stopPropagation(); e.preventDefault();
+    var act = e.target.closest("[data-vp]");
+    var kind = act ? act.dataset.vp : (el.classList.contains("started") ? "tap" : "play");
+    if(kind === "seek") return;
+    vpHandle(el, kind);
+  }, true);
+  var sk = null;
+  document.addEventListener("pointerdown", function(e){
+    var b = e.target.closest && e.target.closest(".vplayer .vp-bar"); if(!b) return;
+    sk = b.closest(".vplayer"); sk._seek = true; vpBind(sk);
+    try{ b.setPointerCapture(e.pointerId); }catch(x){}
+    vpSeek(sk, e); vpShow(sk); e.preventDefault(); e.stopPropagation();
+  }, true);
+  document.addEventListener("pointermove", function(e){ if(sk) vpSeek(sk, e); }, true);
+  ["pointerup", "pointercancel"].forEach(function(n){ document.addEventListener(n, function(){ if(sk){ sk._seek = false; sk = null; } }, true); });
+})();
+
+/* ============ تعديل الصفحات والمجموعات ============ */
+window._pgf = {p: null, c: null, g: null};
+function pgCover(p){
+  if(p.cover) return '<div class="pg-cover"><img src="' + esc(p.cover) + '" alt="" loading="lazy"></div>';
+  return '<div class="pg-cover pg-cover-empty"></div>';
+}
+function pageEditCard(p){
+  var cats = ["عامة", "أعمال", "إخبارية", "ترفيهية", "تعليمية", "رياضية", "تقنية"];
+  var opts = cats.map(function(c){ return '<option value="' + c + '"' + ((p.cat || "عامة") === c ? " selected" : "") + '>' + c + '</option>'; }).join("");
+  return '<div class="card"><h3>⚙️ تعديل الصفحة</h3>' +
+    '<input type="text" id="pge-n" value="' + esc(p.name) + '" maxlength="50" placeholder="اسم الصفحة">' +
+    '<textarea id="pge-a" maxlength="300" placeholder="وصف الصفحة">' + esc(p.about || "") + '</textarea>' +
+    '<select id="pge-c">' + opts + '</select>' +
+    '<div class="tools"><label>' + (window._pgf.p ? "✓ " + esc(window._pgf.p.name) : "تغيير الشعار") + '<input type="file" id="pge-p" accept="image/*" hidden></label>' +
+    '<label>' + (window._pgf.c ? "✓ " + esc(window._pgf.c.name) : "تغيير الغلاف") + '<input type="file" id="pge-cv" accept="image/*" hidden></label>' +
+    '<button class="btn" data-a="savepage" data-i="' + p.id + '" style="margin-inline-start:auto">حفظ</button></div></div>';
+}
+function groupEditCard(g){
+  return '<div class="card"><h3>⚙️ تعديل المجموعة</h3>' +
+    '<input type="text" id="gre-n" value="' + esc(g.name) + '" maxlength="50" placeholder="اسم المجموعة">' +
+    '<textarea id="gre-a" maxlength="300" placeholder="وصف المجموعة">' + esc(g.about || "") + '</textarea>' +
+    '<div class="tools"><label>' + (window._pgf.g ? "✓ " + esc(window._pgf.g.name) : "تغيير الصورة") + '<input type="file" id="gre-p" accept="image/*" hidden></label>' +
+    '<button class="btn" data-a="savegroup" data-i="' + g.id + '" style="margin-inline-start:auto">حفظ</button></div></div>';
+}
+document.addEventListener("change", function(e){
+  var id = e.target && e.target.id, f = e.target && e.target.files && e.target.files[0];
+  if(!f || (id !== "pge-p" && id !== "pge-cv" && id !== "gre-p")) return;
+  if(f.type.indexOf("image/") !== 0) return toast("اختر صورة");
+  if(id === "pge-p") window._pgf.p = f; else if(id === "pge-cv") window._pgf.c = f; else window._pgf.g = f;
+  draw();
+});
+
 function bnavBtn(t, svg, label, badgeId){
   return '<button data-t="' + t + '" class="' + (tab === t ? "on" : "") + '"><svg viewBox="0 0 24 24">' + svg + '</svg>' + (badgeId ? '<b id="' + badgeId + '"></b>' : '') + '<span>' + label + '</span></button>';
 }
@@ -1199,61 +1544,19 @@ function goTab(t){
 var tm;
 
 function bindFeedVideos(){
-  var wraps = document.querySelectorAll(".video-wrap video.media.vid");
-  wraps.forEach(function(v){
-    if(v._hhBound) return;
-    v._hhBound = true;
-    var wrap = v.closest(".video-wrap");
-    var loadTimer = null;
-    function showLoader(){
-      if(loadTimer) return;
-      loadTimer = setTimeout(function(){ if(wrap) wrap.classList.add("is-loading"); }, 350);
-    }
-    function hideLoader(){
-      if(loadTimer){ clearTimeout(loadTimer); loadTimer = null; }
-      if(wrap) wrap.classList.remove("is-loading");
-    }
-    v.addEventListener("loadstart", showLoader);
-    v.addEventListener("waiting", showLoader);
-    v.addEventListener("loadeddata", hideLoader);
-    v.addEventListener("canplay", hideLoader);
-    v.addEventListener("playing", hideLoader);
-    v.addEventListener("error", function(){
-      hideLoader();
-      if(wrap && !wrap.querySelector(".vid-err")){
-        var e = document.createElement("div");
-        e.className = "vid-err";
-        e.style.cssText = "position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;background:rgba(0,0,0,.55);padding:16px;text-align:center;font-size:.9rem";
-        e.textContent = "تعذّر تشغيل الفيديو";
-        wrap.appendChild(e);
-      }
-    });
-    // لا تشغّل تلقائياً إذا أوقف المستخدم التشغيل التلقائي
-    v.addEventListener("click", function(){ hideLoader(); });
-  });
-  if(!window._feedVidObs && "IntersectionObserver" in window){
-    window._feedVidObs = new IntersectionObserver(function(entries){
-      entries.forEach(function(en){
-        var v = en.target;
-        if(en.isIntersecting && en.intersectionRatio > 0.6){
-          if(getPref("autoplay") !== "off"){
-            // حمّل ثم شغّل صامتاً
-            if(v.preload !== "auto"){ v.preload = "auto"; }
-            v.muted = true;
-            var p = v.play();
-            if(p && p.catch) p.catch(function(){});
-          }
-        } else {
-          if(!v.paused) v.pause();
-        }
+  if(!("IntersectionObserver" in window)) return;
+  if(!window._vpIO){
+    window._vpIO = new IntersectionObserver(function(es){
+      es.forEach(function(en){
+        if(en.isIntersecting) return;
+        var el = en.target, v = el.querySelector("video");
+        if(el.classList.contains("playing") && v && !document.fullscreenElement && !document.webkitFullscreenElement) v.pause();
       });
-    }, { threshold: [0, 0.6, 1] });
+    }, {threshold: 0.15});
   }
-  if(window._feedVidObs){
-    wraps.forEach(function(v){ window._feedVidObs.observe(v); });
-  }
+  window._vpIO.disconnect();
+  document.querySelectorAll(".vplayer").forEach(function(el){ window._vpIO.observe(el); });
 }
-
 
 function draw(){ clearTimeout(tm); tm = setTimeout(function(){ render(); try{ bindFeedVideos(); }catch(e){} }, 110); }
 
@@ -1262,7 +1565,21 @@ function render(){
   if(!m || !me) return;
   var tx = $("#tx") ? $("#tx").value : "";
   var mv = $("#mi") ? $("#mi").value : "";
+  var keep = m.querySelector(".vplayer.playing"), keepPid = keep && keep.dataset.pid, keepWas = !!keep;
+  var keepVals = {}, aeKey = null, ae = document.activeElement;
+  function kOf(el){ return el.id ? "#" + el.id : (el.dataset && el.dataset.ci ? "ci:" + el.dataset.ci : null); }
+  m.querySelectorAll('[id^="pge-"],[id^="gre-"],input[data-ci]').forEach(function(el){ var k = kOf(el); if(k && el.type !== "file") keepVals[k] = el.value; });
+  if(ae && m.contains(ae)) aeKey = kOf(ae);
   m.innerHTML = fixMedia(view()).replace(/<img (?![^>]*loading=)/g, '<img loading="lazy" decoding="async" ');
+  Object.keys(keepVals).forEach(function(k){
+    var el = k.indexOf("ci:") === 0 ? m.querySelector('input[data-ci="' + k.slice(3) + '"]') : m.querySelector(k);
+    if(el && keepVals[k] !== "" ) el.value = keepVals[k];
+    if(el && k === aeKey){ try{ el.focus(); el.setSelectionRange(el.value.length, el.value.length); }catch(e){} }
+  });
+  if(keepWas && keepPid){
+    var ph = m.querySelector('.vplayer[data-pid="' + keepPid + '"]');
+    if(ph){ ph.replaceWith(keep); var kv = keep.querySelector("video"); if(kv && kv.paused){ var kp = kv.play(); if(kp && kp.catch) kp.catch(function(){}); } }
+  }
   if($("#mi")) $("#mi").value = mv;
   if($("#tx")) $("#tx").value = tx;
   if(tab === "notif"){ seenN = Date.now(); sv("hn_n", seenN); }
@@ -1326,9 +1643,13 @@ function postHtml(p){
   if(p.privacy === "friends") h += ' · <span class="chip">الأصدقاء</span>';
   h += '</div></div>';
   h += '<button class="mini" data-a="postmenu" title="خيارات المنشور" aria-label="خيارات المنشور">⋯</button>';
-  h += '</div><div class="body">' + renderText(p.t) + '</div>' + yt(p.t);
+  var longT = (p.t || "").length > 130 || ((p.t || "").match(/\n/g) || []).length >= 2;
+  var expP = tab === "post" || (window._expPost && window._expPost[p.id]);
+  h += '</div><div class="body' + (longT && !expP ? " clamp" : "") + '">' + renderText(p.t) + '</div>';
+  if(longT && !expP) h += '<button type="button" class="more-btn" data-a="moretext">المزيد…</button>';
+  h += yt(p.t);
   if(p.media && /^https?:\/\//i.test(p.media)){
-    if(p.type === "video") h += '<div class="video-wrap"><video class="media vid" controls playsinline webkit-playsinline preload="metadata" muted src="' + esc(p.media) + '"></video><button type="button" class="feed-sound" data-a="feedsound" aria-label="تشغيل الصوت">🔇 تشغيل الصوت</button><div class="video-loader"><span class="spinner"></span><span>جارٍ التحميل…</span></div></div>';
+    if(p.type === "video") h += vpHtml(p);
     else h += '<img class="media" src="' + esc(p.media) + '" alt="" loading="lazy"' + (getPref("dataSaver") === "on" ? ' style="filter:contrast(.95)"' : "") + '>';
   }
   // reaction summary
@@ -1372,10 +1693,12 @@ function postHtml(p){
     s += '</div></div>';
     return s;
   }
-  top.forEach(function(c){
+  var expC = tab === "post" || (window._expCm && window._expCm[p.id]);
+  (expC ? top : top.slice(-1)).forEach(function(c){
     h += cmBlock(c, false);
-    replies.filter(function(r){ return r.parentId === c.id; }).forEach(function(r){ h += cmBlock(r, true); });
+    if(expC) replies.filter(function(r){ return r.parentId === c.id; }).forEach(function(r){ h += cmBlock(r, true); });
   });
+  if(tab !== "post" && (top.length > 1 || (!expC && replies.length))) h += '<button type="button" class="more-btn" data-a="allcm">' + (expC ? "إخفاء التعليقات" : "عرض كل التعليقات (" + cs.length + ")") + '</button>';
   h += '<div class="row"><input type="text" placeholder="اكتب تعليقا…" data-ci="' + p.id + '" maxlength="2000"><button class="btn alt" data-a="send" style="margin-top:8px">إرسال</button></div>';
   h += '</article>';
   return h;
@@ -1437,6 +1760,13 @@ function homeView(){
     fl = posts;
   }
   fl = fl.filter(function(p){ return p.privacy !== "friends" || p.uid === me.uid || isFriend(p.uid); });
+  var rlist = reels.filter(function(r){
+    if(blocks.has(r.uid) || !(r.videoUrl || r.media || r.url)) return false;
+    if(feedMode === "friends") return r.uid === me.uid || isFriend(r.uid);
+    if(feedMode === "following") return r.uid === me.uid || following(me.uid, r.uid);
+    return true;
+  }).map(function(r){ return Object.assign({_reel: true}, r); });
+  fl = fl.concat(rlist).sort(function(a, b){ return (b.ts || 0) - (a.ts || 0); });
 
   var mySeen = {}, byUid = {}, order = [];
   storyViews.forEach(function(v){ if(v.uid === me.uid) mySeen[v.storyId] = 1; });
@@ -1454,17 +1784,9 @@ function homeView(){
     sh += '<button type="button" class="story-bubble" data-a="openstory" data-u="' + esc(g.uid) + '"><div class="story-ring' + (g.unseen ? "" : " seen") + '"><img src="' + (esc(g.photo) || DEF) + '" alt=""></div><span>' + (g.uid === me.uid ? t("قصتك","Your story") : esc(g.name || "")) + '</span></button>';
   });
   sh += '</div>';
-  var rs = sortedReels();
+  var rs = shelfReels();
   if(rs.length){
-    sh += '<div class="shelf-head"><h3>🎬 ' + t("ريلز","Reels") + '</h3><button class="mini" data-t="reels">' + t("عرض الكل","See all") + ' ←</button></div><div class="reel-shelf">';
-    rs.slice(0, 8).forEach(function(r){
-      var src = r.videoUrl || r.media || r.url || "";
-      sh += '<button type="button" class="reel-tile" data-a="openreel" data-i="' + r.id + '" aria-label="' + esc(r.name || "") + '">' +
-        '<video src="' + esc(src) + '#t=0.1" muted playsinline preload="metadata"></video>' +
-        '<div class="rt-play"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M8 5v14l11-7z" fill="#fff"/></svg></div>' +
-        '<div class="rt-meta"><div class="rt-name">' + esc(r.name || t("عضو","Member")) + '</div><div class="rt-views">▶ ' + fmtN(r.views) + '</div></div></button>';
-    });
-    sh += '</div>';
+    sh += '<div class="shelf-head"><h3>🎬 ' + t("ريلز","Reels") + '</h3><button class="mini" data-t="reels">' + t("عرض الكل","See all") + ' ←</button></div><div class="reel-shelf">' + rs.slice(0, 8).map(reelTileHtml).join("") + '</div>';
   }
 
   var mps = myPages();
@@ -1500,7 +1822,7 @@ function homeView(){
 
   var list = "", n = 0;
   for(var i = 0; i < fl.length; i++){
-    list += postHtml(fl[i]);
+    list += fl[i]._reel ? reelCardHtml(fl[i]) : postHtml(fl[i]);
     if((i + 1) % 5 === 0 && act.length) list += adHtml(act[n++ % act.length]);
   }
   if(!list) list = '<div class="empty">لا منشورات هنا بعد.</div>';
@@ -1555,6 +1877,7 @@ function meView(){
     '<button class="btn alt" data-a="teststorage" style="flex:1">🔧 فحص الاتصال بالتخزين</button></div>' +
     '<div class="note" style="margin-top:6px">لوحة فحص خاصة بالإدارة فقط</div><div class="note">معرّف الإدارة: <code style="user-select:all;word-break:break-all">' + me.uid + '</code></div></div>';
 
+  h += reelsSection(me.uid);
   var mine = posts.filter(function(p){ return p.uid === me.uid; });
   mine.forEach(function(p){ h += postHtml(p); });
   if(!mine.length) h += '<div class="empty">لم تنشر شيئاً بعد.</div>';
@@ -1648,6 +1971,7 @@ function profileView(){
   }
   h += '</div></div>';
 
+  h += reelsSection(u);
   var up = posts.filter(function(p){ return p.uid === u; });
   up.forEach(function(p){ h += postHtml(p); });
   if(!up.length) h += '<div class="empty">لا منشورات.</div>';
@@ -1822,7 +2146,7 @@ function reelsView(){
   list.forEach(function(r){
     var src = r.videoUrl || r.media || r.url || "";
     h += '<button type="button" class="reel-cell" data-a="openreel" data-i="' + r.id + '" aria-label="' + esc(r.name || "") + '">' +
-      '<video src="' + esc(src) + '#t=0.1" preload="metadata" muted playsinline></video>' +
+      reelCoverHtml(r) +
       '<span class="reel-meta"><span class="rc-name">' + esc(r.name || "") + ' ' + pBadge(r.uid) + '</span><span class="rc-stats">▶ ' + fmtN(r.views) + ' · ❤ ' + fmtN(r.likes) + '</span></span></button>';
   });
   return h + '</div>';
@@ -1830,9 +2154,9 @@ function reelsView(){
 
 function paintReelLike(rid){
   var on = !!window._reelLiked[rid], r = reels.filter(function(x){ return x.id === rid; })[0];
-  document.querySelectorAll('#reelplayer [data-reel-item="' + rid + '"] [data-a="reellike"]').forEach(function(b){
+  document.querySelectorAll('[data-reel-item="' + rid + '"] [data-a="reellike"], [data-reel-card="' + rid + '"] [data-a="reellike"]').forEach(function(b){
     b.classList.toggle("on", on);
-    var n = b.querySelector(".rsa-n"); if(n && r) n.textContent = fmtN(r.likes);
+    var n = b.querySelector(".rsa-n,.act-n"); if(n && r) n.textContent = (r.likes ? fmtN(r.likes) : (b.closest(".reel-card") ? "" : "0"));
   });
 }
 async function toggleReelLike(rid, onlyLike){
@@ -1868,6 +2192,7 @@ function closeReelPlayer(fromPop){
 
 function openReelPlayer(id){
   closeReelPlayer(true);
+  document.querySelectorAll(".vplayer.playing video").forEach(function(v){ try{ v.pause(); }catch(e){} });
   var list = sortedReels();
   if(!list.length){ toast(t("لا ريلز","No reels")); return; }
   if(!window._reelLiked) window._reelLiked = {};
@@ -1885,12 +2210,13 @@ function openReelPlayer(id){
     var liked = !!window._reelLiked[x.id];
     var uidA = esc(x.uid || "");
     h += '<section class="reel-item paused" data-reel-item="' + x.id + '" data-reel-idx="' + idx + '" data-src="' + esc(x.videoUrl || x.media || x.url || "") + '">' +
-      '<video playsinline webkit-playsinline loop preload="none"></video>' +
+      '<video playsinline webkit-playsinline loop preload="none"' + (x.poster ? ' poster="' + esc(x.poster) + '"' : '') + '></video>' +
       '<div class="reel-shade"></div>' +
       '<div class="reel-flash">' + RIC.play + '</div><div class="reel-heart">❤️</div>' +
       '<div class="reel-loader"><span class="spinner"></span></div>' +
       '<div class="reel-info"><div class="ri-user"><button type="button" class="ri-av" data-a="prof" data-u="' + uidA + '"><img src="' + (esc(x.photo) || DEF) + '" alt=""></button>' +
-        '<button type="button" class="ri-name" data-a="prof" data-u="' + uidA + '">' + esc(x.name || "") + (verified ? " " + VB : "") + " " + pBadge(x.uid) + '</button></div>' +
+        '<button type="button" class="ri-name" data-a="prof" data-u="' + uidA + '">' + esc(x.name || "") + (verified ? " " + VB : "") + " " + pBadge(x.uid) + '</button>' +
+        ((x.uid === me.uid || isAdmin) ? '<button type="button" class="ri-menu" data-a="reelmenu" data-i="' + x.id + '" aria-label="خيارات">⋯</button>' : '') + '</div>' +
         (x.caption ? '<div class="ri-cap">' + esc(x.caption) + '</div>' : '') +
         '<div class="ri-views">▶ ' + fmtN(x.views) + ' ' + t("مشاهدة","views") + '</div></div>' +
       '<div class="reel-side-actions">' +
@@ -1919,16 +2245,37 @@ function openReelPlayer(id){
     var b = viewer.querySelector('[data-a="reelsound"]');
     if(b){ b.innerHTML = window._hhReelMuted ? RIC.volOff : RIC.volOn; b.setAttribute("aria-label", window._hhReelMuted ? t("تشغيل الصوت","Unmute") : t("كتم الصوت","Mute")); }
   }
+  function lowData(){ return getPref("dataSaver") === "on"; }
+  function setSrc(it, url){ var v = vid(it); if(v.getAttribute("src") !== url) v.src = url; }
+  function prepare(it, full){
+    var u = it.dataset.src, v = vid(it);
+    if(!u) return Promise.resolve();
+    return mediaCachedUrl(u, false).then(function(b){
+      if(b){ setSrc(it, b); return; }
+      if(!v.getAttribute("src")){ v.preload = full ? "auto" : "metadata"; v.src = u; }
+      if(full && !lowData()){
+        mediaCachedUrl(u, true).then(function(b2){ if(b2 && items[cur] !== it && v.getAttribute("src") === u) setSrc(it, b2); });
+      }
+    });
+  }
   function ensureWindow(i){
     items.forEach(function(it, k){
-      var v = vid(it), d = Math.abs(k - i);
-      if(d <= 1 || k === i + 2){
-        if(!v.getAttribute("src") && it.dataset.src){ v.preload = (d <= 1 && k >= i) ? "auto" : "metadata"; v.src = it.dataset.src; }
-      } else if(d > 3 && v.getAttribute("src")){
+      var v = vid(it);
+      if(Math.abs(k - i) > 3 && v.getAttribute("src")){
         try{ v.pause(); v.removeAttribute("src"); v.load(); }catch(e){}
         setLoading(it, false);
       }
     });
+    if(items[i + 1]) prepare(items[i + 1], false);
+    if(items[i - 1]) prepare(items[i - 1], false);
+  }
+  function warm(it){ // بعد أن يبدأ المقطع الحالي: نخزّنه والتالي في الذاكرة المؤقتة ليعمل بلا تقطيع عند الإعادة
+    if(lowData()) return;
+    setTimeout(function(){
+      if(items[cur] !== it) return;
+      mediaCachedUrl(it.dataset.src, true);
+      if(items[cur + 1]) prepare(items[cur + 1], true);
+    }, 1500);
   }
   function playItem(it){
     var v = vid(it); if(!v) return;
@@ -1963,11 +2310,14 @@ function openReelPlayer(id){
     if(i === cur || !items[i]) return;
     cur = i;
     items.forEach(function(it, k){ it.classList.toggle("cur", k === i); if(k !== i){ try{ vid(it).pause(); }catch(e){} } });
-    ensureWindow(i);
     var it = items[i];
     try{ vid(it).currentTime = 0; }catch(e){}
-    playItem(it);
-    countView(it.dataset.reelItem);
+    Promise.race([prepare(it, false), new Promise(function(r){ setTimeout(r, 150); })]).then(function(){
+      if(cur !== i) return;
+      ensureWindow(i);
+      playItem(it);
+      countView(it.dataset.reelItem);
+    });
   }
   function heart(it, e){
     var r = it.getBoundingClientRect(), el = it.querySelector(".reel-heart");
@@ -1986,10 +2336,11 @@ function openReelPlayer(id){
     v.addEventListener("playing", function(){ it.classList.remove("paused"); setLoading(it, false); });
     v.addEventListener("pause", function(){ if(items[cur] === it && !v.ended && !document.hidden) it.classList.add("paused"); });
     v.addEventListener("waiting", function(){ if(!v.paused) setLoading(it, true); });
-    v.addEventListener("canplay", function(){ setLoading(it, false); });
+    v.addEventListener("canplay", function(){ setLoading(it, false); if(items[cur] === it) warm(it); });
     v.addEventListener("timeupdate", function(){ if(!seeking && v.duration) bar.style.width = (v.currentTime / v.duration * 100) + "%"; });
     v.addEventListener("error", function(){
       if(!v.getAttribute("src")) return;
+      if(/^blob:/.test(v.getAttribute("src")) && it.dataset.src){ v.src = it.dataset.src; v.load(); if(items[cur] === it) playItem(it); return; }
       setLoading(it, false);
       loader.innerHTML = '<span>' + t("تعذّر تحميل المقطع","Couldn't load") + '</span><button type="button" class="reel-retry" data-a="reelretry">' + t("إعادة المحاولة","Retry") + '</button>';
       loader.style.display = "flex"; loader.style.pointerEvents = "auto";
@@ -2040,7 +2391,8 @@ function openReelPlayer(id){
         paintMute();
       }
       else if(a === "reellike"){ toggleReelLike(b.dataset.i, false); }
-      else if(a === "reelshare"){ share("#reel=" + b.dataset.i); }
+      else if(a === "reelshare"){ shareContent("reel", b.dataset.i, false); }
+      else if(a === "reelmenu"){ reelMenu(b.dataset.i); }
       else if(a === "reelcomment"){ openComments(b.dataset.i); }
       else if(a === "reelcclose"){ var sh0 = document.getElementById("reelsheet"); if(sh0) sh0.remove(); }
       else if(a === "reelcsend"){ sendComment(); }
@@ -2148,7 +2500,7 @@ function pageView(){
   var followersN = pageFollows.filter(function(f){ return f.pid === p.id; }).length;
   var isOwner = p.owner === me.uid;
   var h = '<button class="btn alt" data-t="pages" style="margin-bottom:10px">رجوع للصفحات</button>';
-  h += '<div class="pcard"><div class="row">' +
+  h += pgCover(p) + '<div class="pcard"><div class="row">' +
     '<img class="pg-av" src="' + (esc(p.photo) || DEF) + '" alt="">' +
     '<div style="flex:1"><div class="name" style="font-size:1.15rem">' + esc(p.name) + '</div>' +
     '<div class="chip">' + esc(p.cat || "عامة") + '</div>' +
@@ -2161,6 +2513,7 @@ function pageView(){
     h += '<button class="btn ' + (pageFollowed(p.id) ? "gray" : "") + '" data-a="followpage" data-i="' + p.id + '" style="flex:1">' + (pageFollowed(p.id) ? "✓ متابَعة" : "متابعة الصفحة") + '</button>';
   }
   h += '</div></div>';
+  if(isOwner || isAdmin) h += pageEditCard(p);
   if(isOwner){
     h += '<div class="card"><div class="row" style="align-items:flex-start">' +
       '<img class="av" src="' + (esc(p.photo) || DEF) + '" alt="">' +
@@ -2214,6 +2567,7 @@ function groupView(){
       ? '<button class="btn gray" data-a="leavegroup" data-i="' + g.id + '" style="flex:1">✓ عضو — مغادرة</button>'
       : '<button class="btn" data-a="joingroup" data-i="' + g.id + '" style="flex:1">انضمام للمجموعة</button>') +
     '</div></div>';
+  if(g.owner === me.uid || isAdmin) h += groupEditCard(g);
   if(joined){
     h += '<div class="card"><div class="row" style="align-items:flex-start">' +
       '<img class="av" src="' + (esc(prof.photo) || DEF) + '" alt="">' +
@@ -2796,6 +3150,14 @@ document.addEventListener("click", async function(e){
     }
     return;
   }
+  var rb = e.target.closest("button[data-a]");
+  if(rb && !e.target.closest("#reelplayer")){
+    var ra = rb.dataset.a;
+    if(ra === "reellike"){ toggleReelLike(rb.dataset.i, false); return; }
+    if(ra === "reelcomment"){ openReelPlayer(rb.dataset.i); return; }
+    if(ra === "reelshare"){ shareContent("reel", rb.dataset.i, false); return; }
+    if(ra === "reelmenu"){ reelMenu(rb.dataset.i); return; }
+  }
   var tb = e.target.closest("button[data-t]");
   if(tb && tb.closest("#app")){ closeMenu(); goTab(tb.dataset.t); return; }
 
@@ -2891,8 +3253,14 @@ async function actions(b, er){
     try{
       if(draft.file){
         var isVid = draft.file.type.indexOf("video/") === 0;
-        d.media = await upUpload(draft.file, isVid ? "videos" : "posts");
-        d.type = isVid ? "video" : "image";
+        if(isVid){
+          var uv = await uploadVideoWithPoster(draft.file, "videos");
+          d.media = uv.url; d.type = "video";
+          if(uv.poster) d.poster = uv.poster;
+          if(uv.w && uv.h){ d.vw = uv.w; d.vh = uv.h; }
+        } else {
+          d.media = await upUpload(draft.file, "posts"); d.type = "image";
+        }
       }
       await addDoc(collection(db, "posts"), d);
       draft = {file: null, text: ""};
@@ -3151,9 +3519,9 @@ async function actions(b, er){
     var qshare=null; for(i=0;i<posts.length;i++) if(posts[i].id===pid){qshare=posts[i];break;}
     openSheet("مشاركة المنشور", [
       {label:"📤 مشاركة إلى القصة", action: async function(){ if(!qshare) return; await addDoc(collection(db,"stories"),{uid:me.uid,name:prof.name,photo:prof.photo||"",media:qshare.media||"",caption:(qshare.t||"").slice(0,180),sharedPost:pid,ts:Date.now(),exp:Date.now()+86400000}); toast("نُشر في قصتك"); }},
-      {label:"📰 مشاركة في الموجز", action: async function(){ if(!qshare) return; await addDoc(collection(db,"posts"),{uid:me.uid,name:prof.name,photo:prof.photo||"",t:"مشاركة: "+(qshare.t||"").slice(0,400),media:qshare.media||"",type:qshare.type||"text",sharedFrom:pid,privacy:"public",ts:Date.now()}); toast("نُشر في موجزك"); }},
-      {label:"🔗 نسخ الرابط", action: async function(){ var pu=location.origin+location.pathname+"#p="+pid; try{await navigator.clipboard.writeText(pu);}catch(e){prompt("انسخ",pu);} toast("تم نسخ الرابط"); }},
-      {label:"🌐 مشاركة عبر التطبيقات", action: function(){ share("#p=" + pid); }}
+      {label:"📰 مشاركة في الموجز", action: async function(){ if(!qshare) return; await addDoc(collection(db,"posts"),{uid:me.uid,name:prof.name,photo:prof.photo||"",t:"مشاركة: "+(qshare.t||"").slice(0,400),media:qshare.media||"",type:qshare.type||"text",poster:qshare.poster||"",vw:qshare.vw||0,vh:qshare.vh||0,sharedFrom:pid,privacy:"public",ts:Date.now()}); toast("نُشر في موجزك"); }},
+      {label:"🔗 نسخ الرابط", action: function(){ shareContent("post", pid, true); }},
+      {label:"🌐 مشاركة عبر التطبيقات", action: function(){ shareContent("post", pid, false); }}
     ]);
     return;
   }
@@ -3166,7 +3534,7 @@ async function actions(b, er){
       isOwn ? {label:"✏️ تعديل النص", action: async function(){ var txt=prompt("تعديل النص",qmenu.t||""); if(txt!==null) await updateDoc(doc(db,"posts",pid),{t:txt.trim(),editedAt:Date.now()}); }} : null,
       {label:"🔖 حفظ المنشور", action: async function(){ var sr=doc(db,"savedPosts",me.uid+"_"+pid),ss=await getDoc(sr); if(ss.exists()){await deleteDoc(sr);toast("أزيل من المحفوظات");}else{await setDoc(sr,{uid:me.uid,pid:pid,ts:Date.now()});toast("تم الحفظ");} }},
       isOwn ? {label:"🔒 تغيير الخصوصية", action: async function(){ var np=qmenu.privacy==="friends"?"public":"friends"; await updateDoc(doc(db,"posts",pid),{privacy:np}); toast(np==="friends"?"للأصدقاء فقط":"عام"); }} : null,
-      {label:"🔗 نسخ الرابط", action: async function(){ var pu=location.origin+location.pathname+"#p="+pid; try{await navigator.clipboard.writeText(pu);}catch(e){prompt("انسخ",pu);} toast("تم نسخ الرابط"); }},
+      {label:"🔗 نسخ الرابط", action: function(){ shareContent("post", pid, true); }},
       {label:"📤 مشاركة إلى القصة", action: async function(){ await addDoc(collection(db,"stories"),{uid:me.uid,name:prof.name,photo:prof.photo||"",media:qmenu.media||"",caption:(qmenu.t||"").slice(0,180),sharedPost:pid,ts:Date.now(),exp:Date.now()+86400000}); toast("نُشر في قصتك"); }},
       {label:"📰 مشاركة في الموجز", action: async function(){ await addDoc(collection(db,"posts"),{uid:me.uid,name:prof.name,photo:prof.photo||"",t:"مشاركة: "+(qmenu.t||"").slice(0,400),media:qmenu.media||"",type:qmenu.type||"text",sharedFrom:pid,privacy:"public",ts:Date.now()}); toast("نُشر في موجزك"); }},
       isOwn ? {label:"📢 ترويج المنشور", action: function(){ openPromoteSheet(pid, qmenu); }} : null,
@@ -3262,10 +3630,12 @@ if(a === "shareu"){ share("#u=" + b.dataset.u); return; }
     return;
   }
   if(a === "cm"){
-    var inp = art.querySelector("input");
-    if(inp) inp.focus();
+    window._expCm = window._expCm || {}; window._expCm[pid] = true; draw();
+    setTimeout(function(){ var i2 = document.querySelector('article[data-id="' + pid + '"] input[data-ci]'); if(i2){ i2.focus(); try{ i2.scrollIntoView({block: "center", behavior: "smooth"}); }catch(e){} } }, 260);
     return;
   }
+  if(a === "allcm"){ window._expCm = window._expCm || {}; window._expCm[pid] = !window._expCm[pid]; draw(); return; }
+  if(a === "moretext"){ window._expPost = window._expPost || {}; window._expPost[pid] = true; draw(); return; }
   if(a === "send"){
     var inp2 = art.querySelector("input");
     if(!inp2) return;
@@ -3509,30 +3879,50 @@ if(a === "adlike"){
       var isLongReel=duration>60;
       if(isLongReel && !confirm("مدة المقطع "+Math.round(duration)+" ثانية، وتتجاوز حد الريلز (60 ثانية). سننشره كفيديو عادي في الموجز بدلاً من رفضه. متابعة؟")) return;
       try{
-        var vurl = await upUpload(vf, isLongReel ? "videos" : "reels");
+        var uvr = await uploadVideoWithPoster(vf, isLongReel ? "videos" : "reels");
+        var vurl = uvr.url;
         var vcap = prompt("وصف المقطع (اختياري)") || "";
-        if(isLongReel){ await addDoc(collection(db,"posts"),{uid:me.uid,name:prof.name,photo:prof.photo||"",t:vcap,media:vurl,type:"video",ts:Date.now(),ver:!!prof.verified}); toast("تم نشر الفيديو في الموجز؛ الريلز مخصصة للمقاطع حتى 60 ثانية.",5000); goTab("home"); }
-        else { await addDoc(collection(db, "reels"), {uid: me.uid, name: prof.name, photo: prof.photo || "", videoUrl: vurl, caption: vcap, likes: 0, ts: Date.now()}); toast("تم نشر الريل بنجاح"); goTab("reels"); }
+        if(isLongReel){ await addDoc(collection(db,"posts"),{uid:me.uid,name:prof.name,photo:prof.photo||"",t:vcap,media:vurl,type:"video",poster:uvr.poster||"",vw:uvr.w||0,vh:uvr.h||0,ts:Date.now(),ver:!!prof.verified}); toast("تم نشر الفيديو في الموجز؛ الريلز مخصصة للمقاطع حتى 60 ثانية.",5000); goTab("home"); }
+        else { await addDoc(collection(db, "reels"), {uid: me.uid, name: prof.name, photo: prof.photo || "", videoUrl: vurl, poster: uvr.poster || "", caption: vcap, likes: 0, views: 0, comments: 0, ts: Date.now()}); toast("تم نشر الريل بنجاح"); goTab("reels"); }
       }catch(x){ toast("تعذّر النشر: " + x.message,6000); }
     };
     inp4.click();
     return;
   }
-  if(a === "openreel"){ openReelPlayer(b.dataset.i); return; }
-  if(a === "prof" && document.getElementById("reelplayer")){ closeReelPlayer(false); }
-  if(a === "feedsound"){
-    var fw = b.closest(".video-wrap");
-    var fv = fw && fw.querySelector("video");
-    if(!fv) return;
-    fv.muted = !fv.muted;
-    if(!fv.muted){
-      var fp = fv.play();
-      if(fp && fp.catch) fp.catch(function(){});
-    }
-    b.textContent = fv.muted ? "🔇 تشغيل الصوت" : "🔊 كتم الصوت";
-    b.setAttribute("aria-label", fv.muted ? "تشغيل الصوت" : "كتم الصوت");
+  if(a === "savepage"){
+    var pg2 = null; for(i = 0; i < pages.length; i++) if(pages[i].id === b.dataset.i){ pg2 = pages[i]; break; }
+    if(!pg2 || (pg2.owner !== me.uid && !isAdmin)) return;
+    var nm = ($("#pge-n").value || "").trim();
+    if(!nm) return toast("اكتب اسم الصفحة");
+    b.disabled = true;
+    try{
+      var upd = {name: nm.slice(0, 50), about: ($("#pge-a").value || "").trim().slice(0, 300), cat: $("#pge-c").value};
+      if(window._pgf.p) upd.photo = await upUpload(window._pgf.p, "pages");
+      if(window._pgf.c) upd.cover = await upUpload(window._pgf.c, "pages");
+      await updateDoc(doc(db, "pages", pg2.id), upd);
+      Object.assign(pg2, upd); activePage = pg2;
+      window._pgf.p = null; window._pgf.c = null;
+      toast("تم حفظ الصفحة ✅"); draw();
+    }catch(x){ toast("تعذّر الحفظ: " + (x.message || x), 5000); b.disabled = false; }
     return;
   }
+  if(a === "savegroup"){
+    var gr2 = null; for(i = 0; i < groups.length; i++) if(groups[i].id === b.dataset.i){ gr2 = groups[i]; break; }
+    if(!gr2 || (gr2.owner !== me.uid && !isAdmin)) return;
+    var gn = ($("#gre-n").value || "").trim();
+    if(!gn) return toast("اكتب اسم المجموعة");
+    b.disabled = true;
+    try{
+      var gu = {name: gn.slice(0, 50), about: ($("#gre-a").value || "").trim().slice(0, 300)};
+      if(window._pgf.g) gu.photo = await upUpload(window._pgf.g, "groups");
+      await updateDoc(doc(db, "groups", gr2.id), gu);
+      Object.assign(gr2, gu); activeGroup = gr2; window._pgf.g = null;
+      toast("تم حفظ المجموعة ✅"); draw();
+    }catch(x){ toast("تعذّر الحفظ: " + (x.message || x), 5000); b.disabled = false; }
+    return;
+  }
+  if(a === "openreel"){ openReelPlayer(b.dataset.i); return; }
+  if(a === "prof" && document.getElementById("reelplayer")){ closeReelPlayer(false); }
   if(a === "stab"){
     window._stab = b.dataset.v;
     $$(".search-tabs button").forEach(function(x){ x.classList.toggle("on", x.dataset.v === b.dataset.v); });
