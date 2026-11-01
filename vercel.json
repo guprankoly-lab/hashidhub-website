@@ -2,11 +2,19 @@
   "rewrites": [
     {
       "source": "/media/:path*",
-      "destination": "https://hashid-media.YOUR-SUBDOMAIN.workers.dev/:path*"
+      "destination": "https://hashid-media.guprankoly.workers.dev/:path*"
     },
     {
       "source": "/s/:id",
       "destination": "/api/share?id=:id"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/media/:path*",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, max-age=0" }
+      ]
     }
   ]
 }
