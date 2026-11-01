@@ -1,4 +1,4 @@
-var CACHE = "hashidhub-v16";
+var CACHE = "hashidhub-v17";
 var ASSETS = ["./index.html", "./manifest.json", "./icon.svg", "./firebase-config.js"];
 
 self.addEventListener("install", function(e){
@@ -32,23 +32,29 @@ self.addEventListener("fetch", function(e){
 
 self.addEventListener("push", function(event){
   var data = {};
-  try{ data = event.data ? event.data.json() : {}; }catch(e){ data = { body: event.data && event.data.text() }; }
-  var title = (data.notification && data.notification.title) || data.title || "HashidHub";
-  var body = (data.notification && data.notification.body) || data.body || "لديك إشعار جديد";
-  var options = {
-    body: body,
-    icon: "icon.svg",
-    badge: "icon.svg",
-    data: data.data || data,
-    dir: "rtl",
-    lang: "ar"
+  try{ data = event.data ? event.data.json() : {}; }catch(e){ data = { title: event.data ? event.data.text() : "" }; }
+  var d = data.data || {}, n = data.notification || {};
+  var title = d.title || n.title || data.title || "HashidHub";
+  var body = d.body || n.body || data.body || "لديك إشعار جديد";
+  var isCall = d.type === "call";
+  var opts = {
+    body: body, icon: "icon.svg", badge: "icon.svg",
+    tag: d.tag || d.type || "hh", renotify: true, dir: "rtl", lang: "ar",
+    data: { url: d.url || "./", type: d.type || "" },
+    requireInteraction: isCall,
+    vibrate: isCall ? [400, 200, 400, 200, 400, 200, 400] : [120]
   };
-  event.waitUntil(self.registration.showNotification(title, options));
+  // إن كانت المنصة مفتوحة ومرئية فهي تتولى التنبيه بنفسها
+  event.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(function(list){
+    for(var i = 0; i < list.length; i++){ if(list[i].visibilityState === "visible") return; }
+    return self.registration.showNotification(title, opts);
+  }));
 });
 self.addEventListener("notificationclick", function(event){
   event.notification.close();
+  var url = (event.notification.data && event.notification.data.url) || "./";
   event.waitUntil(clients.matchAll({ type: "window", includeUncontrolled: true }).then(function(list){
-    for(var i=0;i<list.length;i++){ if(list[i].focus) return list[i].focus(); }
-    if(clients.openWindow) return clients.openWindow("./");
+    for(var i = 0; i < list.length; i++){ if(list[i].focus) return list[i].focus(); }
+    if(clients.openWindow) return clients.openWindow(url);
   }));
 });

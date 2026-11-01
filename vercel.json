@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/media/:path*",
-      "destination": "https://hashid-media.guprankoly.workers.dev/:path*"
+      "destination": "https://hashid-media.YOUR-SUBDOMAIN.workers.dev/:path*"
     },
     {
       "source": "/s/:id",
