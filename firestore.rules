@@ -27,10 +27,10 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if signedIn();
       allow create: if isOwner(userId)
-        && !request.resource.data.keys().hasAny(['admin', 'isAdmin', 'role']);
+        && !request.resource.data.keys().hasAny(['admin', 'isAdmin', 'role', 'verified']);
       allow update: if (isOwner(userId) || isAdmin())
         && (!request.resource.data.diff(resource.data).affectedKeys()
-              .hasAny(['admin', 'isAdmin', 'role'])
+              .hasAny(['admin', 'isAdmin', 'role', 'verified'])
             || isAdmin());
       allow delete: if isAdmin();
     }
@@ -243,9 +243,11 @@ service cloud.firestore {
     // —— Pages ——
     match /pages/{id} {
       allow read: if signedIn();
-      allow create: if signedIn() && request.resource.data.owner == uid();
-      allow update, delete: if signedIn()
-        && (resource.data.owner == uid() || isAdmin());
+      allow create: if signedIn() && request.resource.data.owner == uid()
+        && !request.resource.data.keys().hasAny(['verified']);
+      allow update: if signedIn() && (isAdmin() || (resource.data.owner == uid()
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['verified', 'owner'])));
+      allow delete: if signedIn() && (resource.data.owner == uid() || isAdmin());
     }
     match /pageFollows/{id} {
       allow read: if signedIn();
