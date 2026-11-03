@@ -3808,7 +3808,7 @@ document.addEventListener("click", async function(e){
       var f = $("#pf").files[0];
       if(f){ photo = await upUpload(f, "avatars"); }
       else if(me.photoURL){ photo = me.photoURL; }
-      prof = {name: n, bio: $("#pb").value.trim(), photo: photo, ts: Date.now(), verified: false};
+      prof = {name: n, bio: $("#pb").value.trim(), photo: photo, ts: Date.now()};
       await setDoc(doc(db, "users", me.uid), prof);
       location.reload();
       return;
