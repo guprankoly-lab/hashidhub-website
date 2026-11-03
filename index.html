@@ -79,9 +79,10 @@ select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(-
 .media{max-width:100%;max-height:480px;border-radius:10px;display:block;margin:6px 0;cursor:zoom-in}
 .media.vid{max-height:600px;width:100%;cursor:default}
 .stats{font-size:.85rem;color:var(--mute);display:flex;justify-content:space-between;padding-bottom:8px;border-bottom:1px solid var(--line)}
-.acts{display:flex;justify-content:space-around;padding-top:6px}
-.acts button{padding:8px 12px;border-radius:8px;color:var(--mute);font-weight:600;display:flex;align-items:center;gap:4px}
-.acts .on{color:var(--like)}
+/* legacy acts v1 neutralized */
+.acts{display:flex}
+.acts button{display:inline-flex}
+.acts .on{color:var(--brand)}
 .cm{background:var(--bg);border-radius:12px;padding:8px 12px;margin-top:8px;font-size:.95rem;word-break:break-word}
 .cm small{color:var(--mute)}
 .ad{border:1.5px dashed var(--gold);position:relative}
@@ -282,18 +283,9 @@ button[data-a="like"]{-webkit-touch-callout:none;-webkit-user-select:none;user-s
 .rsa.on .rsa-ico{filter:none}
 
 
-.acts{display:flex;justify-content:space-around;padding:4px 0 2px;border-top:1px solid var(--line);margin-top:4px}
-.acts button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 4px;border-radius:10px;color:var(--mute);font-weight:700;font-size:.72rem;min-height:48px;background:transparent;border:0}
-.acts button .act-ico{font-size:1.4rem;line-height:1;display:flex;align-items:center;justify-content:center}
-.acts button .act-ico.like-svg{width:1.45rem;height:1.45rem}
-.acts button .act-ico.like-svg path{fill:currentColor}
-.acts button[data-a="like"]{color:#9aa3a0}
-.acts button[data-a="like"] .act-ico.like-svg{color:#fff;filter:drop-shadow(0 0 1px rgba(0,0,0,.55)) drop-shadow(0 1px 2px rgba(0,0,0,.25))}
-.acts button[data-a="like"] .act-ico.like-svg path{fill:#ffffff}
-.acts button[data-a="like"].on{color:#0d7a5f !important}
-.acts button[data-a="like"].on .act-ico.like-svg{color:#0d7a5f !important;filter:none !important}
-.acts button[data-a="like"].on .act-ico.like-svg path{fill:#0d7a5f !important}
-.acts button[data-a="like"].on .act-n{color:#0d7a5f !important;font-weight:800}
+/* legacy acts rules neutralized — see Style 4 final block */
+.acts{display:flex}
+.acts button{display:inline-flex}
 :root[data-theme="dark"] .acts button[data-a="like"].on,
 :root[data-theme="dark"] .acts button[data-a="like"].on .act-ico.like-svg,
 :root[data-theme="dark"] .acts button[data-a="like"].on .act-ico.like-svg path,
@@ -592,6 +584,90 @@ article.card{content-visibility:auto;contain-intrinsic-size:auto 420px}
 .cm .aplayer{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.25)}
 .chall-card{background:linear-gradient(135deg,rgba(240,193,75,.18),rgba(15,154,117,.10))}
 
+
+/* ========== HashidHub v1.8.2 — Feed actions Style 4 (final) ========== */
+.card > .row.post-head{align-items:flex-start;gap:10px}
+.post-menu-btn,.reel-menu-btn{
+  flex:none!important;width:38px!important;height:38px!important;min-width:38px!important;
+  border-radius:11px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  font-size:1.4rem!important;line-height:1!important;font-weight:800!important;letter-spacing:.5px!important;
+  color:var(--ink)!important;background:var(--bg)!important;border:1px solid var(--line)!important;
+  padding:0!important;opacity:.95!important;margin-inline-start:4px!important
+}
+.post-menu-btn:active,.reel-menu-btn:active{background:var(--line)!important;transform:scale(.94)}
+:root[data-theme="dark"] .post-menu-btn,:root[data-theme="dark"] .reel-menu-btn{
+  background:rgba(255,255,255,.07)!important;border-color:rgba(255,255,255,.12)!important
+}
+
+/* Horizontal bar — design 4 */
+.acts{
+  display:flex!important;flex-direction:row!important;align-items:center!important;
+  justify-content:flex-start!important;gap:2px!important;flex-wrap:nowrap!important;
+  padding:6px 0 2px!important;margin-top:4px!important;
+  border-top:1px solid var(--line)!important
+}
+.acts button{
+  flex:0 0 auto!important;display:inline-flex!important;flex-direction:row!important;
+  align-items:center!important;justify-content:center!important;gap:5px!important;
+  padding:8px 11px!important;border-radius:999px!important;min-height:40px!important;
+  min-width:auto!important;width:auto!important;
+  color:var(--mute)!important;font-weight:700!important;font-size:.88rem!important;
+  background:transparent!important;border:0!important
+}
+.acts button .act-ico{
+  font-size:1.2rem!important;line-height:1!important;display:inline-flex!important;
+  align-items:center!important;justify-content:center!important;width:auto!important;height:auto!important
+}
+.acts button .act-ico.like-svg,.acts button .act-ico.save-svg,.acts button .act-ico.share-svg,.acts button .act-ico.cm-svg{
+  width:1.22rem!important;height:1.22rem!important
+}
+.acts button .act-ico.like-svg path{fill:currentColor!important}
+.acts button[data-a="like"] .act-ico.like-svg,
+.acts button[data-a="reellike"] .act-ico.like-svg{
+  color:var(--mute)!important;filter:none!important
+}
+.acts button[data-a="like"] .act-ico.like-svg path,
+.acts button[data-a="reellike"] .act-ico.like-svg path{
+  fill:currentColor!important
+}
+.acts button .act-n{font-size:.84rem!important;font-weight:700!important;color:inherit!important;min-height:0!important;min-width:.5em!important}
+.acts button[data-a="like"].on,
+.acts button[data-a="reellike"].on{
+  color:var(--brand)!important;background:rgba(13,122,95,.12)!important
+}
+:root[data-theme="dark"] .acts button[data-a="like"].on,
+:root[data-theme="dark"] .acts button[data-a="reellike"].on{
+  color:#2dd4a8!important;background:rgba(45,212,168,.14)!important
+}
+.acts button[data-a="like"].on .act-ico.like-svg,
+.acts button[data-a="reellike"].on .act-ico.like-svg,
+.acts button[data-a="like"].on .act-n,
+.acts button[data-a="reellike"].on .act-n{color:inherit!important}
+.acts button[data-a="save"].on{color:var(--brand)!important}
+.acts button:active{background:var(--bg)!important;transform:scale(.95)}
+.acts button .act-ico.share-ico{font-size:1.15rem!important;font-weight:800!important}
+
+/* Compact stats under media */
+.stats{
+  font-size:.82rem!important;color:var(--mute)!important;
+  display:flex!important;justify-content:space-between!important;align-items:center!important;
+  padding:4px 2px 6px!important;border-bottom:0!important;gap:8px!important
+}
+.stats-react{display:flex!important;gap:5px!important;flex-wrap:wrap!important}
+.stats-react span{
+  display:inline-flex!important;align-items:center!important;gap:3px!important;
+  background:var(--bg)!important;padding:2px 8px!important;border-radius:999px!important;font-size:.78rem!important
+}
+
+/* Own-video cover chip */
+.vp-cover-btn{
+  position:absolute!important;top:10px!important;inset-inline-start:10px!important;z-index:5!important;
+  display:inline-flex!important;align-items:center!important;gap:6px!important;
+  padding:7px 12px!important;border-radius:999px!important;
+  background:rgba(0,0,0,.65)!important;color:#fff!important;font-size:.78rem!important;font-weight:700!important;
+  border:1px solid rgba(255,255,255,.22)!important;backdrop-filter:blur(6px)!important
+}
+.vplayer.started .vp-cover-btn{opacity:0!important;pointer-events:none!important}
 </style>
 </head>
 <body>
@@ -1485,21 +1561,28 @@ function reelsSection(uid){
 function reelCardHtml(r){
   var own = r.uid === me.uid || isAdmin, liked = !!(window._reelLiked && window._reelLiked[r.id]);
   var cap = String(r.caption || "");
-  var h = '<article class="card reel-card" data-reel-card="' + r.id + '"><div class="row">' +
+  var h = '<article class="card reel-card" data-reel-card="' + r.id + '"><div class="row post-head">' +
     '<img class="av" src="' + (esc(r.photo) || DEF) + '" alt="">' +
-    '<div style="flex:1">' + (r.pageId
+    '<div style="flex:1;min-width:0">' + (r.pageId
       ? '<button class="name" data-a="openpage" data-i="' + esc(r.pageId) + '">' + esc(r.name || "") + (pageVerified(r.pageId) ? VB : "") + ' <span class="chip">صفحة</span></button>'
       : '<button class="name" data-a="prof" data-u="' + esc(r.uid) + '">' + esc(r.name || "") + (isVerifiedUid(r.uid, r) ? VB : "") + pBadge(r.uid) + '</button>') +
     '<div class="time">' + ago(r.ts) + ' · 🎬 ريل</div></div>' +
-    followBtnHtml(r) + (own ? '<button class="mini" data-a="reelmenu" data-i="' + r.id + '" aria-label="خيارات الريل">⋯</button>' : '') + '</div>';
+    followBtnHtml(r) +
+    (own
+      ? '<button type="button" class="reel-menu-btn" data-a="reelmenu" data-i="' + r.id + '" title="خيارات الريل" aria-label="خيارات الريل">⋮</button>'
+      : '<button type="button" class="reel-menu-btn" data-a="reelshare" data-i="' + r.id + '" title="مشاركة" aria-label="مشاركة">⋮</button>') +
+    '</div>';
   if(cap) h += '<div class="body clamp">' + renderText(cap) + '</div>';
   h += '<button type="button" class="vcover" data-a="openreel" data-i="' + r.id + '" aria-label="تشغيل الريل">' + reelCoverHtml(r) +
     '<span class="vp-big-s"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>' +
     (showViews(r) ? '<span class="vc-views">👁 ' + fmtN(r.views) + '</span>' : '') + '</button>';
   h += '<div class="acts">' +
-    '<button type="button" data-a="reellike" data-i="' + r.id + '" class="' + (liked ? "on" : "") + '">' + LIKE_SVG + '<span class="act-n">' + (r.likes || "") + '</span></button>' +
-    '<button type="button" data-a="reelcomment" data-i="' + r.id + '"><span class="act-ico">💬</span><span class="act-n">' + (r.comments || "") + '</span></button>' +
-    '<button type="button" data-a="reelshare" data-i="' + r.id + '"><span class="act-ico share-ico">↗</span><span class="act-n"></span></button></div></article>';
+    '<button type="button" data-a="reellike" data-i="' + r.id + '" class="' + (liked ? "on" : "") + '" title="إعجاب">' + LIKE_SVG + '<span class="act-n">' + (r.likes || "") + '</span></button>' +
+    '<button type="button" data-a="reelcomment" data-i="' + r.id + '" title="تعليق">' + CM_SVG + '<span class="act-n">' + (r.comments || "") + '</span></button>' +
+    '<button type="button" data-a="reelshare" data-i="' + r.id + '" title="مشاركة">' + SHARE_SVG + '</button>' +
+    '<button type="button" data-a="openreel" data-i="' + r.id + '" title="تشغيل">' +
+      '<svg class="act-ico" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></button>' +
+    '</div></article>';
   return h;
 }
 function reelMenu(rid){
