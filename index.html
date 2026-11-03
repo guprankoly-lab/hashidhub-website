@@ -546,6 +546,28 @@ article.card{content-visibility:auto;contain-intrinsic-size:auto 420px}
 .cm .aplayer{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.25)}
 .chall-card{background:linear-gradient(135deg,rgba(240,193,75,.18),rgba(15,154,117,.10))}
 
+
+/* ================= v1.9: أزرار التفاعل بنمط فيسبوك ================= */
+.acts.fbacts{display:flex;justify-content:stretch;gap:4px;padding:4px 0 2px;border-top:1px solid var(--line);margin-top:4px}
+.acts.fbacts .fbb{flex:1 1 0;flex-direction:row !important;gap:7px !important;min-height:44px !important;padding:8px 6px !important;border-radius:10px !important;font-size:.92rem !important;font-weight:700 !important;color:var(--mute) !important;justify-content:center !important;background:transparent !important;-webkit-tap-highlight-color:transparent;transition:background .15s,color .15s,transform .12s}
+.acts.fbacts .fbb:hover{background:var(--bg) !important}
+.acts.fbacts .fbb:active{transform:scale(.95);background:var(--bg) !important}
+.fbi{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.acts.fbacts .fbb.on{color:var(--brand) !important}
+.acts.fbacts .fbb.on .fbi{fill:currentColor;animation:hh-pop .35s ease}
+.fbe{font-size:1.3rem;line-height:1;animation:hh-pop .35s ease}
+.acts.fbacts .fbb.on.rx-love{color:#e0245e !important}
+.acts.fbacts .fbb.on.rx-laugh,.acts.fbacts .fbb.on.rx-sad{color:#d9990f !important}
+.acts.fbacts .fbb.on.rx-angry{color:#e9710f !important}
+@keyframes hh-pop{0%{transform:scale(.6)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
+.fbb .fbl{white-space:nowrap}
+.reel-card .stats b{font-weight:700}
+/* الفيديو يبقى خلف الغلاف حتى يظهر أول إطار */
+.vplayer.started video{display:none}
+.vplayer.showvid video{display:block}
+.vplayer.started .vp-poster,.vplayer.started .vp-fallback{display:block}
+.vplayer.showvid .vp-poster,.vplayer.showvid .vp-fallback{display:none}
+
 </style>
 </head>
 <body>
@@ -981,7 +1003,7 @@ var follows = [], friends = [], reqs = [], pages = [], groups = [], pageFollows 
 var users = [], ads = [], adComments = [], reports = [], premiumReqs = [], promoteRequests = [], verifyRequests = [];
 var adminTab = "home";
 var banned = {}, premium = {}, blocks = new Set(), clicks = {};
-var pv = null, pd = null, single = null, feedMode = (function(){ var v = getPref("feed"); return /^(foryou|all|friends|following)$/.test(v) ? v : "foryou"; })();
+var pv = null, pd = null, single = null, feedMode = (function(){ var v = getPref("feed"); return /^(foryou|all|friends|following)$/.test(v) ? v : "all"; })();
 var draft = {file:null, text:""};
 var adFile = null, chatWith = null, chatName = "";
 var plim = 25, unP = null, usersLoaded = false, storyTimer = null;
@@ -1299,7 +1321,7 @@ function menuHtml(){
       acc("priv", "🔒 " + t("الخصوصية ورؤية المنشورات","Privacy & post visibility")) +
       '<div class="mi-sub" id="acc-priv" hidden>' +
         opt("fm","foryou","✨ " + t("لك (مقترح)","For you"), feedMode === "foryou") +
-        opt("fm","all","🌐 " + t("العامة","Public"), feedMode === "all") +
+        opt("fm","all","🕒 " + t("الأحدث","Newest"), feedMode === "all") +
         opt("fm","friends","👥 " + t("الأصدقاء","Friends"), feedMode === "friends") +
         opt("fm","following","➕ " + t("المتابعون","Followers"), feedMode === "following") +
       '</div>' +
@@ -1353,11 +1375,11 @@ function videoPoster(file){
   });
 }
 /* يرفع الفيديو مع غلافه ويعيد {url, poster, w, h} */
-async function uploadVideoWithPoster(file, folder){
+async function uploadVideoWithPoster(file, folder, skipPoster){
   var vm = await videoPoster(file);
   var url = await upUpload(file, folder);
   var poster = "";
-  if(vm && vm.file){ try{ poster = await upUpload(vm.file, "posts"); }catch(e){} }
+  if(!skipPoster && vm && vm.file){ try{ poster = await upUpload(vm.file, "posts"); }catch(e){} }
   return {url: url, poster: poster, w: vm ? vm.w : 0, h: vm ? vm.h : 0};
 }
 
@@ -1447,10 +1469,11 @@ function reelCardHtml(r){
   h += '<button type="button" class="vcover" data-a="openreel" data-i="' + r.id + '" aria-label="تشغيل الريل">' + reelCoverHtml(r) +
     '<span class="vp-big-s"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>' +
     (showViews(r) ? '<span class="vc-views">👁 ' + fmtN(r.views) + '</span>' : '') + '</button>';
-  h += '<div class="acts">' +
-    '<button type="button" data-a="reellike" data-i="' + r.id + '" class="' + (liked ? "on" : "") + '">' + LIKE_SVG + '<span class="act-n">' + (r.likes || "") + '</span></button>' +
-    '<button type="button" data-a="reelcomment" data-i="' + r.id + '"><span class="act-ico">💬</span><span class="act-n">' + (r.comments || "") + '</span></button>' +
-    '<button type="button" data-a="reelshare" data-i="' + r.id + '"><span class="act-ico share-ico">↗</span><span class="act-n"></span></button></div></article>';
+  h += '<div class="stats"><span class="stats-react"><span class="rl-wrap"' + (r.likes ? "" : " hidden") + '>❤️ <b class="rl-n">' + (r.likes || 0) + '</b></span></span><span>' + (r.comments ? r.comments + " 💬" : "") + '</span></div>';
+  h += '<div class="acts fbacts">' +
+    '<button type="button" data-a="reellike" data-i="' + r.id + '" class="fbb' + (liked ? " on rx-love" : "") + '">' + FBI.like + '<span class="fbl">أعجبني</span></button>' +
+    '<button type="button" data-a="reelcomment" data-i="' + r.id + '" class="fbb">' + FBI.cm + '<span class="fbl">تعليق</span></button>' +
+    '<button type="button" data-a="reelshare" data-i="' + r.id + '" class="fbb">' + FBI.share + '<span class="fbl">مشاركة</span></button></div></article>';
   return h;
 }
 function reelMenu(rid){
@@ -1515,7 +1538,7 @@ function vpBind(el){
   if(el._b) return; el._b = true;
   var v = el.querySelector("video"), bar = el.querySelector(".vp-bar i"), tt = el.querySelector(".vp-t"), tg = el.querySelector(".vp-tg");
   function icon(){ tg.innerHTML = v.paused ? VPI.playSm : VPI.pause; }
-  v.addEventListener("playing", function(){ el.classList.add("playing"); el.classList.remove("ended", "loading"); icon(); });
+  v.addEventListener("playing", function(){ el.classList.add("playing", "showvid"); el.classList.remove("ended", "loading"); icon(); });
   v.addEventListener("pause", function(){ el.classList.remove("playing"); icon(); });
   v.addEventListener("ended", function(){ el.classList.remove("playing"); el.classList.add("ended"); icon(); });
   v.addEventListener("waiting", function(){ if(!v.paused) el.classList.add("loading"); });
@@ -1527,7 +1550,7 @@ function vpBind(el){
     if(d && isFinite(d)){ bar.style.width = (v.currentTime / d * 100) + "%"; tt.textContent = vpFmt(v.currentTime) + " / " + vpFmt(d); }
     else tt.textContent = vpFmt(v.currentTime);
   });
-  v.addEventListener("error", function(){ el.classList.remove("loading", "playing", "started"); try{ v.removeAttribute("src"); }catch(e){} toast("تعذّر تشغيل الفيديو، حاول مجدداً"); });
+  v.addEventListener("error", function(){ el.classList.remove("loading", "playing", "started", "showvid"); try{ v.removeAttribute("src"); }catch(e){} toast("تعذّر تشغيل الفيديو، حاول مجدداً"); });
 }
 function vpPlay(el){
   var v = el.querySelector("video"); vpBind(el);
@@ -2035,9 +2058,28 @@ function challengeCard(){
 function feedScore(it, likeCnt, cmCnt){
   var age = Math.max(0, (Date.now() - (it.ts || 0)) / 3600000);
   var lc = it._reel ? (it.likes || 0) : (likeCnt[it.id] || 0), cc = it._reel ? (it.comments || 0) : (cmCnt[it.id] || 0);
-  var aff = it.uid === me.uid ? 1.2 : isFriend(it.uid) ? 1.7 : following(me.uid, it.uid) ? 1.5 : isAdminUid(it.uid) ? 1.3 : 1;
-  return (1 + lc * 2 + cc * 3) * aff * ((it.media || it._reel) ? 1.12 : 1) / Math.pow(age / 10 + 2, 1.35);
+  var aff = it.uid === me.uid ? 1.4 : isFriend(it.uid) ? 1.7 : following(me.uid, it.uid) ? 1.5 : isAdminUid(it.uid) ? 1.3 : 1;
+  var eng = Math.sqrt(1 + Math.min(lc * 2 + cc * 3, 40)); // التفاعل مهم لكن الحداثة أهم
+  return eng * aff * ((it.media || it._reel) ? 1.1 : 1) / Math.pow(age / 4 + 1, 1.5);
 }
+
+/* ============ v1.9: أزرار تفاعل بنمط فيسبوك + غلاف الفيديو ============ */
+var FBI = {
+  like: '<svg class="fbi" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3v11z"/></svg>',
+  cm: '<svg class="fbi" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.4 8.4 0 01-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.4 8.4 0 013.8-.9h.5a8.5 8.5 0 018 8v.5z"/></svg>',
+  share: '<svg class="fbi" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 14l5-5-5-5"/><path d="M4 20v-7a4 4 0 014-4h12"/></svg>'
+};
+function coverPick(){
+  if(!draft.file || (draft.file.type || "").indexOf("video/") !== 0) return "";
+  return '<div class="note"><label class="vlabel">🖼️ ' + (draft.cover ? "✓ غلاف مختار: " + esc(draft.cover.name) : "اختر غلافاً للفيديو") +
+    '<input type="file" id="fcv" accept="image/*" hidden></label></div>';
+}
+document.addEventListener("change", function(e){
+  if(!e.target || e.target.id !== "fcv") return;
+  var f = e.target.files && e.target.files[0]; if(!f) return;
+  if(f.type.indexOf("image/") !== 0) return toast("اختر صورة");
+  draft.cover = f; draw();
+});
 
 function bnavBtn(t, svg, label, badgeId){
   return '<button data-t="' + t + '" class="' + (tab === t ? "on" : "") + '"><svg viewBox="0 0 24 24">' + svg + '</svg>' + (badgeId ? '<b id="' + badgeId + '"></b>' : '') + '<span>' + label + '</span></button>';
@@ -2181,19 +2223,18 @@ function postHtml(p){
   Object.keys(reactCounts).forEach(function(k){ if(reactCounts[k]) sumHtml += '<span>' + reactEmoji[k] + ' ' + reactCounts[k] + '</span>'; });
   var topCmCount = cs.filter(function(x){return !x.parentId;}).length;
   h += '<div class="stats"><span class="stats-react">' + (sumHtml || (lk.length ? ('👍 ' + lk.length) : "")) + '</span><span>' + (topCmCount ? (topCmCount + " 💬") : "") + '</span></div>';
-  h += '<div class="acts">';
+  h += '<div class="acts fbacts">';
   var myReaction = lk.filter(function(l){ return l.uid === me.uid; })[0];
-  var likeIco;
+  var likeInner, rxCls = "";
   if(myReaction && myReaction.reaction && myReaction.reaction !== "like"){
-    likeIco = '<span class="act-ico">' + reactEmoji[myReaction.reaction] + '</span>';
-  } else if(on){
-    likeIco = LIKE_SVG;
+    likeInner = '<span class="fbe">' + reactEmoji[myReaction.reaction] + '</span><span class="fbl">' + reactLabel[myReaction.reaction] + '</span>';
+    rxCls = " rx-" + myReaction.reaction;
   } else {
-    likeIco = LIKE_SVG;
+    likeInner = FBI.like + '<span class="fbl">' + (on ? "أعجبني" : "أعجبني") + '</span>';
   }
-  h += '<button type="button" data-a="like" class="' + (on ? "on" : "") + '" title="اضغط مطولاً لاختيار التفاعل">' + likeIco + '<span class="act-n">' + (lk.length || "") + '</span></button>';
-  h += '<button type="button" data-a="cm"><span class="act-ico">💬</span><span class="act-n">' + (topCmCount || "") + '</span></button>';
-  h += '<button type="button" data-a="share"><span class="act-ico share-ico">↗</span><span class="act-n"></span></button></div>';
+  h += '<button type="button" data-a="like" class="fbb' + (on ? " on" : "") + rxCls + '" title="اضغط مطولاً لاختيار التفاعل">' + likeInner + '</button>';
+  h += '<button type="button" data-a="cm" class="fbb">' + FBI.cm + '<span class="fbl">تعليق</span></button>';
+  h += '<button type="button" data-a="share" class="fbb">' + FBI.share + '<span class="fbl">مشاركة</span></button></div>';
 
   // comments: top-level then replies
   var top = cs.filter(function(c){ return !c.parentId; });
@@ -2692,6 +2733,10 @@ function paintReelLike(rid){
     b.classList.toggle("on", on);
     var n = b.querySelector(".rsa-n,.act-n"); if(n && r) n.textContent = (r.likes ? fmtN(r.likes) : (b.closest(".reel-card") ? "" : "0"));
   });
+  document.querySelectorAll('[data-reel-card="' + rid + '"] .rl-n').forEach(function(n){
+    if(r) n.textContent = r.likes || 0;
+    var w = n.closest(".rl-wrap"); if(w) w.hidden = !(r && r.likes);
+  });
 }
 async function toggleReelLike(rid, onlyLike){
   if(isGuest){ showAuthModal(); return; }
@@ -3055,7 +3100,7 @@ function pageView(){
     h += '<div class="card"><div class="row" style="align-items:flex-start">' +
       '<img class="av" src="' + (esc(p.photo) || DEF) + '" alt="">' +
       '<textarea id="tx" placeholder="انشر باسم ' + esc(p.name) + '…" maxlength="5000"></textarea></div>' +
-      (draft.file ? '<div class="note">مرفق: ' + esc(draft.file.name) + '</div>' : "") + audioNote() +
+      (draft.file ? '<div class="note">مرفق: ' + esc(draft.file.name) + '</div>' : "") + coverPick() + audioNote() +
       '<div class="tools"><label>صورة<input type="file" id="fm" accept="image/*" hidden></label>' +
       '<label title="الحد الأقصى 50 ميجا ويُضغط تلقائياً">فيديو <small style="opacity:.65">≤50MB</small><input type="file" id="fv" accept="video/*" hidden></label>' + '<button type="button" class="vlabel" data-a="recpost">🎙 صوت</button>' +
       '<button type="button" class="btn alt" data-a="addreel" data-p="' + p.id + '">🎬 ريل</button>' +
@@ -3111,7 +3156,7 @@ function groupView(){
     h += '<div class="card"><div class="row" style="align-items:flex-start">' +
       '<img class="av" src="' + (esc(prof.photo) || DEF) + '" alt="">' +
       '<textarea id="tx" placeholder="اكتب للمجموعة…" maxlength="5000"></textarea></div>' +
-      (draft.file ? '<div class="note">مرفق: ' + esc(draft.file.name) + '</div>' : "") + audioNote() +
+      (draft.file ? '<div class="note">مرفق: ' + esc(draft.file.name) + '</div>' : "") + coverPick() + audioNote() +
       '<div class="tools"><label>صورة<input type="file" id="fm" accept="image/*" hidden></label>' +
       '<label title="الحد الأقصى 50 ميجا ويُضغط تلقائياً">فيديو <small style="opacity:.65">≤50MB</small><input type="file" id="fv" accept="video/*" hidden></label>' + '<button type="button" class="vlabel" data-a="recpost">🎙 صوت</button>' +
       '<button class="btn" id="pub" style="margin-inline-start:auto">نشر</button></div></div>';
@@ -3819,9 +3864,10 @@ async function actions(b, er){
       if(draft.file){
         var isVid = draft.file.type.indexOf("video/") === 0;
         if(isVid){
-          var uv = await uploadVideoWithPoster(draft.file, "videos");
+          var uv = await uploadVideoWithPoster(draft.file, "videos", !!draft.cover);
           d.media = uv.url; d.type = "video";
-          if(uv.poster) d.poster = uv.poster;
+          if(draft.cover){ try{ d.poster = await upUpload(draft.cover, "posts"); }catch(e){} }
+          else if(uv.poster) d.poster = uv.poster;
           if(uv.w && uv.h){ d.vw = uv.w; d.vh = uv.h; }
         } else {
           d.media = await upUpload(draft.file, "posts"); d.type = "image";
@@ -4101,6 +4147,15 @@ async function actions(b, er){
     openSheet("خيارات المنشور", [
       isOwn ? {label:"✏️ تعديل النص", action: async function(){ var txt=prompt("تعديل النص",qmenu.t||""); if(txt!==null) await updateDoc(doc(db,"posts",pid),{t:txt.trim(),editedAt:Date.now()}); }} : null,
       {label:"🔖 حفظ المنشور", action: async function(){ var sr=doc(db,"savedPosts",me.uid+"_"+pid),ss=await getDoc(sr); if(ss.exists()){await deleteDoc(sr);toast("أزيل من المحفوظات");}else{await setDoc(sr,{uid:me.uid,pid:pid,ts:Date.now()});toast("تم الحفظ");} }},
+      isOwn && qmenu.type === "video" ? {label:"🖼️ تغيير غلاف الفيديو", action: function(){
+        var ci = document.createElement("input"); ci.type = "file"; ci.accept = "image/*";
+        ci.onchange = async function(){
+          var f = ci.files[0]; if(!f) return;
+          try{ var cu = await upUpload(f, "posts"); await updateDoc(doc(db, "posts", pid), {poster: cu}); toast("تم تغيير الغلاف"); }
+          catch(x){ toast(x.message || friendlyErr(x), 5000); }
+        };
+        ci.click();
+      }} : null,
       isOwn ? {label:"🔒 تغيير الخصوصية", action: async function(){ var np=qmenu.privacy==="friends"?"public":"friends"; await updateDoc(doc(db,"posts",pid),{privacy:np}); toast(np==="friends"?"للأصدقاء فقط":"عام"); }} : null,
       {label:"🔗 نسخ الرابط", action: function(){ shareContent("post", pid, true); }},
       {label:"📤 مشاركة إلى القصة", action: async function(){ await addDoc(collection(db,"stories"),{uid:me.uid,name:prof.name,photo:prof.photo||"",media:qmenu.media||"",caption:(qmenu.t||"").slice(0,180),sharedPost:pid,ts:Date.now(),exp:Date.now()+86400000}); toast("نُشر في قصتك"); }},
