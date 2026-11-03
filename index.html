@@ -79,10 +79,9 @@ select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(-
 .media{max-width:100%;max-height:480px;border-radius:10px;display:block;margin:6px 0;cursor:zoom-in}
 .media.vid{max-height:600px;width:100%;cursor:default}
 .stats{font-size:.85rem;color:var(--mute);display:flex;justify-content:space-between;padding-bottom:8px;border-bottom:1px solid var(--line)}
-/* legacy acts v1 neutralized */
-.acts{display:flex}
-.acts button{display:inline-flex}
-.acts .on{color:var(--brand)}
+.acts{display:flex;justify-content:space-around;padding-top:6px}
+.acts button{padding:8px 12px;border-radius:8px;color:var(--mute);font-weight:600;display:flex;align-items:center;gap:4px}
+.acts .on{color:var(--like)}
 .cm{background:var(--bg);border-radius:12px;padding:8px 12px;margin-top:8px;font-size:.95rem;word-break:break-word}
 .cm small{color:var(--mute)}
 .ad{border:1.5px dashed var(--gold);position:relative}
@@ -283,9 +282,18 @@ button[data-a="like"]{-webkit-touch-callout:none;-webkit-user-select:none;user-s
 .rsa.on .rsa-ico{filter:none}
 
 
-/* legacy acts rules neutralized — see Style 4 final block */
-.acts{display:flex}
-.acts button{display:inline-flex}
+.acts{display:flex;justify-content:space-around;padding:4px 0 2px;border-top:1px solid var(--line);margin-top:4px}
+.acts button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 4px;border-radius:10px;color:var(--mute);font-weight:700;font-size:.72rem;min-height:48px;background:transparent;border:0}
+.acts button .act-ico{font-size:1.4rem;line-height:1;display:flex;align-items:center;justify-content:center}
+.acts button .act-ico.like-svg{width:1.45rem;height:1.45rem}
+.acts button .act-ico.like-svg path{fill:currentColor}
+.acts button[data-a="like"]{color:#9aa3a0}
+.acts button[data-a="like"] .act-ico.like-svg{color:#fff;filter:drop-shadow(0 0 1px rgba(0,0,0,.55)) drop-shadow(0 1px 2px rgba(0,0,0,.25))}
+.acts button[data-a="like"] .act-ico.like-svg path{fill:#ffffff}
+.acts button[data-a="like"].on{color:#0d7a5f !important}
+.acts button[data-a="like"].on .act-ico.like-svg{color:#0d7a5f !important;filter:none !important}
+.acts button[data-a="like"].on .act-ico.like-svg path{fill:#0d7a5f !important}
+.acts button[data-a="like"].on .act-n{color:#0d7a5f !important;font-weight:800}
 :root[data-theme="dark"] .acts button[data-a="like"].on,
 :root[data-theme="dark"] .acts button[data-a="like"].on .act-ico.like-svg,
 :root[data-theme="dark"] .acts button[data-a="like"].on .act-ico.like-svg path,
@@ -295,52 +303,6 @@ button[data-a="like"]{-webkit-touch-callout:none;-webkit-user-select:none;user-s
 .acts button.on .act-ico{transform:scale(1.1)}
 .acts button .act-ico.share-ico{font-size:1.55rem;font-weight:800}
 .acts button:active{background:var(--bg)}
-
-/* ===== v1.8 UI polish: post menu + horizontal acts (style 4) ===== */
-.card > .row.post-head{align-items:flex-start;gap:10px}
-.post-menu-btn{
-  flex:none;width:36px;height:36px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;
-  font-size:1.35rem;line-height:1;color:var(--ink);background:var(--bg);border:1px solid var(--line);
-  padding:0;font-weight:800;letter-spacing:1px;opacity:.92
-}
-.post-menu-btn:active,.post-menu-btn:hover{background:var(--line);opacity:1}
-:root[data-theme="dark"] .post-menu-btn{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:var(--ink)}
-:root[data-theme="dark"] .post-menu-btn:active{background:rgba(255,255,255,.12)}
-
-/* Style 4 — horizontal elegant interaction bar */
-.acts{
-  display:flex;align-items:center;justify-content:flex-start;gap:4px;
-  padding:8px 2px 2px;border-top:1px solid var(--line);margin-top:6px
-}
-.acts button{
-  flex:0 0 auto;display:inline-flex;flex-direction:row;align-items:center;justify-content:center;
-  gap:6px;padding:8px 12px;border-radius:999px;min-height:40px;
-  color:var(--mute);font-weight:700;font-size:.86rem;background:transparent;border:0
-}
-.acts button .act-ico{font-size:1.25rem;line-height:1;display:inline-flex;align-items:center}
-.acts button .act-ico.like-svg{width:1.25rem;height:1.25rem}
-.acts button .act-n{font-size:.82rem;font-weight:700;color:var(--mute);min-width:.6em}
-.acts button[data-a="like"].on{color:var(--brand)!important;background:rgba(13,122,95,.1)}
-.acts button[data-a="like"].on .act-n{color:var(--brand)!important}
-:root[data-theme="dark"] .acts button[data-a="like"].on{background:rgba(45,212,168,.12)}
-.acts button[data-a="save"].on{color:var(--brand)}
-.acts button:active{background:var(--bg);transform:scale(.96)}
-.acts button .act-ico.share-ico{font-size:1.2rem;font-weight:800}
-
-/* Video cover change affordance on own posts */
-.vplayer{position:relative}
-.vp-cover-btn{
-  position:absolute;top:10px;inset-inline-start:10px;z-index:5;
-  display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;
-  background:rgba(0,0,0,.62);color:#fff;font-size:.78rem;font-weight:700;
-  border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(6px)
-}
-.vp-cover-btn:active{background:rgba(0,0,0,.8)}
-.vplayer.started .vp-cover-btn{opacity:0;pointer-events:none;transition:opacity .2s}
-
-/* Subtle reaction chips polish */
-.stats-react span{box-shadow:0 1px 2px rgba(0,0,0,.04)}
-
 .stats{font-size:.85rem;color:var(--mute);display:flex;justify-content:space-between;align-items:center;padding:6px 2px 8px;border-bottom:1px solid var(--line);gap:8px}
 .stats-react{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .stats-react span{display:inline-flex;align-items:center;gap:3px;background:var(--bg);padding:2px 8px;border-radius:999px;font-size:.78rem}
@@ -584,90 +546,6 @@ article.card{content-visibility:auto;contain-intrinsic-size:auto 420px}
 .cm .aplayer{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.25)}
 .chall-card{background:linear-gradient(135deg,rgba(240,193,75,.18),rgba(15,154,117,.10))}
 
-
-/* ========== HashidHub v1.8.2 — Feed actions Style 4 (final) ========== */
-.card > .row.post-head{align-items:flex-start;gap:10px}
-.post-menu-btn,.reel-menu-btn{
-  flex:none!important;width:38px!important;height:38px!important;min-width:38px!important;
-  border-radius:11px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;
-  font-size:1.4rem!important;line-height:1!important;font-weight:800!important;letter-spacing:.5px!important;
-  color:var(--ink)!important;background:var(--bg)!important;border:1px solid var(--line)!important;
-  padding:0!important;opacity:.95!important;margin-inline-start:4px!important
-}
-.post-menu-btn:active,.reel-menu-btn:active{background:var(--line)!important;transform:scale(.94)}
-:root[data-theme="dark"] .post-menu-btn,:root[data-theme="dark"] .reel-menu-btn{
-  background:rgba(255,255,255,.07)!important;border-color:rgba(255,255,255,.12)!important
-}
-
-/* Horizontal bar — design 4 */
-.acts{
-  display:flex!important;flex-direction:row!important;align-items:center!important;
-  justify-content:flex-start!important;gap:2px!important;flex-wrap:nowrap!important;
-  padding:6px 0 2px!important;margin-top:4px!important;
-  border-top:1px solid var(--line)!important
-}
-.acts button{
-  flex:0 0 auto!important;display:inline-flex!important;flex-direction:row!important;
-  align-items:center!important;justify-content:center!important;gap:5px!important;
-  padding:8px 11px!important;border-radius:999px!important;min-height:40px!important;
-  min-width:auto!important;width:auto!important;
-  color:var(--mute)!important;font-weight:700!important;font-size:.88rem!important;
-  background:transparent!important;border:0!important
-}
-.acts button .act-ico{
-  font-size:1.2rem!important;line-height:1!important;display:inline-flex!important;
-  align-items:center!important;justify-content:center!important;width:auto!important;height:auto!important
-}
-.acts button .act-ico.like-svg,.acts button .act-ico.save-svg,.acts button .act-ico.share-svg,.acts button .act-ico.cm-svg{
-  width:1.22rem!important;height:1.22rem!important
-}
-.acts button .act-ico.like-svg path{fill:currentColor!important}
-.acts button[data-a="like"] .act-ico.like-svg,
-.acts button[data-a="reellike"] .act-ico.like-svg{
-  color:var(--mute)!important;filter:none!important
-}
-.acts button[data-a="like"] .act-ico.like-svg path,
-.acts button[data-a="reellike"] .act-ico.like-svg path{
-  fill:currentColor!important
-}
-.acts button .act-n{font-size:.84rem!important;font-weight:700!important;color:inherit!important;min-height:0!important;min-width:.5em!important}
-.acts button[data-a="like"].on,
-.acts button[data-a="reellike"].on{
-  color:var(--brand)!important;background:rgba(13,122,95,.12)!important
-}
-:root[data-theme="dark"] .acts button[data-a="like"].on,
-:root[data-theme="dark"] .acts button[data-a="reellike"].on{
-  color:#2dd4a8!important;background:rgba(45,212,168,.14)!important
-}
-.acts button[data-a="like"].on .act-ico.like-svg,
-.acts button[data-a="reellike"].on .act-ico.like-svg,
-.acts button[data-a="like"].on .act-n,
-.acts button[data-a="reellike"].on .act-n{color:inherit!important}
-.acts button[data-a="save"].on{color:var(--brand)!important}
-.acts button:active{background:var(--bg)!important;transform:scale(.95)}
-.acts button .act-ico.share-ico{font-size:1.15rem!important;font-weight:800!important}
-
-/* Compact stats under media */
-.stats{
-  font-size:.82rem!important;color:var(--mute)!important;
-  display:flex!important;justify-content:space-between!important;align-items:center!important;
-  padding:4px 2px 6px!important;border-bottom:0!important;gap:8px!important
-}
-.stats-react{display:flex!important;gap:5px!important;flex-wrap:wrap!important}
-.stats-react span{
-  display:inline-flex!important;align-items:center!important;gap:3px!important;
-  background:var(--bg)!important;padding:2px 8px!important;border-radius:999px!important;font-size:.78rem!important
-}
-
-/* Own-video cover chip */
-.vp-cover-btn{
-  position:absolute!important;top:10px!important;inset-inline-start:10px!important;z-index:5!important;
-  display:inline-flex!important;align-items:center!important;gap:6px!important;
-  padding:7px 12px!important;border-radius:999px!important;
-  background:rgba(0,0,0,.65)!important;color:#fff!important;font-size:.78rem!important;font-weight:700!important;
-  border:1px solid rgba(255,255,255,.22)!important;backdrop-filter:blur(6px)!important
-}
-.vplayer.started .vp-cover-btn{opacity:0!important;pointer-events:none!important}
 </style>
 </head>
 <body>
@@ -842,9 +720,6 @@ function share(h){
 
 var VB = '<svg class="vb" viewBox="0 0 24 24"><g fill="#1877f2"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="3.6"/><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="3.6" transform="rotate(45 12 12)"/></g><path d="M8 12.4l2.9 2.9 5.3-5.8" stroke="#fff" stroke-width="2.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 var LIKE_SVG = '<svg class="act-ico like-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3v11z"/></svg>';
-var SAVE_SVG = '<svg class="act-ico save-svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 4h12a1 1 0 011 1v16l-7-4-7 4V5a1 1 0 011-1z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>';
-var SHARE_SVG = '<svg class="act-ico share-svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7M16 6l-4-4-4 4M12 2v13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-var CM_SVG = '<svg class="act-ico cm-svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M21 12a8.5 8.5 0 01-8.5 8.5H7l-4 3V12A8.5 8.5 0 0112 3.5 8.5 8.5 0 0121 12z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>';
 var CROWN = '<svg class="crown" viewBox="0 0 24 24" fill="#e0a94a"><path d="M3 8l4.5 3L12 5l4.5 6L21 8l-1.6 10H4.6L3 8zm1.8 12h14.4v2H4.8v-2z"/></svg>';
 var DEF = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#9aa596"/><circle cx="20" cy="15" r="7" fill="#fff"/><ellipse cx="20" cy="37" rx="13" ry="12" fill="#fff"/></svg>');
 
@@ -1561,28 +1436,21 @@ function reelsSection(uid){
 function reelCardHtml(r){
   var own = r.uid === me.uid || isAdmin, liked = !!(window._reelLiked && window._reelLiked[r.id]);
   var cap = String(r.caption || "");
-  var h = '<article class="card reel-card" data-reel-card="' + r.id + '"><div class="row post-head">' +
+  var h = '<article class="card reel-card" data-reel-card="' + r.id + '"><div class="row">' +
     '<img class="av" src="' + (esc(r.photo) || DEF) + '" alt="">' +
-    '<div style="flex:1;min-width:0">' + (r.pageId
+    '<div style="flex:1">' + (r.pageId
       ? '<button class="name" data-a="openpage" data-i="' + esc(r.pageId) + '">' + esc(r.name || "") + (pageVerified(r.pageId) ? VB : "") + ' <span class="chip">صفحة</span></button>'
       : '<button class="name" data-a="prof" data-u="' + esc(r.uid) + '">' + esc(r.name || "") + (isVerifiedUid(r.uid, r) ? VB : "") + pBadge(r.uid) + '</button>') +
     '<div class="time">' + ago(r.ts) + ' · 🎬 ريل</div></div>' +
-    followBtnHtml(r) +
-    (own
-      ? '<button type="button" class="reel-menu-btn" data-a="reelmenu" data-i="' + r.id + '" title="خيارات الريل" aria-label="خيارات الريل">⋮</button>'
-      : '<button type="button" class="reel-menu-btn" data-a="reelshare" data-i="' + r.id + '" title="مشاركة" aria-label="مشاركة">⋮</button>') +
-    '</div>';
+    followBtnHtml(r) + (own ? '<button class="mini" data-a="reelmenu" data-i="' + r.id + '" aria-label="خيارات الريل">⋯</button>' : '') + '</div>';
   if(cap) h += '<div class="body clamp">' + renderText(cap) + '</div>';
   h += '<button type="button" class="vcover" data-a="openreel" data-i="' + r.id + '" aria-label="تشغيل الريل">' + reelCoverHtml(r) +
     '<span class="vp-big-s"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M8 5v14l11-7z" fill="#fff"/></svg></span>' +
     (showViews(r) ? '<span class="vc-views">👁 ' + fmtN(r.views) + '</span>' : '') + '</button>';
   h += '<div class="acts">' +
-    '<button type="button" data-a="reellike" data-i="' + r.id + '" class="' + (liked ? "on" : "") + '" title="إعجاب">' + LIKE_SVG + '<span class="act-n">' + (r.likes || "") + '</span></button>' +
-    '<button type="button" data-a="reelcomment" data-i="' + r.id + '" title="تعليق">' + CM_SVG + '<span class="act-n">' + (r.comments || "") + '</span></button>' +
-    '<button type="button" data-a="reelshare" data-i="' + r.id + '" title="مشاركة">' + SHARE_SVG + '</button>' +
-    '<button type="button" data-a="openreel" data-i="' + r.id + '" title="تشغيل">' +
-      '<svg class="act-ico" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></button>' +
-    '</div></article>';
+    '<button type="button" data-a="reellike" data-i="' + r.id + '" class="' + (liked ? "on" : "") + '">' + LIKE_SVG + '<span class="act-n">' + (r.likes || "") + '</span></button>' +
+    '<button type="button" data-a="reelcomment" data-i="' + r.id + '"><span class="act-ico">💬</span><span class="act-n">' + (r.comments || "") + '</span></button>' +
+    '<button type="button" data-a="reelshare" data-i="' + r.id + '"><span class="act-ico share-ico">↗</span><span class="act-n"></span></button></div></article>';
   return h;
 }
 function reelMenu(rid){
@@ -1599,7 +1467,7 @@ function reelMenu(rid){
         toast("تم تعديل الوصف"); draw();
       }catch(e){ toast(friendlyErr(e)); }
     }},
-    {label: "🖼️ تغيير غلاف الريل (صورة مصغّرة)", action: function(){
+    {label: "🖼️ تغيير الغلاف", action: function(){
       var inp = document.createElement("input"); inp.type = "file"; inp.accept = "image/*";
       inp.onchange = async function(){
         var f = inp.files[0]; if(!f) return;
@@ -1631,10 +1499,7 @@ function vpHtml(p){
   var ar = (p.vw && p.vh) ? Math.min(1.91, Math.max(0.8, p.vw / p.vh)) : 1.7778;
   var cover = p.poster ? '<img class="vp-poster" src="' + esc(p.poster) + '" alt="" loading="lazy">'
     : '<div class="vp-fallback"><img src="' + (esc(p.photo) || DEF) + '" alt=""></div>';
-  var ownVid = (p.uid === me.uid) || (p.pageId && myPages().some(function(x){ return x.id === p.pageId; })) || isAdmin;
-  var coverBtn = ownVid ? '<button type="button" class="vp-cover-btn" data-a="postmenu" data-i="' + p.id + '" title="تغيير الغلاف">🖼️ غلاف</button>' : '';
   return '<div class="vplayer" data-pid="' + p.id + '" data-src="' + esc(p.media) + '" style="--ar:' + ar.toFixed(3) + '">' + cover +
-    coverBtn +
     '<video playsinline webkit-playsinline preload="none"></video>' +
     '<div class="vp-spin"><span class="spinner"></span></div>' +
     '<button type="button" class="vp-big" data-vp="play" aria-label="تشغيل">' + VPI.play + '</button>' +
@@ -2285,9 +2150,9 @@ function postHtml(p){
   var cs = comments.filter(function(c){ return c.pid === p.id && !blocks.has(c.uid); });
   var own = p.uid === me.uid || (p.pageId && myPages().some(function(x){ return x.id === p.pageId; }));
   var friendChip = !own && isFriend(p.uid) ? ' <span class="chip green">صديق</span>' : "";
-  var h = '<article class="card" data-id="' + p.id + '"><div class="row post-head">';
+  var h = '<article class="card" data-id="' + p.id + '"><div class="row">';
   h += '<img class="av" src="' + (esc(p.photo) || DEF) + '" alt="">';
-  h += '<div style="flex:1;min-width:0">' + (p.pageId
+  h += '<div style="flex:1">' + (p.pageId
     ? '<button class="name" data-a="openpage" data-i="' + p.pageId + '">' + esc(p.name) + (pageVerified(p.pageId) ? VB : "") + ' <span class="chip">صفحة</span></button>'
     : '<button class="name" data-a="prof" data-u="' + p.uid + '">' + esc(p.name) + (isVerifiedUid(p.uid, p) ? VB : "") + pBadge(p.uid) + (isAdminUid(p.uid) ? ' <span class="chip green">الإدارة</span>' : "") + friendChip + '</button>');
   h += '<div class="time">' + ago(p.ts);
@@ -2296,7 +2161,7 @@ function postHtml(p){
   if(p.privacy === "friends") h += ' · <span class="chip">الأصدقاء</span>';
   h += '</div></div>';
   h += followBtnHtml(p);
-  h += '<button type="button" class="post-menu-btn" data-a="postmenu" title="خيارات المنشور" aria-label="خيارات المنشور">⋮</button>';
+  h += '<button class="mini" data-a="postmenu" title="خيارات المنشور" aria-label="خيارات المنشور">⋯</button>';
   var longT = (p.t || "").length > 130 || ((p.t || "").match(/\n/g) || []).length >= 2;
   var expP = tab === "post" || (window._expPost && window._expPost[p.id]);
   h += '</div><div class="body' + (longT && !expP ? " clamp" : "") + '">' + renderText(p.t) + '</div>';
@@ -2321,14 +2186,14 @@ function postHtml(p){
   var likeIco;
   if(myReaction && myReaction.reaction && myReaction.reaction !== "like"){
     likeIco = '<span class="act-ico">' + reactEmoji[myReaction.reaction] + '</span>';
+  } else if(on){
+    likeIco = LIKE_SVG;
   } else {
     likeIco = LIKE_SVG;
   }
-  var savedOn = (typeof savedItems !== 'undefined' && savedItems.some(function(s){ return s.pid === p.id; })) || !!(window._savedPosts && window._savedPosts[p.id]);
   h += '<button type="button" data-a="like" class="' + (on ? "on" : "") + '" title="اضغط مطولاً لاختيار التفاعل">' + likeIco + '<span class="act-n">' + (lk.length || "") + '</span></button>';
-  h += '<button type="button" data-a="cm" title="تعليق">' + CM_SVG + '<span class="act-n">' + (topCmCount || "") + '</span></button>';
-  h += '<button type="button" data-a="share" title="مشاركة">' + SHARE_SVG + '</button>';
-  h += '<button type="button" data-a="save" class="' + (savedOn ? "on" : "") + '" title="حفظ">' + SAVE_SVG + '</button></div>';
+  h += '<button type="button" data-a="cm"><span class="act-ico">💬</span><span class="act-n">' + (topCmCount || "") + '</span></button>';
+  h += '<button type="button" data-a="share"><span class="act-ico share-ico">↗</span><span class="act-n"></span></button></div>';
 
   // comments: top-level then replies
   var top = cs.filter(function(c){ return !c.parentId; });
@@ -2393,8 +2258,8 @@ function adHtml(a){
     likeIcoAd = LIKE_SVG;
   }
   h += '<button type="button" data-a="like" class="' + (on ? "on" : "") + '" title="اضغط مطولاً للتفاعل">' + likeIcoAd + '<span class="act-n">' + (lk.length || "") + '</span></button>';
-  h += '<button type="button" data-a="adcm" data-i="' + a.id + '" title="تعليق">' + CM_SVG + '<span class="act-n">' + (cs.length || "") + '</span></button>';
-  h += '<button type="button" data-a="share" data-i="' + a.id + '" title="مشاركة">' + SHARE_SVG + '</button></div>';
+  h += '<button type="button" data-a="adcm" data-i="' + a.id + '"><span class="act-ico">💬</span><span class="act-n">' + (cs.length || "") + '</span></button>';
+  h += '<button type="button" data-a="share" data-i="' + a.id + '"><span class="act-ico share-ico">↗</span><span class="act-n"></span></button></div>';
   cs.slice(-5).forEach(function(cm){
     h += '<div class="cm"><b>'+esc(cm.name||"عضو")+'</b> <small>'+ago(cm.ts)+'</small><div>'+renderText(cm.t||"")+'</div></div>';
   });
@@ -4130,27 +3995,6 @@ async function actions(b, er){
     draw();
     return;
   }
-  if(a === "save"){
-    var sr = doc(db, "savedPosts", me.uid + "_" + pid);
-    try{
-      var ss = await getDoc(sr);
-      if(!window._savedPosts) window._savedPosts = {};
-      if(ss.exists()){
-        await deleteDoc(sr);
-        delete window._savedPosts[pid];
-        if(typeof savedItems !== "undefined") savedItems = savedItems.filter(function(s){ return s.pid !== pid; });
-        b.classList.remove("on");
-        toast("أزيل من المحفوظات");
-      } else {
-        await setDoc(sr, {uid: me.uid, pid: pid, ts: Date.now()});
-        window._savedPosts[pid] = true;
-        if(typeof savedItems !== "undefined") savedItems.push({id: me.uid + "_" + pid, uid: me.uid, pid: pid, ts: Date.now()});
-        b.classList.add("on");
-        toast("تم الحفظ");
-      }
-    }catch(e){ toast(friendlyErr(e)); }
-    return;
-  }
   if(a === "like"){
     var r = doc(db, "likes", pid + "_" + me.uid);
     var lid = pid + "_" + me.uid;
@@ -4256,20 +4100,7 @@ async function actions(b, er){
     var isOwn = qmenu.uid===me.uid || isAdmin;
     openSheet("خيارات المنشور", [
       isOwn ? {label:"✏️ تعديل النص", action: async function(){ var txt=prompt("تعديل النص",qmenu.t||""); if(txt!==null) await updateDoc(doc(db,"posts",pid),{t:txt.trim(),editedAt:Date.now()}); }} : null,
-      (isOwn && qmenu.type === "video") ? {label:"🖼️ تغيير غلاف الفيديو", action: function(){
-        var inp = document.createElement("input"); inp.type = "file"; inp.accept = "image/*";
-        inp.onchange = async function(){
-          var f = inp.files[0]; if(!f) return;
-          try{
-            var u = await upUpload(f, "posts");
-            await updateDoc(doc(db, "posts", pid), {poster: u});
-            qmenu.poster = u;
-            toast("تم تغيير غلاف الفيديو"); draw();
-          }catch(e){ toast(e.message || friendlyErr(e), 5000); }
-        };
-        inp.click();
-      }} : null,
-      {label:"🔖 حفظ المنشور", action: async function(){ var sr=doc(db,"savedPosts",me.uid+"_"+pid),ss=await getDoc(sr); if(ss.exists()){await deleteDoc(sr); if(window._savedPosts) delete window._savedPosts[pid]; toast("أزيل من المحفوظات");}else{await setDoc(sr,{uid:me.uid,pid:pid,ts:Date.now()}); if(!window._savedPosts) window._savedPosts={}; window._savedPosts[pid]=true; toast("تم الحفظ");} draw(); }},
+      {label:"🔖 حفظ المنشور", action: async function(){ var sr=doc(db,"savedPosts",me.uid+"_"+pid),ss=await getDoc(sr); if(ss.exists()){await deleteDoc(sr);toast("أزيل من المحفوظات");}else{await setDoc(sr,{uid:me.uid,pid:pid,ts:Date.now()});toast("تم الحفظ");} }},
       isOwn ? {label:"🔒 تغيير الخصوصية", action: async function(){ var np=qmenu.privacy==="friends"?"public":"friends"; await updateDoc(doc(db,"posts",pid),{privacy:np}); toast(np==="friends"?"للأصدقاء فقط":"عام"); }} : null,
       {label:"🔗 نسخ الرابط", action: function(){ shareContent("post", pid, true); }},
       {label:"📤 مشاركة إلى القصة", action: async function(){ await addDoc(collection(db,"stories"),{uid:me.uid,name:prof.name,photo:prof.photo||"",media:qmenu.media||"",caption:(qmenu.t||"").slice(0,180),sharedPost:pid,ts:Date.now(),exp:Date.now()+86400000}); toast("نُشر في قصتك"); }},
@@ -5230,19 +5061,6 @@ document.addEventListener("input", function(e){
     });
   }
 });
-
-/* hydrate saved posts cache for UI state */
-async function hydrateSavedPosts(){
-  try{
-    if(!me || !me.uid || isGuest) return;
-    if(window._savedPostsHydrated) return;
-    window._savedPostsHydrated = true;
-    window._savedPosts = window._savedPosts || {};
-    var qs = await getDocs(query(collection(db, "savedPosts"), where("uid", "==", me.uid)));
-    qs.forEach(function(d){ var x = d.data(); if(x && x.pid) window._savedPosts[x.pid] = true; });
-  }catch(e){}
-}
-if(typeof me !== "undefined"){ try{ hydrateSavedPosts(); }catch(e){} }
 
 window.addEventListener("hashchange", openHash);
 setTimeout(openHash, 1500);
