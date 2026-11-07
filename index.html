@@ -568,6 +568,17 @@ article.card{content-visibility:auto;contain-intrinsic-size:auto 420px}
 .vplayer.started .vp-poster,.vplayer.started .vp-fallback{display:block}
 .vplayer.showvid .vp-poster,.vplayer.showvid .vp-fallback{display:none}
 
+
+/* ================= v2.0 ================= */
+.poll{margin:8px 0}
+.poll-o{position:relative;display:flex;justify-content:space-between;align-items:center;width:100%;margin:6px 0;padding:11px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);overflow:hidden;font-weight:700;text-align:start}
+button.poll-o:hover{border-color:var(--brand)}
+button.poll-o:active{transform:scale(.98)}
+.poll-o i{position:absolute;inset-block:0;inset-inline-start:0;background:rgba(15,154,117,.22);transition:width .5s}
+.poll-o.mine{border-color:var(--brand)}
+.poll-o span,.poll-o b{position:relative}
+.invite-card{background:linear-gradient(135deg,rgba(24,119,242,.10),rgba(15,154,117,.14))}
+
 </style>
 </head>
 <body>
@@ -824,7 +835,7 @@ function mediaResolve(raw){
 function mediaApi(){ return mediaResolve(window.HH_MEDIA_API); }                       // للرفع والفحص
 function mediaPublic(){ return mediaResolve(window.HH_MEDIA_PUBLIC || window.HH_MEDIA_API); } // لعرض الملفات
 /* إعادة كتابة روابط workers.dev المحفوظة سابقاً إلى العنوان العام الحالي (تدعم الانتقال لأي نطاق لاحقاً) */
-var MEDIA_OLD = /https?:\/\/[a-z0-9-]+(?:\.[a-z0-9-]+)*\.workers\.dev\/f\//gi;
+var MEDIA_OLD = /https?:\/\/(?:[a-z0-9-]+\.)*workers\.dev\/f\/|https?:\/\/(?:[a-z0-9-]+\.)*vercel\.app\/media\/f\/|https?:\/\/(?:www\.)?hashidhub\.com\/media\/f\//gi;
 function fixMedia(str){ var pb; try{ pb = mediaPublic(); }catch(e){ return str; } return String(str).replace(MEDIA_OLD, pb + "/f/"); }
 function fixMediaNode(n){
   if(!n || n.nodeType !== 1) return;
@@ -832,7 +843,7 @@ function fixMediaNode(n){
   if(n.querySelectorAll) list = list.concat(Array.prototype.slice.call(n.querySelectorAll("img,video,source")));
   list.forEach(function(el){
     var v = el.getAttribute("src");
-    if(v && v.indexOf(".workers.dev/f/") > -1){ MEDIA_OLD.lastIndex = 0; el.setAttribute("src", fixMedia(v)); }
+    if(v){ MEDIA_OLD.lastIndex = 0; var hit = MEDIA_OLD.test(v); MEDIA_OLD.lastIndex = 0; if(hit){ var nv = fixMedia(v); if(nv !== v) el.setAttribute("src", nv); } }
   });
 }
 try{
@@ -1080,6 +1091,7 @@ onAuthStateChanged(auth, async function(u){
   shell();
   setTimeout(syncPushToken, 2500);
   setTimeout(touchStreak, 3500);
+  setTimeout(flushPendingAsk, 4500);
   if(isAdmin) setTimeout(testStorage, 2000);
 });
 
@@ -1220,6 +1232,7 @@ function listen(){
       .sort(function(x,y){ return x.ts - y.ts; });
   });
   L(query(collection(db,"messageRequests"),where("members","array-contains",me.uid)),function(s){msgReqs=s.docs.map(function(d){return Object.assign({id:d.id},d.data());});});
+  L(collection(db, "pollVotes"), function(s){ pollVotes = s.docs.map(function(d){ return d.data(); }); });
   L(collection(db, "admins"), function(s){ adminIds = new Set(s.docs.map(function(d){ return d.id; })); });
   L(query(collection(db, "askQ"), where("to", "==", me.uid)), function(s){ askIn = s.docs.map(function(d){ return Object.assign({id: d.id}, d.data()); }); });
   L(query(collection(db,"savedPosts"),where("uid","==",me.uid)),function(s){savedItems=s.docs.map(function(d){return Object.assign({id:d.id},d.data());});});
@@ -1385,7 +1398,11 @@ async function uploadVideoWithPoster(file, folder, skipPoster){
 
 /* ذاكرة مؤقتة للفيديو (Cache Storage + Blob) لتشغيل فوري عند الإعادة */
 var _mc = {mem: {}, order: [], inflight: {}};
-function mediaCacheable(u){ return !!u && (u.charAt(0) === "/" || u.indexOf(location.origin) === 0) && u.indexOf("/media/f/") > -1; }
+function mediaCacheable(u){
+  if(!u || !/\/f\/[A-Za-z0-9_-]{20,}\.\w{2,5}(\?.*)?$/.test(u)) return false;
+  if(u.charAt(0) === "/" || u.indexOf(location.origin) === 0) return true;
+  try{ return u.indexOf(mediaPublic()) === 0; }catch(e){ return false; }
+}
 function mcRemember(u, obj){
   _mc.mem[u] = obj; _mc.order.push(u);
   while(_mc.order.length > 5){ var o = _mc.order.shift(); try{ URL.revokeObjectURL(_mc.mem[o]); }catch(e){} delete _mc.mem[o]; }
@@ -1764,6 +1781,7 @@ function listenGuest(){
   L(collection(db, "likes"), function(s){ likes = s.docs.map(function(d){ return Object.assign({id: d.id}, d.data()); }); });
   L(query(collection(db, "comments"), orderBy("ts", "asc")), function(s){ comments = s.docs.map(function(d){ return Object.assign({id: d.id}, d.data()); }); });
   L(query(collection(db, "reels"), orderBy("ts", "desc"), limit(60)), function(s){ reels = s.docs.map(function(d){ return Object.assign({id: d.id}, d.data()); }); });
+  L(collection(db, "pollVotes"), function(s){ pollVotes = s.docs.map(function(d){ return d.data(); }); });
 }
 function guestShell(){
   $("#app").innerHTML =
@@ -1828,6 +1846,7 @@ function askInbox(){
   var an = askIn.filter(function(q){ return q.answered; }).sort(function(a, b){ return (b.ansTs || 0) - (a.ansTs || 0); });
   var h = '<div class="card ask-card"><h3>❓ أسئلتي السرية ' + (un.length ? '<span class="chip gold">' + un.length + ' جديد</span>' : '') + '</h3>';
   if(!askIn.length) h += '<div class="note">لم يصلك شيء بعد. شارك رابط ملفك ليسألك الناس 🤫</div>';
+  h += '<button class="btn alt" data-a="askshare" style="width:100%;margin:8px 0">🔗 شارك رابط «اسألني» مع أصدقائك</button>';
   un.forEach(function(q){ h += askQHtml(q, true); });
   an.slice(0, 5).forEach(function(q){ h += askQHtml(q, true); });
   return h + '</div>';
@@ -1998,7 +2017,8 @@ async function recStart(){
 }
 function recStop(){ clearInterval(REC.timer); try{ if(REC.mr && REC.mr.state !== "inactive") REC.mr.stop(); }catch(e){} }
 function audioNote(){
-  return draft.audio ? '<div class="note">🎙 تسجيل صوتي (' + vpFmt(draft.audio.dur) + ') مرفق <button type="button" class="mini" data-a="rmaudio">✕</button></div>' : "";
+  return (draft.audio ? '<div class="note">🎙 تسجيل صوتي (' + vpFmt(draft.audio.dur) + ') مرفق <button type="button" class="mini" data-a="rmaudio">✕</button></div>' : "") +
+    (draft.poll ? '<div class="note">📊 استطلاع بـ ' + draft.poll.length + ' خيارات <button type="button" class="mini" data-a="rmpoll">✕</button></div>' : "");
 }
 function apHtml(url, dur){
   return '<div class="aplayer" data-src="' + esc(url) + '"><button type="button" class="ap-btn" data-ap="toggle" aria-label="تشغيل">' + VPI.playSm + '</button>' +
@@ -2080,6 +2100,129 @@ document.addEventListener("change", function(e){
   if(f.type.indexOf("image/") !== 0) return toast("اختر صورة");
   draft.cover = f; draw();
 });
+
+/* ============ v2.0: استطلاعات، دعوات، رابط «اسألني»، محتوى رسمي ============ */
+(function captureRef(){
+  try{
+    var r = new URLSearchParams(location.search).get("ref");
+    if(r && /^[A-Za-z0-9_-]{10,40}$/.test(r)) localStorage.setItem("hh_ref", r);
+  }catch(e){}
+})();
+
+/* ---- الاستطلاعات ---- */
+var pollVotes = [];
+function pollHtml(p){
+  var opts = p.poll || [], vs = pollVotes.filter(function(v){ return v.pid === p.id; });
+  var mine = vs.filter(function(v){ return v.uid === me.uid; })[0], tot = vs.length;
+  var h = '<div class="poll">';
+  opts.forEach(function(o, i){
+    var c = vs.filter(function(v){ return v.opt === i; }).length, pc = tot ? Math.round(c / tot * 100) : 0;
+    if(mine) h += '<div class="poll-o done' + (mine.opt === i ? " mine" : "") + '"><i style="width:' + pc + '%"></i><span>' + esc(o) + (mine.opt === i ? " ✓" : "") + '</span><b>' + pc + '%</b></div>';
+    else h += '<button type="button" class="poll-o" data-a="pollvote" data-o="' + i + '"><span>' + esc(o) + '</span></button>';
+  });
+  return h + '<div class="note">' + tot + ' صوت' + (mine ? "" : " · صوّت لترى النتائج") + '</div></div>';
+}
+function closePollMaker(){ var d = document.getElementById("pollmodal"); if(d) d.remove(); if(!document.getElementById("authmodal") && !document.getElementById("reelplayer")) document.body.style.overflow = ""; }
+function openPollMaker(){
+  closePollMaker();
+  var d = document.createElement("div");
+  d.id = "pollmodal"; d.className = "amodal";
+  d.innerHTML = '<div class="am-card"><button type="button" class="am-x" data-pm="close" aria-label="إغلاق">✕</button><h3>📊 استطلاع جديد</h3>' +
+    '<div class="note" style="text-align:center">اكتب السؤال في مربع النشر، وأضف الخيارات هنا (من 2 إلى 4).</div>' +
+    '<input type="text" id="pm-1" maxlength="40" placeholder="الخيار 1"><input type="text" id="pm-2" maxlength="40" placeholder="الخيار 2">' +
+    '<input type="text" id="pm-3" maxlength="40" placeholder="الخيار 3 (اختياري)"><input type="text" id="pm-4" maxlength="40" placeholder="الخيار 4 (اختياري)">' +
+    '<button type="button" class="btn big" data-pm="ok" style="width:100%;margin-top:10px">إضافة الاستطلاع للمنشور</button></div>';
+  document.body.appendChild(d); document.body.style.overflow = "hidden";
+  d.addEventListener("click", function(e){
+    e.stopPropagation();
+    var k = e.target.closest("[data-pm]"), a = k ? k.dataset.pm : (e.target === d ? "close" : "");
+    if(a === "close"){ closePollMaker(); return; }
+    if(a === "ok"){
+      var o = [1, 2, 3, 4].map(function(i){ return (document.getElementById("pm-" + i).value || "").trim(); }).filter(Boolean);
+      if(o.length < 2) return toast("أضف خيارين على الأقل");
+      draft.poll = o; closePollMaker(); draw(); toast("أُضيف الاستطلاع — اكتب السؤال ثم انشر");
+    }
+  });
+}
+
+/* ---- الدعوات ---- */
+function refCount(uid){ return users.filter(function(u){ return u.refBy === uid; }).length; }
+function ambLevel(n){ return n >= 25 ? {i: "👑", t: "أسطورة"} : n >= 10 ? {i: "🚀", t: "نجم"} : n >= 3 ? {i: "🌟", t: "سفير"} : null; }
+function ambBadge(uidOrDoc){
+  var id = typeof uidOrDoc === "string" ? uidOrDoc : (uidOrDoc && uidOrDoc.id);
+  var lv = id ? ambLevel(refCount(id)) : null;
+  return lv ? '<div class="chip gold">' + lv.i + ' ' + lv.t + '</div>' : "";
+}
+function inviteCard(){
+  var n = refCount(me.uid), next = n < 3 ? 3 : n < 10 ? 10 : n < 25 ? 25 : 0, lv = ambLevel(n);
+  return '<div class="card invite-card"><h3>🎁 ادعُ أصدقاءك</h3>' +
+    '<div class="note">كل من ينضم عبر رابطك يُحتسب لك. ' + (lv ? 'مستواك: ' + lv.i + ' ' + lv.t + '. ' : '') + (next ? 'بقي ' + (next - n) + ' للمستوى التالي.' : 'وصلت لأعلى مستوى!') + '</div>' +
+    '<div class="row" style="margin:8px 0"><span class="chip">دعوت ' + n + '</span><span class="chip">🔥 ' + (prof.streak || 0) + ' يوم</span></div>' +
+    '<button class="btn big" data-a="invite" style="width:100%">📤 شارك رابط الدعوة</button></div>';
+}
+async function shareText(title, text, url){
+  if(navigator.share){ try{ await navigator.share({title: title, text: text, url: url}); return; }catch(e){ if(e && e.name === "AbortError") return; } }
+  try{ await navigator.clipboard.writeText(url); toast("تم نسخ الرابط"); }catch(e){ prompt("انسخ الرابط", url); }
+}
+
+/* ---- رابط «اسألني» (يعمل للزوار ثم يطلب التسجيل) ---- */
+async function sendAsk(to, text){
+  var qref = doc(collection(db, "askQ"));
+  await setDoc(qref, {to: to, t: String(text).slice(0, 300), ts: Date.now(), answered: false, answer: "", ansTs: 0});
+  await setDoc(doc(db, "askMeta", qref.id), {from: me.uid, ts: Date.now()}).catch(function(){});
+  pushTo(to, "question");
+}
+async function shareAskLink(){
+  var ph = prof.photo || "";
+  if(ph.charAt(0) === "/") ph = location.origin + ph;
+  try{
+    await setDoc(doc(db, "shares", "ask_" + me.uid), {uid: me.uid, kind: "ask", name: prof.name || "", photo: /^https:/.test(ph) ? ph : "",
+      title: ("اسأل " + (prof.name || "صديقك") + " سراً 🤫").slice(0, 110), desc: "اكتب سؤالاً أو رسالة دون أن يعرف أحد من أنت", image: /^https:/.test(ph) ? ph : "", ts: Date.now()});
+  }catch(e){}
+  await shareText("اسألني سراً", "اسألني أي شيء بسرية تامة 🤫", location.origin + "/s/ask_" + me.uid);
+}
+function closeAskModal(){ var d = document.getElementById("askmodal"); if(d) d.remove(); if(!document.getElementById("authmodal")) document.body.style.overflow = ""; }
+async function openAskModal(uid){
+  if(!uid) return;
+  if(!isGuest && uid === me.uid){ toast("هذا رابطك 😄 شاركه مع أصدقائك"); return; }
+  var info = {};
+  try{ var sn = await getDoc(doc(db, "shares", "ask_" + uid)); if(sn.exists()) info = sn.data(); }catch(e){}
+  closeAskModal();
+  var d = document.createElement("div");
+  d.id = "askmodal"; d.className = "amodal";
+  d.innerHTML = '<div class="am-card" style="text-align:center"><button type="button" class="am-x" data-ak="close" aria-label="إغلاق">✕</button>' +
+    '<img class="pg-av" src="' + (esc(info.photo) || DEF) + '" alt="" style="margin:4px auto;display:block">' +
+    '<h3>اسأل ' + esc(info.name || "صاحب الرابط") + ' سراً 🤫</h3><div class="note">لن يعرف أحد من أنت. اكتب ما تشاء باحترام.</div>' +
+    '<textarea id="am-ask" maxlength="300" placeholder="اكتب سؤالك أو رسالتك…"></textarea>' +
+    '<button type="button" class="btn big" data-ak="send" style="width:100%;margin-top:8px">إرسال بسرية</button></div>';
+  document.body.appendChild(d); document.body.style.overflow = "hidden";
+  d.addEventListener("click", async function(e){
+    e.stopPropagation();
+    var k = e.target.closest("[data-ak]"), a = k ? k.dataset.ak : (e.target === d ? "close" : "");
+    if(a === "close"){ closeAskModal(); return; }
+    if(a !== "send") return;
+    var t = (document.getElementById("am-ask").value || "").trim();
+    if(!t) return toast("اكتب سؤالك أولاً");
+    if(isGuest){
+      try{ localStorage.setItem("hh_pending_ask", JSON.stringify({to: uid, t: t, ts: Date.now()})); }catch(x){}
+      closeAskModal(); showAuthModal(); toast("سجّل دخولك ليصل سؤالك — ويبقى سرياً");
+      return;
+    }
+    if(Date.now() - (window._askLast || 0) < 20000) return toast("انتظر قليلاً قبل سؤال جديد");
+    window._askLast = Date.now();
+    try{ await sendAsk(uid, t); closeAskModal(); toast("وصل سؤالك دون أن يعرف أحد من أنت 🤫"); }
+    catch(x){ toast(friendlyErr(x)); }
+  });
+}
+async function flushPendingAsk(){
+  try{
+    var raw = localStorage.getItem("hh_pending_ask"); if(!raw || isGuest) return;
+    localStorage.removeItem("hh_pending_ask");
+    var o = JSON.parse(raw);
+    if(Date.now() - o.ts > 3600000 || o.to === me.uid) return;
+    await sendAsk(o.to, o.t); toast("وصل سؤالك دون أن يعرف أحد من أنت 🤫");
+  }catch(e){}
+}
 
 function bnavBtn(t, svg, label, badgeId){
   return '<button data-t="' + t + '" class="' + (tab === t ? "on" : "") + '"><svg viewBox="0 0 24 24">' + svg + '</svg>' + (badgeId ? '<b id="' + badgeId + '"></b>' : '') + '<span>' + label + '</span></button>';
@@ -2194,7 +2337,7 @@ function postHtml(p){
   var friendChip = !own && isFriend(p.uid) ? ' <span class="chip green">صديق</span>' : "";
   var h = '<article class="card" data-id="' + p.id + '"><div class="row">';
   h += '<img class="av" src="' + (esc(p.photo) || DEF) + '" alt="">';
-  h += '<div style="flex:1">' + (p.pageId
+  h += '<div style="flex:1">' + (p.official ? '<span class="name">' + esc(p.name) + VB + ' <span class="chip green">رسمي</span></span>' : p.pageId
     ? '<button class="name" data-a="openpage" data-i="' + p.pageId + '">' + esc(p.name) + (pageVerified(p.pageId) ? VB : "") + ' <span class="chip">صفحة</span></button>'
     : '<button class="name" data-a="prof" data-u="' + p.uid + '">' + esc(p.name) + (isVerifiedUid(p.uid, p) ? VB : "") + pBadge(p.uid) + (isAdminUid(p.uid) ? ' <span class="chip green">الإدارة</span>' : "") + friendChip + '</button>');
   h += '<div class="time">' + ago(p.ts);
@@ -2209,6 +2352,7 @@ function postHtml(p){
   h += '</div><div class="body' + (longT && !expP ? " clamp" : "") + '">' + renderText(p.t) + '</div>';
   if(longT && !expP) h += '<button type="button" class="more-btn" data-a="moretext">المزيد…</button>';
   h += yt(p.t);
+  if(p.poll && p.poll.length) h += pollHtml(p);
   if(p.media && /^https?:\/\//i.test(p.media)){
     if(p.type === "audio") h += apHtml(p.media, p.dur);
     else if(p.type === "video") h += vpHtml(p);
@@ -2364,7 +2508,7 @@ function homeView(){
     '<textarea id="tx" placeholder="بماذا تفكر يا ' + esc((prof.name||"").split(" ")[0]) + '؟" maxlength="5000"></textarea></div>';
   if(draft.file) composer += '<div class="note" style="margin-top:6px">مرفق: ' + esc(draft.file.name) + ' <button class="mini" data-a="cleardraft">إزالة</button></div>';
   composer += '<div class="tools"><label>صورة<input type="file" id="fm" accept="image/*" hidden></label>' +
-    '<label title="الحد الأقصى 50 ميجا ويُضغط تلقائياً">فيديو <small style="opacity:.65">≤50MB</small><input type="file" id="fv" accept="video/*" hidden></label>' + '<button type="button" class="vlabel" data-a="recpost">🎙 صوت</button>';
+    '<label title="الحد الأقصى 50 ميجا ويُضغط تلقائياً">فيديو <small style="opacity:.65">≤50MB</small><input type="file" id="fv" accept="video/*" hidden></label>' + '<button type="button" class="vlabel" data-a="recpost">🎙 صوت</button>' + '<button type="button" class="vlabel" data-a="pollmake">📊 استطلاع</button>';
   if(mps.length){
     composer += '<select id="aspage" style="margin-top:0;max-width:150px"><option value="">انشر باسمك</option>';
     mps.forEach(function(p){ composer += '<option value="' + p.id + '">صفحة: ' + esc(p.name) + '</option>'; });
@@ -2409,7 +2553,7 @@ function meView(){
   var h = '<div class="pcard"><div class="row">' +
     '<img class="av lg" src="' + (esc(prof.photo) || DEF) + '" alt="">' +
     '<div style="flex:1"><div class="name" style="font-size:1.2rem">' + esc(prof.name) + (prof.verified ? VB : "") + (prem ? CROWN : "") + '</div>' +
-    (prem ? '<div class="chip gold">عضو مميز 👑</div>' : "") + moodBadge(prof) +
+    (prem ? '<div class="chip gold">عضو مميز 👑</div>' : "") + moodBadge(prof) + ambBadge(me.uid) +
     '<div class="note" style="margin-top:4px">' + esc(prof.bio || "لا توجد نبذة.") + '</div></div></div>' +
     '<div class="grid" style="margin-top:12px">' +
     '<div><b>' + fc + '</b>صديق' + (fc >= 5000 ? " (ممتلئ)" : "") + '</div>' +
@@ -2446,7 +2590,7 @@ function meView(){
     '<button class="btn alt" data-a="teststorage" style="flex:1">🔧 فحص الاتصال بالتخزين</button></div>' +
     '<div class="note" style="margin-top:6px">لوحة فحص خاصة بالإدارة فقط</div><div class="note">معرّف الإدارة: <code style="user-select:all;word-break:break-all">' + me.uid + '</code></div></div>';
 
-  h += pagesSection(me.uid) + askInbox();
+  h += inviteCard() + pagesSection(me.uid) + askInbox();
   h += reelsSection(me.uid);
   var mine = posts.filter(function(p){ return p.uid === me.uid; });
   mine.forEach(function(p){ h += postHtml(p); });
@@ -2485,7 +2629,7 @@ function profileView(){
   var h = '<div class="pcard"><div class="row">' +
     '<img class="av lg" src="' + (esc(d.photo) || DEF) + '" alt="">' +
     '<div style="flex:1"><div class="name" style="font-size:1.2rem">' + esc(d.name) + (d.verified ? VB : "") + (prem ? CROWN : "") + '</div>' +
-    (prem ? '<div class="chip gold">عضو مميز 👑</div>' : "") + moodBadge(d) +
+    (prem ? '<div class="chip gold">عضو مميز 👑</div>' : "") + moodBadge(d) + ambBadge(u) +
     '<div class="note" style="margin-top:4px">' + esc(d.bio || "") + '</div></div></div>' +
     '<div class="grid" style="margin-top:12px">' +
     '<div><b>' + fc + '</b>صديق</div>' +
@@ -3102,7 +3246,7 @@ function pageView(){
       '<textarea id="tx" placeholder="انشر باسم ' + esc(p.name) + '…" maxlength="5000"></textarea></div>' +
       (draft.file ? '<div class="note">مرفق: ' + esc(draft.file.name) + '</div>' : "") + coverPick() + audioNote() +
       '<div class="tools"><label>صورة<input type="file" id="fm" accept="image/*" hidden></label>' +
-      '<label title="الحد الأقصى 50 ميجا ويُضغط تلقائياً">فيديو <small style="opacity:.65">≤50MB</small><input type="file" id="fv" accept="video/*" hidden></label>' + '<button type="button" class="vlabel" data-a="recpost">🎙 صوت</button>' +
+      '<label title="الحد الأقصى 50 ميجا ويُضغط تلقائياً">فيديو <small style="opacity:.65">≤50MB</small><input type="file" id="fv" accept="video/*" hidden></label>' + '<button type="button" class="vlabel" data-a="recpost">🎙 صوت</button>' + '<button type="button" class="vlabel" data-a="pollmake">📊 استطلاع</button>' +
       '<button type="button" class="btn alt" data-a="addreel" data-p="' + p.id + '">🎬 ريل</button>' +
       '<button class="btn" id="pub" style="margin-inline-start:auto">نشر</button></div></div>';
   }
@@ -3158,7 +3302,7 @@ function groupView(){
       '<textarea id="tx" placeholder="اكتب للمجموعة…" maxlength="5000"></textarea></div>' +
       (draft.file ? '<div class="note">مرفق: ' + esc(draft.file.name) + '</div>' : "") + coverPick() + audioNote() +
       '<div class="tools"><label>صورة<input type="file" id="fm" accept="image/*" hidden></label>' +
-      '<label title="الحد الأقصى 50 ميجا ويُضغط تلقائياً">فيديو <small style="opacity:.65">≤50MB</small><input type="file" id="fv" accept="video/*" hidden></label>' + '<button type="button" class="vlabel" data-a="recpost">🎙 صوت</button>' +
+      '<label title="الحد الأقصى 50 ميجا ويُضغط تلقائياً">فيديو <small style="opacity:.65">≤50MB</small><input type="file" id="fv" accept="video/*" hidden></label>' + '<button type="button" class="vlabel" data-a="recpost">🎙 صوت</button>' + '<button type="button" class="vlabel" data-a="pollmake">📊 استطلاع</button>' +
       '<button class="btn" id="pub" style="margin-inline-start:auto">نشر</button></div></div>';
   } else {
     h += '<div class="card note">انضم للمجموعة لتتمكن من النشر والمشاركة.</div>';
@@ -3809,6 +3953,7 @@ document.addEventListener("click", async function(e){
       if(f){ photo = await upUpload(f, "avatars"); }
       else if(me.photoURL){ photo = me.photoURL; }
       prof = {name: n, bio: $("#pb").value.trim(), photo: photo, ts: Date.now()};
+      try{ var rf = localStorage.getItem("hh_ref"); if(rf && rf !== me.uid) prof.refBy = rf; }catch(e){}
       await setDoc(doc(db, "users", me.uid), prof);
       location.reload();
       return;
@@ -3844,6 +3989,7 @@ async function actions(b, er){
   if(b.id === "pub"){
     var t = ($("#tx").value || "").trim();
     if(!t && !draft.file && !draft.audio) return;
+    if(draft.poll && !t) return toast("اكتب سؤال الاستطلاع في مربع النشر");
     if(!cool()) return;
     b.disabled = true;
     var d = {uid: me.uid, t: t, ts: Date.now(), ver: !!prof.verified};
@@ -3874,6 +4020,7 @@ async function actions(b, er){
         }
       }
       if(draft.audio){ d.media = await upUpload(draft.audio.file, "voice"); d.type = "audio"; d.dur = draft.audio.dur; }
+      if(draft.poll){ d.poll = draft.poll; }
       await addDoc(collection(db, "posts"), d);
       draft = {file: null, text: ""};
       var txe = $("#tx"); if(txe) txe.value = "";
@@ -4667,6 +4814,18 @@ if(a === "adlike"){
     });
     return;
   }
+  if(a === "pollvote"){
+    var pidv = pid, ov = parseInt(b.dataset.o, 10);
+    if(pollVotes.some(function(v){ return v.pid === pidv && v.uid === me.uid; })) return;
+    pollVotes.push({pid: pidv, uid: me.uid, opt: ov, ts: Date.now()}); draw();
+    try{ await setDoc(doc(db, "pollVotes", pidv + "_" + me.uid), {pid: pidv, uid: me.uid, opt: ov, ts: Date.now()}); }
+    catch(x){ pollVotes = pollVotes.filter(function(v){ return !(v.pid === pidv && v.uid === me.uid); }); draw(); toast(friendlyErr(x)); }
+    return;
+  }
+  if(a === "pollmake"){ openPollMaker(); return; }
+  if(a === "rmpoll"){ draft.poll = null; draw(); return; }
+  if(a === "invite"){ await shareText("HashidHub", "انضم لي على HashidHub — منصة تواصل جديدة 🔥", location.origin + "/?ref=" + me.uid); return; }
+  if(a === "askshare"){ await shareAskLink(); return; }
   if(a === "openreel"){ openReelPlayer(b.dataset.i); return; }
   if(a === "prof" && document.getElementById("reelplayer")){ closeReelPlayer(false); }
   if(a === "stab"){
@@ -4958,6 +5117,8 @@ async function openHash(){
   var h = location.hash;
   var m;
   try{
+    m = h.match(/^#ask=([\w-]+)/);
+    if(m){ history.replaceState(null, "", location.pathname + location.search); openAskModal(m[1]); return; }
     m = h.match(/^#reel=(\w+)/);
     if(m){
       tab = "reels"; draw();

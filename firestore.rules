@@ -27,7 +27,8 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if signedIn();
       allow create: if isOwner(userId)
-        && !request.resource.data.keys().hasAny(['admin', 'isAdmin', 'role', 'verified']);
+        && !request.resource.data.keys().hasAny(['admin', 'isAdmin', 'role'])
+        && (!('verified' in request.resource.data) || request.resource.data.verified == false);
       allow update: if (isOwner(userId) || isAdmin())
         && (!request.resource.data.diff(resource.data).affectedKeys()
               .hasAny(['admin', 'isAdmin', 'role', 'verified'])
@@ -224,6 +225,15 @@ service cloud.firestore {
       allow read, delete: if isAdmin();
       allow update: if false;
     }
+    // —— أصوات الاستطلاعات: صوت واحد لكل عضو ولا يتغير ——
+    match /pollVotes/{id} {
+      allow read: if true;
+      allow create: if signedIn() && request.resource.data.uid == uid()
+        && id == request.resource.data.pid + '_' + uid()
+        && request.resource.data.opt is int
+        && request.resource.data.opt >= 0 && request.resource.data.opt < 6;
+      allow update, delete: if false;
+    }
     match /reelLikes/{id} {
       allow read: if signedIn();
       allow create, update: if signedIn()
@@ -244,7 +254,7 @@ service cloud.firestore {
     match /pages/{id} {
       allow read: if signedIn();
       allow create: if signedIn() && request.resource.data.owner == uid()
-        && !request.resource.data.keys().hasAny(['verified']);
+        && (!('verified' in request.resource.data) || request.resource.data.verified == false);
       allow update: if signedIn() && (isAdmin() || (resource.data.owner == uid()
         && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['verified', 'owner'])));
       allow delete: if signedIn() && (resource.data.owner == uid() || isAdmin());
