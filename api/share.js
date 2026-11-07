@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
   let image = d.image || "";
   if (image.charAt(0) === "/") image = origin + image;
   if (!/^https:\/\//i.test(image)) image = "";
-  const target = origin + "/#" + (d.kind === "reel" ? "reel=" : "p=") + id;
+  const target = origin + "/#" + (d.kind === "ask" ? "ask=" + id.replace(/^ask_/, "") : (d.kind === "reel" ? "reel=" : "p=") + id);
   const html = '<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8">' +
     '<meta name="viewport" content="width=device-width,initial-scale=1">' +
     "<title>" + esc(title) + "</title>" +
