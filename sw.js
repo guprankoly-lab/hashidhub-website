@@ -1,5 +1,5 @@
-var CACHE = "hashidhub-v20";
-var ASSETS = ["./index.html", "./manifest.json", "./icon.svg", "./firebase-config.js"];
+var CACHE = "hashidhub-v21";
+var ASSETS = ["./index.html", "./manifest.json", "./icon.svg", "./firebase-config.js", "./media-config.js"];
 
 self.addEventListener("install", function(e){
   e.waitUntil(caches.open(CACHE).then(function(c){ return c.addAll(ASSETS); }).then(function(){ self.skipWaiting(); }));
