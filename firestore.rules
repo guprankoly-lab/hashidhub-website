@@ -47,7 +47,10 @@ service cloud.firestore {
       allow read: if true;
       allow create: if signedIn()
         && request.resource.data.uid == uid()
-        && request.resource.data.t is string && request.resource.data.t.size() <= 5000;
+        && request.resource.data.t is string && request.resource.data.t.size() <= 5000
+        && (!request.resource.data.keys().hasAny(['official']) || request.resource.data.official == false)
+        && (!request.resource.data.keys().hasAny(['ver'])
+            || request.resource.data.ver == get(/databases/$(database)/documents/users/$(uid())).data.verified);
       allow update, delete: if signedIn()
         && (resource.data.uid == uid() || isAdmin());
     }
@@ -187,7 +190,11 @@ service cloud.firestore {
     // —— Reels ——
     match /reels/{id} {
       allow read: if true;
-      allow create: if signedIn() && request.resource.data.uid == uid();
+      allow create: if signedIn()
+        && request.resource.data.uid == uid()
+        && (!request.resource.data.keys().hasAny(['official']) || request.resource.data.official == false)
+        && (!request.resource.data.keys().hasAny(['ver'])
+            || request.resource.data.ver == get(/databases/$(database)/documents/users/$(uid())).data.verified);
       allow update: if signedIn()
         && (resource.data.uid == uid() || isAdmin()
             // allow like-count increments from any signed-in user
@@ -237,7 +244,9 @@ service cloud.firestore {
     match /reelLikes/{id} {
       allow read: if signedIn();
       allow create, update: if signedIn()
-        && request.resource.data.uid == uid();
+        && request.resource.data.uid == uid()
+        && request.resource.data.rid is string
+        && id == request.resource.data.rid + '_' + uid();
       allow delete: if signedIn()
         && (resource.data.uid == uid() || isAdmin());
     }
@@ -245,7 +254,9 @@ service cloud.firestore {
       allow read: if true;
       allow create: if signedIn()
         && request.resource.data.uid == uid()
-        && validText(request.resource.data.t, 2000);
+        && request.resource.data.rid is string
+        && validText(request.resource.data.t, 2000)
+        && request.resource.data.ts is number;
       allow update, delete: if signedIn()
         && (resource.data.uid == uid() || isAdmin());
     }

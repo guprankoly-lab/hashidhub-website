@@ -884,6 +884,17 @@ function mediaResolve(raw){
 }
 function mediaApi(){ return mediaResolve(window.HH_MEDIA_API); }                       // للرفع والفحص
 function mediaPublic(){ return mediaResolve(window.HH_MEDIA_PUBLIC || window.HH_MEDIA_API); } // لعرض الملفات
+(function preconnectMedia(){
+  try{
+    var raw = String(window.HH_MEDIA_PUBLIC || window.HH_MEDIA_API || "").trim();
+    if(!raw || raw.charAt(0) === "/") return;
+    if(!/^https?:\/\//i.test(raw)) raw = "https://" + raw;
+    var origin = new URL(raw).origin;
+    if(origin === location.origin) return;
+    var link = document.createElement("link"); link.rel = "preconnect"; link.href = origin; link.crossOrigin = "anonymous";
+    document.head.appendChild(link);
+  }catch(e){}
+})();
 /* إعادة كتابة روابط workers.dev المحفوظة سابقاً إلى العنوان العام الحالي (تدعم الانتقال لأي نطاق لاحقاً) */
 var MEDIA_OLD = /https?:\/\/(?:[a-z0-9-]+\.)*workers\.dev\/f\/|https?:\/\/(?:[a-z0-9-]+\.)*vercel\.app\/media\/f\/|https?:\/\/(?:www\.)?hashidhub\.com\/media\/f\//gi;
 function fixMedia(str){ var pb; try{ pb = mediaPublic(); }catch(e){ return str; } return String(str).replace(MEDIA_OLD, pb + "/f/"); }
@@ -1446,38 +1457,7 @@ async function uploadVideoWithPoster(file, folder, skipPoster){
   return {url: url, poster: poster, w: vm ? vm.w : 0, h: vm ? vm.h : 0};
 }
 
-/* ذاكرة مؤقتة للفيديو (Cache Storage + Blob) لتشغيل فوري عند الإعادة */
-var _mc = {mem: {}, order: [], inflight: {}};
-function mediaCacheable(u){
-  if(!u || !/\/f\/[A-Za-z0-9_-]{20,}\.\w{2,5}(\?.*)?$/.test(u)) return false;
-  if(u.charAt(0) === "/" || u.indexOf(location.origin) === 0) return true;
-  try{ return u.indexOf(mediaPublic()) === 0; }catch(e){ return false; }
-}
-function mcRemember(u, obj){
-  _mc.mem[u] = obj; _mc.order.push(u);
-  while(_mc.order.length > 5){ var o = _mc.order.shift(); try{ URL.revokeObjectURL(_mc.mem[o]); }catch(e){} delete _mc.mem[o]; }
-  return obj;
-}
-async function mediaCachedUrl(u, fetchIfMissing){
-  if(!mediaCacheable(u) || !window.caches) return null;
-  if(_mc.mem[u]) return _mc.mem[u];
-  try{
-    var cache = await caches.open("hh-media-v1");
-    var hit = await cache.match(u);
-    if(hit){ return mcRemember(u, URL.createObjectURL(await hit.blob())); }
-    if(!fetchIfMissing) return null;
-    if(_mc.inflight[u]) return _mc.inflight[u];
-    _mc.inflight[u] = (async function(){
-      try{
-        var r = await fetch(u);
-        if(!r.ok || r.status !== 200) return null;
-        cache.put(u, r.clone()).then(function(){ return cache.keys(); }).then(function(ks){ if(ks.length > 24) cache.delete(ks[0]); }).catch(function(){});
-        return mcRemember(u, URL.createObjectURL(await r.blob()));
-      }catch(e){ return null; } finally { delete _mc.inflight[u]; }
-    })();
-    return _mc.inflight[u];
-  }catch(e){ return null; }
-}
+/* تشغيل الفيديو مباشرة من مصدر الوسائط؛ يدير المتصفح Range وذاكرة HTTP دون تنزيل Blob كامل. */
 
 /* ============ مشاركة بمعاينة (صورة + وصف) ============ */
 async function shareContent(kind, id, copyOnly){
@@ -1622,7 +1602,11 @@ function vpBind(el){
 function vpPlay(el){
   var v = el.querySelector("video"); vpBind(el);
   document.querySelectorAll(".vplayer.playing").forEach(function(o){ if(o !== el){ var ov = o.querySelector("video"); if(ov) ov.pause(); } });
-  if(v.getAttribute("src") !== el.dataset.src) v.src = el.dataset.src;
+  if(v.getAttribute("src") !== el.dataset.src){
+    v.preload = "auto";
+    v.setAttribute("data-started-by-user", "1");
+    v.src = el.dataset.src;
+  }
   if(el.classList.contains("ended")){ try{ v.currentTime = 0; }catch(e){} }
   el.classList.add("started", "loading");
   v.muted = !!window._hhFeedMuted; vpMuteIcon(el);
@@ -2981,12 +2965,16 @@ function closeReelPlayer(fromPop){
 function openReelPlayer(id){
   closeReelPlayer(true);
   document.querySelectorAll(".vplayer.playing video").forEach(function(v){ try{ v.pause(); }catch(e){} });
-  var list = sortedReels();
-  if(!list.length){ toast(t("لا ريلز","No reels")); return; }
+  var allList = sortedReels();
+  if(!allList.length){ toast(t("لا ريلز","No reels")); return; }
   if(!window._reelLiked) window._reelLiked = {};
   window._hhReelMuted = getPref("reelmuted") === "on";
-  var startIdx = 0;
-  list.forEach(function(r, i){ if(r.id === id) startIdx = i; });
+  var absoluteIdx = 0;
+  allList.forEach(function(r, i){ if(r.id === id) absoluteIdx = i; });
+  // حد عملي يمنع تضخم DOM في الحسابات النشطة؛ نحتفظ بنافذة حول المقطع المطلوب.
+  var windowStart = allList.length > 120 ? Math.max(0, Math.min(absoluteIdx - 40, allList.length - 120)) : 0;
+  var list = allList.slice(windowStart, windowStart + 120);
+  var startIdx = Math.max(0, absoluteIdx - windowStart);
 
   var h = '<div class="reel-viewer" id="reelplayer" role="dialog" aria-modal="true"><div class="reel-stage">' +
     '<div class="reel-top"><button type="button" data-a="closereel" aria-label="' + t("رجوع","Back") + '">' + RIC.back + '</button>' +
@@ -3034,18 +3022,27 @@ function openReelPlayer(id){
     var b = viewer.querySelector('[data-a="reelsound"]');
     if(b){ b.innerHTML = window._hhReelMuted ? RIC.volOff : RIC.volOn; b.setAttribute("aria-label", window._hhReelMuted ? t("تشغيل الصوت","Unmute") : t("كتم الصوت","Mute")); }
   }
-  function lowData(){ return getPref("dataSaver") === "on"; }
+  function lowData(){
+    if(getPref("dataSaver") === "on") return true;
+    try{
+      var c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      return !!(c && (c.saveData || /^(slow-2g|2g)$/.test(c.effectiveType || "")));
+    }catch(e){ return false; }
+  }
   function setSrc(it, url){ var v = vid(it); if(v.getAttribute("src") !== url) v.src = url; }
   function prepare(it, full){
     var u = it.dataset.src, v = vid(it);
     if(!u) return Promise.resolve();
-    return mediaCachedUrl(u, false).then(function(b){
-      if(b){ setSrc(it, b); return; }
-      if(!v.getAttribute("src")){ v.preload = full ? "auto" : "metadata"; v.src = u; }
-      if(full && !lowData()){
-        mediaCachedUrl(u, true).then(function(b2){ if(b2 && items[cur] !== it && v.getAttribute("src") === u) setSrc(it, b2); });
-      }
-    });
+    // لا نحول الفيديو إلى Blob قبل التشغيل؛ ذلك كان يجبر المتصفح على تنزيل الملف كاملاً.
+    // نترك عنصر الفيديو يستخدم Range Requests مباشرة من الـWorker/CDN.
+    if(!v.getAttribute("src")){
+      v.preload = full && !lowData() ? "auto" : "metadata";
+      v.setAttribute("data-prepared", full ? "full" : "metadata");
+      v.src = u;
+    } else if(full && !lowData()) {
+      v.preload = "auto";
+    }
+    return Promise.resolve();
   }
   function ensureWindow(i){
     items.forEach(function(it, k){
@@ -3062,13 +3059,15 @@ function openReelPlayer(id){
     if(lowData()) return;
     setTimeout(function(){
       if(items[cur] !== it) return;
-      mediaCachedUrl(it.dataset.src, true);
       if(items[cur + 1]) prepare(items[cur + 1], true);
     }, 1500);
   }
   function playItem(it){
     var v = vid(it); if(!v) return;
-    if(!v.getAttribute("src") && it.dataset.src) v.src = it.dataset.src;
+    if(!v.getAttribute("src") && it.dataset.src){
+      v.preload = lowData() ? "metadata" : "auto";
+      v.src = it.dataset.src;
+    }
     v.muted = !!window._hhReelMuted;
     setLoading(it, v.readyState < 3);
     var p = v.play();

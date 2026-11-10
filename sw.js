@@ -1,4 +1,4 @@
-var CACHE = "hashidhub-v21";
+var CACHE = "hashidhub-v22";
 var ASSETS = ["./index.html", "./manifest.json", "./icon.svg", "./firebase-config.js", "./media-config.js"];
 
 self.addEventListener("install", function(e){
