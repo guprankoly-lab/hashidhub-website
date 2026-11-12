@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creator Center</title>
+  <style>
+    :root { --bg:#f6faf8; --card:#fff; --ink:#12251e; --muted:#5f7269; --brand:#0d7a5f; --brand2:#149d78; --line:#e1efe8; --amber:#f4b942; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:"Segoe UI",Tahoma,Arial,sans-serif; background:var(--bg); color:var(--ink); }
+    .topbar { background: linear-gradient(135deg,var(--brand),var(--brand2)); color:white; padding:16px 20px; }
+    .nav { display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
+    .nav a { color:white; text-decoration:none; background: rgba(255,255,255,.12); border-radius:999px; padding:8px 12px; font-weight:600; }
+    .container { max-width: 1100px; margin: 24px auto; padding:0 16px 48px; }
+    .grid { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 16px; }
+    .stat { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px; }
+    .stat .num { font-size:2rem; font-weight:800; color:var(--brand); }
+    .panel { background: var(--card); border:1px solid var(--line); border-radius:18px; padding:18px; margin-top:20px; }
+    table { width:100%; border-collapse:collapse; }
+    th, td { padding:12px; border-bottom:1px solid var(--line); text-align:right; }
+    @media (max-width: 720px) { .grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <h1 style="margin:0;">HashidHub</h1>
+    <nav class="nav">
+      <a href="index.html">الرئيسية</a>
+      <a href="ai.html">AI</a>
+      <a href="search.html">بحث</a>
+      <a href="marketplace.html">Marketplace</a>
+      <a href="jobs.html">Jobs</a>
+      <a href="academy.html">Academy</a>
+    </nav>
+  </div>
+
+  <div class="container">
+    <h2>Creator Center</h2>
+    <div class="grid">
+      <div class="stat"><div>المشاهدات</div><div class="num">184.2K</div></div>
+      <div class="stat"><div>التفاعل</div><div class="num">8.7%</div></div>
+      <div class="stat"><div>المتابعين الجدد</div><div class="num">2.8K</div></div>
+      <div class="stat"><div>الأرباح المتوقعة</div><div class="num">$4.6K</div></div>
+    </div>
+
+    <div class="panel">
+      <h3>أداء المحتوى</h3>
+      <table>
+        <thead>
+          <tr><th>المحتوى</th><th>المشاهدات</th><th>التفاعل</th><th>الدخل المتوقع</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ريل تدريب</td><td>53,200</td><td>9.4%</td><td>$1,340</td></tr>
+          <tr><td>تمارين قصيرة</td><td>41,800</td><td>8.1%</td><td>$980</td></tr>
+          <tr><td>تدوينة تعليمية</td><td>37,970</td><td>7.3%</td><td>$860</td></tr>
+          <tr><td>ألبوم أعمال</td><td>29,100</td><td>6.8%</td><td>$710</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>
+

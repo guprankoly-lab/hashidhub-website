@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hashid AI Assistant</title>
+  <style>
+    :root {
+      --bg: #f4fbf8;
+      --card: #ffffff;
+      --ink: #14251d;
+      --muted: #5d7269;
+      --brand: #0d7a5f;
+      --brand2: #149d78;
+      --line: #dfece7;
+      --accent: #f5b942;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      background: linear-gradient(180deg, #eefaf6 0%, #f9fdfb 100%);
+      color: var(--ink);
+    }
+    .topbar {
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .brand { font-size: 1.5rem; font-weight: 800; }
+    .nav {
+      display: flex; flex-wrap: wrap; gap: 10px;
+    }
+    .nav a {
+      color: white; text-decoration: none; padding: 8px 12px; border-radius: 999px; background: rgba(255,255,255,.12);
+      font-weight: 600;
+    }
+    .container { max-width: 1100px; margin: 24px auto; padding: 0 16px 48px; }
+    .grid {
+      display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px;
+    }
+    .panel {
+      background: var(--card); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 12px 28px rgba(13, 122, 95, .06); padding: 18px;
+    }
+    h1, h2, h3 { margin-top: 0; }
+    textarea {
+      width: 100%; min-height: 140px; padding: 14px; border-radius: 12px; border: 1px solid var(--line); font-size: 1rem; resize: vertical;
+    }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: none; border-radius: 12px; padding: 10px 16px; font-weight: 700; cursor: pointer;
+      background: linear-gradient(135deg, var(--brand), var(--brand2)); color: white;
+    }
+    .secondary {
+      background: #edf8f3; color: var(--brand); border: 1px solid var(--line);
+    }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+    .card-grid { display: grid; gap: 12px; margin-top: 18px; }
+    .feature {
+      background: #f5faf8; border: 1px solid var(--line); border-radius: 14px; padding: 14px;
+    }
+    .code-box {
+      background: #0f1f1b; color: #dfeee8; border-radius: 12px; padding: 12px; font-family: monospace; white-space: pre-wrap; min-height: 100px;
+    }
+    .badge { display: inline-block; padding: 6px 10px; border-radius: 999px; background: #eaf7f1; color: var(--brand); font-weight: 700; font-size: .82rem; }
+    @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">HashidHub</div>
+    <nav class="nav">
+      <a href="index.html">الرئيسية</a>
+      <a href="search.html">بحث</a>
+      <a href="creator-center.html">Creator Center</a>
+      <a href="marketplace.html">Marketplace</a>
+      <a href="jobs.html">Jobs</a>
+      <a href="academy.html">Academy</a>
+      <a href="profile.html">Profile</a>
+      <a href="verification.html">Verification</a>
+    </nav>
+  </div>
+
+  <div class="container">
+    <div class="grid">
+      <section class="panel">
+        <span class="badge">Hashid AI</span>
+        <h1>مساعد المحتوى الذكي</h1>
+        <p>أنشئ منشورات، اقتراحات تعليقات، وترجمة فورية باللغة العربية والإنجليزية والفرنسية والإسبانية والتركية والألمانية.</p>
+
+        <h3>AI Post Generator</h3>
+        <textarea id="postInput" placeholder="اكتب فكرة أو موضوعك…">أطلق حملة لأسبوع المبدعين في المدينة، واكتب رسالة تعكس قيمة المجتمع والهوية المحلية.</textarea>
+        <div class="actions">
+          <button class="btn" onclick="generatePost()">إنشاء منشور</button>
+          <button class="btn secondary" onclick="translateText()">ترجمة</button>
+        </div>
+        <div class="code-box" id="generatedPost"></div>
+
+        <h3 style="margin-top:24px;">AI Comment Suggestions</h3>
+        <textarea id="commentInput" placeholder="اكتب منشورك أو تعليقك…">أحب هذا المحتوى، أعتقد أنه سيعمل بشكل مميز مع شخصيات جديدة.</textarea>
+        <div class="actions">
+          <button class="btn" onclick="generateComment()">اقتراح تعليق</button>
+        </div>
+        <div class="code-box" id="commentOutput"></div>
+      </section>
+
+      <aside class="panel">
+        <h2>الوظائف</h2>
+        <div class="card-grid">
+          <div class="feature">
+            <h3>Content Assist</h3>
+            <p>يؤلف سيناريوهات جاهزة للنشر، الأجندات، وأفكار الحملات.</p>
+          </div>
+          <div class="feature">
+            <h3>Translation Layer</h3>
+            <p>يحافظ على لهجة مناسبة للمنصة مع دعم اللغات العالمية.</p>
+          </div>
+          <div class="feature">
+            <h3>Comment Intelligence</h3>
+            <p>يقترح ردود احترافية وداعمة لتعزيز المشاركة.</p>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const translations = {
+      ar: { prompt: 'ترجمه إلى العربية', ready: 'تمت الترجمة بنجاح.' },
+      en: { prompt: 'Translate to English', ready: 'Translation completed successfully.' },
+      fr: { prompt: 'Traduire en français', ready: 'Traduction terminée.' },
+      es: { prompt: 'Traducir al español', ready: 'Traducción completada.' },
+      tr: { prompt: 'Türkçeye çevir', ready: 'Çeviri tamamlandı.' },
+      de: { prompt: 'Ins Deutsche übersetzen', ready: 'Übersetzung abgeschlossen.' }
+    };
+
+    function generatePost() {
+      const prompt = document.getElementById('postInput').value.trim();
+      const text = prompt ? 
+        `إعلان منشور: "${prompt}"\n\n• افتح الموضوع بقصة مميزة\n�� اعرض الفائدة بشكل مباشر\n• استخدم سؤالًا يفتح النقاش\n• أضف CTA واضح\n• حوّل إلى إصدار مناسب للمجتمع العالمي` :
+        'اكتب فكرة أولاً';
+      document.getElementById('generatedPost').textContent = text;
+    }
+
+    function generateComment() {
+      const value = document.getElementById('commentInput').value.trim();
+      const suggestions = [
+        'مقال رائع ومفيد جدًا، شكراً على هذا المحتوى.',
+        'أحب هذه الفكرة، خاصة في جانب المجتمع والتأثير.',
+        'كأنك فتحت موضوعًا مهمًا جدًا، أتابع المزيد.'
+      ];
+      const output = value ? suggestions.join('\n\n') : 'اكتب تعليقًا أولاً';
+      document.getElementById('commentOutput').textContent = output;
+    }
+
+    function translateText() {
+      const text = document.getElementById('postInput').value.trim();
+      const output = text ? `${translations.ar.ready}\n\n${text}\n\n[ترجمة: ${translations.ar.prompt}]` : 'أدخل نصًا للترجمة';
+      document.getElementById('generatedPost').textContent = output;
+    }
+  </script>
+</body>
+</html>
+
