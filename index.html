@@ -1,1 +1,54 @@
-# Add placeholder tracks only in final summary; actual file updated separately
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#075e49">
+  <meta name="robots" content="noindex">
+  <title>استعادة HashidHub</title>
+  <style>
+    :root{color-scheme:light dark;font-family:system-ui,"Segoe UI",Tahoma,Arial,sans-serif;background:#f0f7f4;color:#12352a}
+    body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;box-sizing:border-box}
+    main{max-width:560px;text-align:center;padding:28px;border-radius:20px;background:#fff;box-shadow:0 12px 40px #075e491c}
+    h1{color:#075e49}p{line-height:1.8}.status{color:#52685f}
+    a{color:#075e49;font-weight:700}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>HashidHub</h1>
+    <p class="status" id="status" role="status">جارٍ استعادة واجهة المنصة…</p>
+    <p id="fallback" hidden>تعذر تحميل الواجهة تلقائياً. <a href="https://github.com/guprankoly-lab/hashidhub-website/tree/2c92ae587742fb321e69137cb226d50cea4072ee">افتح المصدر المستعاد</a> أو أعد تحميل الصفحة.</p>
+  </main>
+  <script>
+    (function(){
+      // Load the last known-good app document from an immutable commit. document.write
+      // keeps the page's base URL on this domain, so Firebase, PWA and media-relative
+      // assets continue to resolve to the existing Vercel/Cloudflare deployment.
+      var source = "https://raw.githubusercontent.com/guprankoly-lab/hashidhub-website/2c92ae587742fb321e69137cb226d50cea4072ee/index.html";
+      var timer = setTimeout(showFallback, 12000);
+      function showFallback(){
+        var status = document.getElementById("status");
+        var fallback = document.getElementById("fallback");
+        if(status) status.textContent = "تعذر الاتصال بمصدر الاستعادة.";
+        if(fallback) fallback.hidden = false;
+      }
+      fetch(source, {cache:"no-store", credentials:"omit"})
+        .then(function(response){
+          if(!response.ok) throw new Error("restore source unavailable");
+          return response.text();
+        })
+        .then(function(html){
+          if(!/^\s*<!doctype html>/i.test(html) || html.indexOf("id=\"app\"") < 0 || html.indexOf("firebase-config.js") < 0){
+            throw new Error("unexpected restore document");
+          }
+          clearTimeout(timer);
+          document.open();
+          document.write(html);
+          document.close();
+        })
+        .catch(function(){ clearTimeout(timer); showFallback(); });
+    })();
+  </script>
+</body>
+</html>
