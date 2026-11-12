@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hashid AI - HashidHub</title>
+  <style>
+    :root { --bg:#f6faf8; --card:#fff; --ink:#12251e; --muted:#5d7269; --brand:#0d7a5f; --brand2:#149d78; --line:#e2efe9; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:"Segoe UI",Tahoma,Arial,sans-serif; background:var(--bg); color:var(--ink); }
+    .topbar { background: linear-gradient(135deg,var(--brand),var(--brand2)); color:white; padding:16px 20px; }
+    .nav { display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
+    .nav a { color:white; text-decoration:none; background: rgba(255,255,255,.12); border-radius:999px; padding:8px 12px; font-weight:600; }
+    .container { max-width:800px; margin:24px auto; padding:0 16px 48px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:20px; margin-bottom:16px; }
+    textarea { width:100%; min-height:120px; padding:14px; border:1px solid var(--line); border-radius:12px; font:inherit; resize:vertical; }
+    .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
+    .btn { background: linear-gradient(135deg,var(--brand),var(--brand2)); color:white; border:none; border-radius:12px; padding:12px 18px; font-weight:700; cursor:pointer; }
+    .btn.alt { background:transparent; color:var(--brand); border:1.5px solid var(--brand); }
+    .out { white-space:pre-wrap; background:#f0f7f4; border-radius:12px; padding:14px; min-height:80px; color:var(--muted); }
+    .chips { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
+    .chip { background:#edf8f3; color:var(--brand); border-radius:999px; padding:8px 12px; font-weight:700; font-size:.85rem; cursor:pointer; border:none; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <h1 style="margin:0;">Hashid AI ✨</h1>
+    <nav class="nav">
+      <a href="index.html">الرئيسية</a>
+      <a href="marketplace.html">Marketplace</a>
+      <a href="jobs.html">Jobs</a>
+      <a href="academy.html">Academy</a>
+      <a href="creator-center.html">Creator Center</a>
+    </nav>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <h2 style="margin-top:0;">مساعد Hashid الذكي</h2>
+      <p style="color:var(--muted);">اكتب فكرتك أو الصق نصاً، واختر ما تريد من المساعد.</p>
+      <div class="chips">
+        <button class="chip" data-p="حسّن هذا المنشور ليكون أكثر جاذبية: ">تحسين منشور</button>
+        <button class="chip" data-p="اكتب سيرة ذاتية قصيرة احترافية بناءً على: ">إنشاء سيرة ذاتية</button>
+        <button class="chip" data-p="اقترح 5 أفكار لمشروع ريادي في مجال: ">أفكار مشاريع</button>
+        <button class="chip" data-p="ترجم إلى الإنجليزية بأسلوب طبيعي: ">ترجمة</button>
+      </div>
+      <textarea id="prompt" placeholder="اكتب هنا… مثلاً: حسّن ملفي الشخصي أو اقترح وصف لريل عن ريادة الأعمال"></textarea>
+      <div class="actions">
+        <button class="btn" id="generate">توليد اقتراح</button>
+        <button class="btn alt" id="clear">مسح</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;">النتيجة</h3>
+      <div class="out" id="output">سيظهر الاقتراح هنا. (نسخة أولية — سيتم ربطها بنموذج AI حقيقي لاحقاً)</div>
+    </div>
+  </div>
+
+  <script>
+    const promptEl = document.getElementById('prompt');
+    const output = document.getElementById('output');
+    document.querySelectorAll('.chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        promptEl.value = (btn.dataset.p || '') + promptEl.value;
+        promptEl.focus();
+      });
+    });
+    document.getElementById('clear').onclick = () => { promptEl.value = ''; output.textContent = 'سيظهر الاقتراح هنا.'; };
+    document.getElementById('generate').onclick = () => {
+      const text = promptEl.value.trim();
+      if (!text) {
+        output.textContent = 'اكتب فكرة أو نصاً أولاً.';
+        return;
+      }
+      // Placeholder response until real AI backend is connected
+      output.textContent =
+        'مسودة مقترحة:\n\n' +
+        text +
+        '\n\n—\nنصيحة: أضف مثالاً شخصياً أو رقم نتائج لزيادة التفاعل.\n\n(سيتم ربط Hashid AI بنموذج ذكي حقيقي في التحديث القادم)';
+    };
+  </script>
+</body>
+</html>
