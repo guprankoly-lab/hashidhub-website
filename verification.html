@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile - HashidHub</title>
+  <style>
+    :root { --bg:#f6faf8; --card:#fff; --ink:#12251e; --muted:#5d7269; --brand:#0d7a5f; --brand2:#149d78; --line:#e2efe9; --amber:#f5b942; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:"Segoe UI",Tahoma,Arial,sans-serif; background:var(--bg); color:var(--ink); }
+    .topbar { background: linear-gradient(135deg,var(--brand),var(--brand2)); color:white; padding:16px 20px; }
+    .nav { display:flex; gap:10px; flex-wrap:wrap; margin-top:8px; }
+    .nav a { color:white; text-decoration:none; background: rgba(255,255,255,.12); border-radius:999px; padding:8px 12px; font-weight:600; }
+    .container { max-width:1100px; margin:24px auto; padding:0 16px 42px; }
+    .hero { display:grid; grid-template-columns: 1.2fr 0.8fr; gap:16px; }
+    .panel { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px; }
+    .badge { display:inline-block; background:#edf8f3; color:var(--brand); border-radius:999px; padding:6px 10px; font-size:.8rem; font-weight:700; }
+    .stats { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:12px; margin-top:14px; }
+    .stat { background:#f7faf8; border:1px solid var(--line); border-radius:14px; padding:14px; }
+    @media (max-width: 760px) { .hero { grid-template-columns: 1fr; } .stats { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <h1 style="margin:0;">HashidHub</h1>
+    <nav class="nav">
+      <a href="index.html">الرئيسية</a>
+      <a href="ai.html">AI</a>
+      <a href="creator-center.html">Creator Center</a>
+      <a href="marketplace.html">Marketplace</a>
+      <a href="jobs.html">Jobs</a>
+    </nav>
+  </div>
+
+  <div class="container">
+    <div class="hero">
+      <div class="panel">
+        <span class="badge">المستوى 18</span>
+        <h2>أماني المبدعة</h2>
+        <p>منشئة محتوى، مصممة تجارب، ومدربة في التسويق الرقمي.</p>
+        <div class="stats">
+          <div class="stat"><strong>XP</strong><div>24,600</div></div>
+          <div class="stat"><strong>المتابعين</strong><div>88.4K</div></div>
+          <div class="stat"><strong>الإنجازات</strong><div>18</div></div>
+          <div class="stat"><strong>التحديات</strong><div>4</div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>المهارات</h3>
+        <ul>
+          <li>Brand Strategy</li>
+          <li>Content Design</li>
+          <li>UI/UX</li>
+          <li>Growth Marketing</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:20px;">
+      <h3>إنجازات</h3>
+      <ul>
+        <li>أفضل منشئ هذا الشهر</li>
+        <li>تحدي المبدعين - إنجاز كامل</li>
+        <li>نجاح في 12 حملة</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
+

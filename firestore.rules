@@ -1,389 +1,55 @@
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verification - HashidHub</title>
+  <style>
+    :root { --bg:#f6faf8; --card:#fff; --ink:#12251e; --muted:#5d7269; --brand:#0d7a5f; --brand2:#149d78; --line:#e2efe9; --amber:#f5b942; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:"Segoe UI",Tahoma,Arial,sans-serif; background:var(--bg); color:var(--ink); }
+    .topbar { background: linear-gradient(135deg,var(--brand),var(--brand2)); color:white; padding:16px 20px; }
+    .nav { display:flex; gap:10px; flex-wrap:wrap; margin-top:8px; }
+    .nav a { color:white; text-decoration:none; background: rgba(255,255,255,.12); border-radius:999px; padding:8px 12px; font-weight:600; }
+    .container { max-width:1100px; margin:24px auto; padding:0 16px 42px; }
+    .grid { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:18px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px; }
+    .badge { display:inline-block; background:#edf8f3; color:var(--brand); border-radius:999px; padding:6px 10px; font-size:.8rem; font-weight:700; }
+    @media (max-width: 760px) { .grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <h1 style="margin:0;">HashidHub</h1>
+    <nav class="nav">
+      <a href="index.html">الرئيسية</a>
+      <a href="ai.html">AI</a>
+      <a href="search.html">بحث</a>
+      <a href="profile.html">Profile</a>
+      <a href="creator-center.html">Creator Center</a>
+    </nav>
+  </div>
 
-    function signedIn() {
-      return request.auth != null;
-    }
-    function uid() {
-      return request.auth.uid;
-    }
-    function isAdmin() {
-      return signedIn() && exists(/databases/$(database)/documents/admins/$(uid()));
-    }
-    function isOwner(id) {
-      return signedIn() && uid() == id;
-    }
-    function validText(t, max) {
-      return t is string && t.size() > 0 && t.size() <= max;
-    }
-    function memberOf(data) {
-      return data.keys().hasAny(['members'])
-        && data.members is list
-        && uid() in data.members;
-    }
+  <div class="container">
+    <h2>Global Verification</h2>
+    <div class="grid">
+      <div class="card">
+        <span class="badge">Business</span>
+        <h3>Business Verification</h3>
+        <p>تأكيد الشركات والأعمال التجارية عبر السجل التجاري والرخصة الرسمية.</p>
+      </div>
+      <div class="card">
+        <span class="badge">Creator</span>
+        <h3>Creator Verification</h3>
+        <p>تأكيد المبدعين من خلال ربط الحسابات، الأداء، والهوية الرقمية.</p>
+      </div>
+      <div class="card">
+        <span class="badge">Organization</span>
+        <h3>Organization Verification</h3>
+        <p>إدارة التحقق للمنظمات والجامعات والهيئات العامة والمؤسسات.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
 
-    // —— Users ——
-    match /users/{userId} {
-      allow read: if signedIn();
-      allow create: if isOwner(userId)
-        && !request.resource.data.keys().hasAny(['admin', 'isAdmin', 'role'])
-        && (!('verified' in request.resource.data) || request.resource.data.verified == false);
-      allow update: if (isOwner(userId) || isAdmin())
-        && (!request.resource.data.diff(resource.data).affectedKeys()
-              .hasAny(['admin', 'isAdmin', 'role', 'verified'])
-            || isAdmin());
-      allow delete: if isAdmin();
-    }
-
-    // —— Admins: only existing admins can add/remove ——
-    match /admins/{adminId} {
-      allow read: if signedIn();
-      allow create, update, delete: if isAdmin();
-    }
-
-    // —— Posts ——
-    match /posts/{id} {
-      allow read: if true;
-      allow create: if signedIn()
-        && request.resource.data.uid == uid()
-        && request.resource.data.t is string && request.resource.data.t.size() <= 5000
-        && (!request.resource.data.keys().hasAny(['official']) || request.resource.data.official == false)
-        && (!request.resource.data.keys().hasAny(['ver'])
-            || request.resource.data.ver == get(/databases/$(database)/documents/users/$(uid())).data.verified);
-      allow update, delete: if signedIn()
-        && (resource.data.uid == uid() || isAdmin());
-    }
-
-    // —— Comments ——
-    match /comments/{id} {
-      allow read: if true;
-      allow create: if signedIn()
-        && request.resource.data.uid == uid()
-        && validText(request.resource.data.t, 2000);
-      allow update, delete: if signedIn()
-        && (resource.data.uid == uid() || isAdmin());
-    }
-
-    // —— Likes ——
-    match /likes/{id} {
-      allow read: if true;
-      allow create, update: if signedIn()
-        && request.resource.data.uid == uid()
-        && id == request.resource.data.pid + '_' + uid();
-      allow delete: if signedIn()
-        && (resource.data.uid == uid() || isAdmin());
-    }
-
-    // —— Saved posts ——
-    match /savedPosts/{id} {
-      allow read: if signedIn() && resource.data.uid == uid();
-      allow create: if signedIn() && request.resource.data.uid == uid();
-      allow update, delete: if signedIn() && resource.data.uid == uid();
-    }
-
-    // —— Friends ——
-    match /friends/{id} {
-      allow read: if signedIn();
-      allow create: if signedIn()
-        && (request.resource.data.u1 == uid() || request.resource.data.u2 == uid());
-      allow delete: if signedIn()
-        && (resource.data.u1 == uid() || resource.data.u2 == uid() || isAdmin());
-      allow update: if false;
-    }
-    match /friendReqs/{id} {
-      allow read: if signedIn();
-      allow create: if signedIn() && request.resource.data.from == uid();
-      allow update, delete: if signedIn()
-        && (resource.data.from == uid() || resource.data.to == uid() || isAdmin());
-    }
-
-    // —— Follows: only the follower (field a) can create/delete their follow ——
-    match /follows/{id} {
-      allow read: if signedIn();
-      allow create: if signedIn() && request.resource.data.a == uid();
-      allow delete: if signedIn()
-        && (resource.data.a == uid() || isAdmin());
-      allow update: if false;
-    }
-
-    // —— Blocks ——
-    match /blocks/{id} {
-      allow read: if signedIn()
-        && (resource == null
-            || resource.data.a == uid()
-            || resource.data.b == uid()
-            || isAdmin());
-      allow create: if signedIn() && request.resource.data.a == uid();
-      allow delete: if signedIn()
-        && (resource.data.a == uid() || isAdmin());
-      allow update: if false;
-    }
-
-    // —— Messages ——
-    match /messages/{id} {
-      allow read: if signedIn()
-        && (resource == null || memberOf(resource.data) || isAdmin());
-      allow create: if signedIn()
-        && request.resource.data.a == uid()
-        && memberOf(request.resource.data)
-        && validText(request.resource.data.t, 4000);
-      allow update: if signedIn()
-        && (memberOf(resource.data) || isAdmin());
-      allow delete: if signedIn()
-        && (resource.data.a == uid() || isAdmin());
-    }
-
-    // —— Message requests ——
-    match /messageRequests/{id} {
-      // allow get of missing docs so client can check status
-      allow read: if signedIn()
-        && (resource == null || memberOf(resource.data) || isAdmin());
-      allow create: if signedIn()
-        && request.resource.data.from == uid()
-        && memberOf(request.resource.data);
-      allow update: if signedIn()
-        && (memberOf(resource.data) || isAdmin());
-      allow delete: if signedIn()
-        && (resource.data.from == uid() || resource.data.to == uid() || isAdmin());
-    }
-
-    // —— Typing ——
-    match /typing/{id} {
-      allow read: if signedIn();
-      allow create, update: if signedIn()
-        && request.resource.data.from == uid();
-      allow delete: if signedIn()
-        && (resource.data.from == uid() || isAdmin());
-    }
-
-    // —— Notifications: cannot spoof sender ——
-    match /notifs/{id} {
-      allow read: if signedIn()
-        && (resource.data.to == uid() || isAdmin());
-      allow create: if signedIn()
-        && request.resource.data.from == uid()
-        && request.resource.data.keys().hasAll(['to', 'from', 'ts']);
-      allow update, delete: if signedIn()
-        && (resource.data.to == uid() || isAdmin());
-    }
-
-    // —— Stories ——
-    match /stories/{id} {
-      allow read: if signedIn();
-      allow create: if signedIn() && request.resource.data.uid == uid();
-      allow update, delete: if signedIn()
-        && (resource.data.uid == uid() || isAdmin());
-    }
-    match /storyViews/{id} {
-      allow read: if signedIn();
-      allow create: if signedIn() && request.resource.data.uid == uid();
-      allow update, delete: if isAdmin();
-    }
-    match /storyReactions/{id} {
-      allow read: if signedIn();
-      allow create, update: if signedIn() && request.resource.data.uid == uid();
-      allow delete: if signedIn()
-        && (resource.data.uid == uid() || isAdmin());
-    }
-
-    // —— Reels ——
-    match /reels/{id} {
-      allow read: if true;
-      allow create: if signedIn()
-        && request.resource.data.uid == uid()
-        && (!request.resource.data.keys().hasAny(['official']) || request.resource.data.official == false)
-        && (!request.resource.data.keys().hasAny(['ver'])
-            || request.resource.data.ver == get(/databases/$(database)/documents/users/$(uid())).data.verified);
-      allow update: if signedIn()
-        && (resource.data.uid == uid() || isAdmin()
-            // allow like-count increments from any signed-in user
-            || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes', 'comments', 'views']));
-      allow delete: if signedIn()
-        && (resource.data.uid == uid() || isAdmin());
-    }
-    // —— لقطات المشاركة العامة (معاينة الروابط في واتساب وغيره) ——
-    match /shares/{id} {
-      allow read: if true;
-      allow create: if signedIn() && request.resource.data.uid == uid()
-        && request.resource.data.title.size() <= 120
-        && request.resource.data.desc.size() <= 300;
-      allow update, delete: if signedIn() && resource.data.uid == uid();
-    }
-    // —— إشعارات الدفع: رموز الجهاز خاصة بصاحبها فقط ——
-    match /pushTokens/{userId} {
-      allow read, write: if signedIn() && userId == uid();
-    }
-    // —— الأسئلة السرية ——
-    match /askQ/{id} {
-      allow read: if signedIn() && (resource.data.to == uid() || resource.data.answered == true || isAdmin());
-      allow create: if signedIn()
-        && request.resource.data.keys().hasOnly(['to','t','ts','answered','answer','ansTs'])
-        && request.resource.data.answered == false
-        && request.resource.data.to != uid()
-        && validText(request.resource.data.t, 300);
-      allow update: if signedIn() && resource.data.to == uid()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['answer','answered','ansTs'])
-        && validText(request.resource.data.answer, 600);
-      allow delete: if signedIn() && (resource.data.to == uid() || isAdmin());
-    }
-    match /askMeta/{id} {
-      allow create: if signedIn() && request.resource.data.from == uid();
-      allow read, delete: if isAdmin();
-      allow update: if false;
-    }
-    // —— أصوات الاستطلاعات: صوت واحد لكل عضو ولا يتغير ——
-    match /pollVotes/{id} {
-      allow read: if true;
-      allow create: if signedIn() && request.resource.data.uid == uid()
-        && id == request.resource.data.pid + '_' + uid()
-        && request.resource.data.opt is int
-        && request.resource.data.opt >= 0 && request.resource.data.opt < 6;
-      allow update, delete: if false;
-    }
-    match /reelLikes/{id} {
-      allow read: if signedIn();
-      allow create, update: if signedIn()
-        && request.resource.data.uid == uid()
-        && request.resource.data.rid is string
-        && id == request.resource.data.rid + '_' + uid();
-      allow delete: if signedIn()
-        && (resource.data.uid == uid() || isAdmin());
-    }
-    match /reelComments/{id} {
-      allow read: if true;
-      allow create: if signedIn()
-        && request.resource.data.uid == uid()
-        && request.resource.data.rid is string
-        && validText(request.resource.data.t, 2000)
-        && request.resource.data.ts is number;
-      allow update, delete: if signedIn()
-        && (resource.data.uid == uid() || isAdmin());
-    }
-
-    // —— Pages ——
-    match /pages/{id} {
-      allow read: if signedIn();
-      allow create: if signedIn() && request.resource.data.owner == uid()
-        && (!('verified' in request.resource.data) || request.resource.data.verified == false);
-      allow update: if signedIn() && (isAdmin() || (resource.data.owner == uid()
-        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['verified', 'owner'])));
-      allow delete: if signedIn() && (resource.data.owner == uid() || isAdmin());
-    }
-    match /pageFollows/{id} {
-      allow read: if signedIn();
-      allow create: if signedIn()
-        && request.resource.data.uid == uid();
-      allow delete: if signedIn()
-        && (resource.data.uid == uid() || isAdmin());
-      allow update: if false;
-    }
-
-    // —— Groups: owner field protected ——
-    match /groups/{id} {
-      allow read: if signedIn();
-      allow create: if signedIn() && request.resource.data.owner == uid();
-      allow update: if signedIn() && (
-        isAdmin()
-        || (resource.data.owner == uid()
-            && request.resource.data.owner == resource.data.owner)
-      );
-      allow delete: if signedIn()
-        && (resource.data.owner == uid() || isAdmin());
-    }
-    // group members: only self-join, or owner/admin managing
-    match /groupMembers/{id} {
-      allow read: if signedIn();
-      allow create: if signedIn()
-        && request.resource.data.uid == uid();
-      allow update: if signedIn() && (
-        isAdmin()
-        || resource.data.uid == uid()
-        || (resource.data.keys().hasAny(['addedBy']) && resource.data.addedBy == uid())
-      );
-      allow delete: if signedIn()
-        && (resource.data.uid == uid() || isAdmin());
-    }
-
-    // —— Reports ——
-    match /reports/{id} {
-      allow create: if signedIn()
-        && request.resource.data.uid == uid();
-      allow read, update, delete: if isAdmin();
-    }
-
-    // —— Banned ——
-    match /banned/{id} {
-      allow read: if signedIn();
-      allow write: if isAdmin();
-    }
-
-    // —— Premium ——
-    match /premium/{id} {
-      allow read: if signedIn();
-      allow write: if isAdmin();
-    }
-    match /premiumReqs/{id} {
-      allow read: if signedIn()
-        && (resource.data.uid == uid() || isAdmin());
-      allow create: if signedIn() && request.resource.data.uid == uid();
-      allow update, delete: if isAdmin();
-    }
-
-    // —— Ads ——
-    match /ads/{id} {
-      allow read: if signedIn();
-      allow write: if isAdmin();
-    }
-    match /adstats/{id} {
-      allow read: if isAdmin();
-      allow create, update: if signedIn()
-        && request.resource.data.uid == uid();
-      allow delete: if isAdmin();
-    }
-    match /adComments/{id} {
-      allow read: if signedIn();
-      allow create: if signedIn()
-        && request.resource.data.uid == uid()
-        && validText(request.resource.data.t, 2000);
-      allow update, delete: if signedIn()
-        && (resource.data.uid == uid() || isAdmin());
-    }
-
-    // —— Calls ——
-    match /calls/{id} {
-      allow read: if signedIn()
-        && (resource == null
-            || resource.data.from == uid()
-            || resource.data.to == uid()
-            || isAdmin());
-      allow create: if signedIn() && request.resource.data.from == uid();
-      allow update, delete: if signedIn()
-        && (resource.data.from == uid() || resource.data.to == uid() || isAdmin());
-    }
-
-    // —— Promote requests ——
-    match /promoteRequests/{id} {
-      allow create: if signedIn() && request.resource.data.uid == uid();
-      allow read: if signedIn()
-        && (resource.data.uid == uid() || isAdmin());
-      allow update, delete: if isAdmin()
-        || (signedIn() && resource.data.uid == uid() && resource.data.status == "pending");
-    }
-
-    // —— Deny everything else ——
-    
-    match /verifyRequests/{id} {
-      allow create: if signedIn()
-        && request.resource.data.uid == uid()
-        && request.resource.data.status == "pending";
-      allow read: if signedIn()
-        && (resource.data.uid == uid() || isAdmin());
-      allow update, delete: if isAdmin();
-    }
-
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
-}

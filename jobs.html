@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marketplace - HashidHub</title>
+  <style>
+    :root { --bg:#f6faf8; --card:#fff; --ink:#12251e; --muted:#5d7269; --brand:#0d7a5f; --brand2:#149d78; --line:#e2efe9; --amber:#f5b942; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:"Segoe UI",Tahoma,Arial,sans-serif; background:var(--bg); color:var(--ink); }
+    .topbar { background: linear-gradient(135deg,var(--brand),var(--brand2)); color:white; padding:16px 20px; }
+    .nav { display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
+    .nav a { text-decoration:none; color:white; background: rgba(255,255,255,.12); border-radius:999px; padding:8px 12px; font-weight:600; }
+    .container { max-width: 1100px; margin:24px auto; padding:0 16px 42px; }
+    .toolbar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom: 18px; }
+    input, select { padding:12px; border:1px solid var(--line); border-radius:12px; width:100%; }
+    .grid { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:16px; }
+    .card { background: var(--card); border:1px solid var(--line); border-radius:18px; padding:16px; }
+    .tag { display:inline-block; background:#edf8f3; color:var(--brand); padding:6px 10px; border-radius:999px; font-size:.8rem; font-weight:700; }
+    @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <h1 style="margin:0;">HashidHub</h1>
+    <nav class="nav">
+      <a href="index.html">الرئيسية</a>
+      <a href="ai.html">AI</a>
+      <a href="search.html">بحث</a>
+      <a href="jobs.html">Jobs</a>
+      <a href="academy.html">Academy</a>
+      <a href="profile.html">Profile</a>
+    </nav>
+  </div>
+
+  <div class="container">
+    <h2>Marketplace</h2>
+    <div class="toolbar">
+      <div style="flex: 1 1 360px;"><input type="text" value="تصميم" placeholder="ابحث عن منتج أو خدمة…" /></div>
+      <div style="flex: 0 0 180px;"><select><option>كل التصنيفات</option><option>منتجات رقمية</option><option>خدمات</option><option>إعلانات</option><option>تطبيقات</option></select></div>
+      <div style="flex: 0 0 180px;"><button style="width:100%;height:46px;background:linear-gradient(135deg,var(--brand),var(--brand2));border:none;color:white;border-radius:12px;font-weight:700;cursor:pointer;">بحث</button></div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <span class="tag">منتج</span>
+        <h3>قالب متجر إبداعي</h3>
+        <p>قالب جاهز لعرض المنتجات، مع ألوان مخصصة ودعم RTL.</p>
+        <strong>190$</strong>
+      </div>
+      <div class="card">
+        <span class="tag">خدمة</span>
+        <h3>تصميم هوية بصرية</h3>
+        <p>هوية كاملة للشركات الناشئة، شارات، ألوان، وأيقونات.</p>
+        <strong>320$</strong>
+      </div>
+      <div class="card">
+        <span class="tag">خدمة</span>
+        <h3>إعداد حملة تسويقية</h3>
+        <p>سير عمل كامل للتسويق عبر Reels والمنشورات.</p>
+        <strong>450$</strong>
+      </div>
+      <div class="card">
+        <span class="tag">منتج</span>
+        <h3>دورة تدريبية PDF</h3>
+        <p>محتوى تعليمي متكامل يساعد المبدعين على التوسع.</p>
+        <strong>69$</strong>
+      </div>
+      <div class="card">
+        <span class="tag">خدمة</span>
+        <h3>تطوير Landing Page</h3>
+        <p>واجهة عالية التحويل مع تجربة مستخدم احترافية.</p>
+        <strong>540$</strong>
+      </div>
+      <div class="card">
+        <span class="tag">منتج</span>
+        <h3>أدوات تسويق ذكية</h3>
+        <p>أدوات لتحليل المحتوى، الأداء، ومؤشرات النمو.</p>
+        <strong>220$</strong>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Academy - HashidHub</title>
+  <style>
+    :root { --bg:#f6faf8; --card:#fff; --ink:#12251e; --muted:#5d7269; --brand:#0d7a5f; --brand2:#149d78; --line:#e2efe9; --amber:#f5b942; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:"Segoe UI",Tahoma,Arial,sans-serif; background:var(--bg); color:var(--ink); }
+    .topbar { background: linear-gradient(135deg,var(--brand),var(--brand2)); color:white; padding:16px 20px; }
+    .nav { display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
+    .nav a { color:white; text-decoration:none; background: rgba(255,255,255,.12); border-radius:999px; padding:8px 12px; font-weight:600; }
+    .container { max-width:1100px; margin:24px auto; padding:0 16px 42px; }
+    .grid { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:18px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px; }
+    .badge { display:inline-block; background:#edf8f3; color:var(--brand); border-radius:999px; padding:6px 10px; font-size:.8rem; font-weight:700; }
+    @media (max-width: 700px) { .grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <h1 style="margin:0;">HashidHub</h1>
+    <nav class="nav">
+      <a href="index.html">الرئيسية</a>
+      <a href="ai.html">AI</a>
+      <a href="search.html">بحث</a>
+      <a href="marketplace.html">Marketplace</a>
+      <a href="jobs.html">Jobs</a>
+    </nav>
+  </div>
+
+  <div class="container">
+    <h2>Academy</h2>
+    <div class="grid">
+      <div class="card">
+        <span class="badge">دورة</span>
+        <h3>تحليل المحتوى للمبدعين</h3>
+        <p>تعلم كيفية تحليل أداء المحتوى، تحسين التفاعل، وبناء استراتيجية يومية.</p>
+        <strong>5 أسابيع</strong>
+      </div>
+      <div class="card">
+        <span class="badge">شهادة</span>
+        <h3>Growth Marketing</h3>
+        <p>أساسيات التسويق الرقمي، بناء العلامة، والترويج عبر منصات التواصل.</p>
+        <strong>مؤهل رسمي</strong>
+      </div>
+      <div class="card">
+        <span class="badge">درس</span>
+        <h3>إدارة المجتمع</h3>
+        <p>كيفية بناء مجتمعات نشطة، إدارة التفاعل، وتطوير هوية العلامة.</p>
+        <strong>3 وحدات</strong>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
