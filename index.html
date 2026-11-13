@@ -696,6 +696,34 @@ button,a,label{touch-action:manipulation}
   .plat-grid{grid-template-columns:1fr}
 }
 
+
+/* Platform composer + dark form fields */
+.sheet{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center;padding:12px}
+.sheet-in{
+  width:min(520px,100%);max-height:min(92vh,760px);overflow:auto;
+  background:var(--card);color:var(--ink);border:1px solid var(--line);
+  border-radius:20px 20px 14px 14px;padding:16px 16px 20px;box-shadow:var(--sh);
+}
+.sheet-in input,.sheet-in select,.sheet-in textarea{
+  width:100%;margin-top:6px;margin-bottom:10px;padding:12px 14px;
+  border-radius:12px;border:1px solid var(--line);
+  background:var(--bg);color:var(--ink);font:inherit;
+}
+.sheet-in input::placeholder,.sheet-in textarea::placeholder{color:var(--mute);opacity:.85}
+.sheet-in label.note{display:block;margin-top:4px;font-weight:700}
+.sheet-in .err{color:#fb7185;font-size:.85rem;min-height:1.2em}
+.plat-empty-card{
+  text-align:center;padding:36px 18px;border-radius:20px;
+  background:var(--card);border:1px dashed var(--line);box-shadow:var(--sh);
+}
+.plat-empty-card .big-ico{font-size:2.6rem;line-height:1;margin-bottom:10px}
+.plat-empty-card h3{margin:0 0 6px;font-size:1.15rem}
+.plat-empty-card p{margin:0 0 14px;color:var(--mute)}
+.plat-preview{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.plat-preview img{width:72px;height:72px;object-fit:cover;border-radius:12px;border:1px solid var(--line)}
+.profile-ro{opacity:.95}
+.profile-edit-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+
 </style>
 </head>
 <body>
@@ -1565,7 +1593,11 @@ function listen(){
   L(query(collection(db, "stories"), orderBy("ts", "desc"), limit(60)), function(s){
     var now = Date.now();
     stories = s.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); })
-      .filter(function(x){ return x.exp > now; });
+      .filter(function(x){
+        var exp = Number(x.exp) || 0;
+        if(!exp && x.ts) exp = Number(x.ts) + 86400000; // 24h default if exp missing
+        return exp > now;
+      });
   });
   L(query(collection(db, "reels"), orderBy("ts", "desc"), limit(60)), function(s){
     reels = s.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
@@ -2601,33 +2633,59 @@ function render(){
 
 function openPlatformComposer(kind){
   kind = kind || "marketplace";
+  window.__platImages = [];
   var titles = { marketplace: t("إضافة عرض","Add listing"), jobs: t("نشر وظيفة","Post a job"), academy: t("إنشاء دورة","Create a course") };
   var d = document.createElement("div");
   d.className = "sheet";
   d.id = "plat-sheet";
   var fields = "";
   if(kind === "marketplace"){
-    fields = '<label class="note">' + t("العنوان","Title") + '</label><input id="pc-title" maxlength="160" placeholder="' + t("مثال: تصميم شعار","e.g. Logo design") + '">' +
+    fields =
+      '<label class="note">' + t("العنوان","Title") + '</label><input id="pc-title" maxlength="160" placeholder="' + t("مثال: تصميم شعار","e.g. Logo design") + '">' +
       '<label class="note">' + t("الوصف","Description") + '</label><textarea id="pc-desc" maxlength="2000" placeholder="' + t("تفاصيل العرض…","Details…") + '"></textarea>' +
+      '<label class="note">' + t("التصنيف","Category") + '</label><select id="pc-cat"><option value="منتج رقمي">' + t("منتج رقمي","Digital") + '</option><option value="خدمة">' + t("خدمة","Service") + '</option><option value="منتج ملموس">' + t("منتج ملموس","Physical") + '</option><option value="أخرى">' + t("أخرى","Other") + '</option></select>' +
       '<label class="note">' + t("السعر","Price") + '</label><input id="pc-price" type="number" min="0" value="0">' +
-      '<label class="note">' + t("العملة","Currency") + '</label><input id="pc-cur" maxlength="3" value="USD">';
+      '<label class="note">' + t("العملة","Currency") + '</label><input id="pc-cur" maxlength="3" value="USD">' +
+      '<label class="note">' + t("وقت التسليم / الكمية","Delivery time / quantity") + '</label><input id="pc-delivery" maxlength="80" placeholder="' + t("مثال: 3 أيام · أو كمية: 10","e.g. 3 days · qty: 10") + '">' +
+      '<label class="note">' + t("صور المنتج","Product images") + '</label>' +
+      '<div class="tools"><label class="btn alt" style="cursor:pointer">' + t("رفع صور","Upload images") + '<input type="file" id="pc-imgs" accept="image/*" multiple hidden></label></div>' +
+      '<div class="plat-preview" id="pc-preview"></div>';
   } else if(kind === "jobs"){
-    fields = '<label class="note">' + t("المسمى","Title") + '</label><input id="pc-title" maxlength="160" placeholder="Frontend Developer">' +
+    fields =
+      '<label class="note">' + t("المسمى","Title") + '</label><input id="pc-title" maxlength="160" placeholder="Frontend Developer">' +
       '<label class="note">' + t("الشركة","Company") + '</label><input id="pc-company" maxlength="120">' +
       '<label class="note">' + t("الموقع","Location") + '</label><input id="pc-loc" maxlength="120" value="Remote">' +
       '<label class="note">' + t("الوصف","Description") + '</label><textarea id="pc-desc" maxlength="4000"></textarea>';
   } else {
-    fields = '<label class="note">' + t("عنوان الدورة","Course title") + '</label><input id="pc-title" maxlength="180">' +
+    fields =
+      '<label class="note">' + t("عنوان الدورة","Course title") + '</label><input id="pc-title" maxlength="180">' +
       '<label class="note">' + t("الوصف","Description") + '</label><textarea id="pc-desc" maxlength="3000"></textarea>';
   }
-  d.innerHTML = '<div class="sheet-in" style="max-height:90vh">' +
+  d.innerHTML = '<div class="sheet-in">' +
     '<div style="width:40px;height:4px;background:var(--line);border-radius:2px;margin:0 auto 10px"></div>' +
-    '<h3>' + (titles[kind] || titles.marketplace) + '</h3>' + fields +
+    '<h3 style="margin-top:0">' + (titles[kind] || titles.marketplace) + '</h3>' + fields +
     '<div class="err" id="pc-err"></div>' +
-    '<button type="button" class="btn" id="pc-save" style="width:100%;margin-top:12px">' + t("نشر","Publish") + '</button>' +
+    '<button type="button" class="btn" id="pc-save" style="width:100%;margin-top:8px">' + t("نشر","Publish") + '</button>' +
     '<button type="button" class="btn gray" data-si="close" style="width:100%;margin-top:8px">' + t("إلغاء","Cancel") + '</button></div>';
   document.body.appendChild(d);
   d.addEventListener("click", function(e){ if(e.target === d || e.target.closest("[data-si=close]")) d.remove(); });
+
+  var imgInput = d.querySelector("#pc-imgs");
+  if(imgInput){
+    imgInput.addEventListener("change", function(){
+      var files = Array.prototype.slice.call(imgInput.files || []).slice(0, 4);
+      window.__platImages = files;
+      var prev = d.querySelector("#pc-preview");
+      prev.innerHTML = "";
+      files.forEach(function(f){
+        var url = URL.createObjectURL(f);
+        var im = document.createElement("img");
+        im.src = url; im.alt = f.name;
+        prev.appendChild(im);
+      });
+    });
+  }
+
   var save = d.querySelector("#pc-save");
   save.onclick = async function(){
     var err = d.querySelector("#pc-err");
@@ -2636,11 +2694,23 @@ function openPlatformComposer(kind){
     if(title.length < 3){ err.textContent = t("العنوان قصير","Title too short"); return; }
     try{
       save.disabled = true;
+      err.textContent = t("جاري النشر…","Publishing…");
       if(kind === "marketplace"){
         if(description.length < 10){ err.textContent = t("الوصف قصير","Description too short"); save.disabled = false; return; }
+        var images = [];
+        var files = window.__platImages || [];
+        for(var i = 0; i < files.length; i++){
+          try{ images.push(await upUpload(files[i], "posts")); }catch(upE){ console.warn(upE); }
+        }
         var price = Math.max(0, Number(d.querySelector("#pc-price").value) || 0);
         var currency = ((d.querySelector("#pc-cur") && d.querySelector("#pc-cur").value) || "USD").toUpperCase().slice(0,3);
-        await addDoc(collection(db, "marketplace"), { ownerId: me.uid, title: title.slice(0,160), description: description.slice(0,2000), category: "خدمات", price: price, currency: currency, status: "published", createdAt: Date.now(), updatedAt: Date.now() });
+        var category = (d.querySelector("#pc-cat") && d.querySelector("#pc-cat").value) || "خدمة";
+        var delivery = (d.querySelector("#pc-delivery") && d.querySelector("#pc-delivery").value || "").trim().slice(0,80);
+        await addDoc(collection(db, "marketplace"), {
+          ownerId: me.uid, title: title.slice(0,160), description: description.slice(0,2000),
+          category: category, price: price, currency: currency, delivery: delivery,
+          images: images, status: "published", createdAt: Date.now(), updatedAt: Date.now()
+        });
         toast(t("تم نشر العرض","Listing published"));
       } else if(kind === "jobs"){
         if(description.length < 20){ err.textContent = t("الوصف قصير","Description too short"); save.disabled = false; return; }
@@ -2668,6 +2738,7 @@ function openPlatformComposer(kind){
   };
 }
 
+
 function ensureCatalog(kind){
   var map = { marketplace: { col: "marketplace", key: "marketplace" }, jobs: { col: "jobPosts", key: "jobs" }, academy: { col: "courses", key: "academy" } };
   var cfg = map[kind]; if(!cfg) return;
@@ -2682,6 +2753,10 @@ function ensureCatalog(kind){
       function(err){ console.warn("catalog", cfg.col, err && err.code); }
     );
   }catch(e){ console.warn(e); }
+}
+function platEmptyCard(ico, title, sub, btnLabel, btnAttrs){
+  return '<div class="plat-empty-card"><div class="big-ico">' + ico + '</div><h3>' + title + '</h3><p>' + sub + '</p>' +
+    (btnLabel ? '<button class="btn" ' + (btnAttrs||'') + '>' + btnLabel + '</button>' : '') + '</div>';
 }
 function platformHead(emoji, title, sub){
   return '<section class="plat-hero">' +
@@ -2703,14 +2778,17 @@ function marketplaceView(){
         : '<button class="btn alt" data-a="needauth">' + t("سجّل للنشر","Sign in to post") + '</button>') +
     '</div>';
   if(!list.length){
-    h += '<div class="plat-empty">🚀 ' + t("لا توجد عروض بعد — كن أول من ينشر","No listings yet — be the first") + '</div>';
+    h += platEmptyCard("🛍️", t("السوق بانتظارك","Marketplace awaits"), t("لا توجد عروض بعد — كن أول من ينشر منتجاً أو خدمة.","No listings yet — be the first to publish."), me ? ("+ " + t("إضافة عرض","Add listing")) : t("سجّل للبدء","Sign in to start"), me ? 'data-a="plat-add" data-kind="marketplace"' : 'data-a="needauth"');
     return h;
   }
   h += '<div class="plat-grid">';
   list.forEach(function(x){
     var own = me && x.ownerId === me.uid;
+    var imgs = x.images || [];
     h += '<article class="plat-card">' +
+      (imgs[0] ? '<img src="' + esc(imgs[0]) + '" alt="" style="width:100%;height:150px;object-fit:cover;border-radius:14px;margin-bottom:10px;border:1px solid var(--line)">' : '') +
       '<div class="plat-meta"><span class="chip green">' + esc(x.category || t("عام","General")) + '</span>' +
+      (x.delivery ? '<span class="chip">' + esc(x.delivery) + '</span>' : '') +
       (own ? '<span class="chip gold">' + t("عرضك","Yours") + '</span>' : '') + '</div>' +
       '<h3>' + esc(x.title || "") + '</h3>' +
       '<p class="plat-desc">' + esc((x.description || "").slice(0, 160)) + ((x.description||"").length > 160 ? "…" : "") + '</p>' +
@@ -2738,7 +2816,7 @@ function jobsView(){
         : '<button class="btn alt" data-a="needauth">' + t("سجّل للنشر","Sign in") + '</button>') +
     '</div>';
   if(!list.length){
-    h += '<div class="plat-empty">💼 ' + t("لا وظائف حالياً — انشر أول فرصة","No jobs yet — post the first one") + '</div>';
+    h += platEmptyCard("💼", t("لا وظائف بعد","No jobs yet"), t("انشر أول فرصة عمل أو تدريب وابدأ المطابقة.","Post the first job or internship."), me ? ("+ " + t("نشر وظيفة","Post job")) : t("سجّل للبدء","Sign in"), me ? 'data-a="plat-add" data-kind="jobs"' : 'data-a="needauth"');
     return h;
   }
   list.forEach(function(x){
@@ -2777,7 +2855,7 @@ function academyView(){
         : '<button class="btn alt" data-a="needauth">' + t("سجّل للإنشاء","Sign in") + '</button>') +
     '</div>';
   if(!list.length){
-    h += '<div class="plat-empty">🎓 ' + t("لا دورات بعد — أنشئ أول مسار","No courses yet — create the first path") + '</div>';
+    h += platEmptyCard("🎓", t("الأكاديمية فارغة","Academy is empty"), t("أنشئ أول دورة وشارك معرفتك مع المجتمع.","Create the first course and share knowledge."), me ? ("+ " + t("إنشاء دورة","Create course")) : t("سجّل للبدء","Sign in"), me ? 'data-a="plat-add" data-kind="academy"' : 'data-a="needauth"');
     return h;
   }
   h += '<div class="plat-grid">';
@@ -2817,7 +2895,7 @@ function aiView(){
   h += '</div>' +
     '<textarea id="ai-prompt" rows="5" placeholder="' + t("اكتب طلبك هنا… مثال: حسّن منشوراً عن ريادة الأعمال","Write your request… e.g. improve a post about entrepreneurship") + '">' + esc(window.__aiPrompt || "") + '</textarea>' +
     '<div class="row" style="gap:8px;margin-top:10px;flex-wrap:wrap">' +
-    '<button class="btn" data-a="ai-run">✨ ' + t("توليد","Generate") + '</button>' +
+    '<button class="btn" data-a="ai-run" id="ai-run-btn">' + (window.__aiBusy ? ("⏳ " + t("جاري التوليد…","Generating…")) : ("✨ " + t("توليد","Generate"))) + '</button>' +
     '<button class="btn alt" data-a="ai-clear">' + t("مسح","Clear") + '</button></div>' +
     '<p class="note" id="ai-status" style="margin-top:8px">' + t("يتطلب OPENAI_API_KEY على Vercel","Requires OPENAI_API_KEY on Vercel") + '</p></div>' +
     '<div class="card" style="border-radius:18px"><h3 style="margin-top:0">' + t("النتيجة","Result") + '</h3>' +
@@ -2828,8 +2906,8 @@ function creatorView(){
   var followers = me ? countFollowers(me.uid) : "—";
   var h = platformHead("📊", "Creator Center", t("نمو الجمهور والأداء والأدوات","Audience growth, performance & tools"));
   h += '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px">' +
-    '<div class="plat-stat"><b>—</b><span>' + t("المشاهدات","Views") + '</span></div>' +
-    '<div class="plat-stat"><b>—</b><span>' + t("التفاعل","Engagement") + '</span></div>' +
+    '<div class="plat-stat"><b>0</b><span>' + t("المشاهدات","Views") + '</span></div>' +
+    '<div class="plat-stat"><b>0</b><span>' + t("التفاعل","Engagement") + '</span></div>' +
     '<div class="plat-stat"><b>' + followers + '</b><span>' + t("المتابعون","Followers") + '</span></div>' +
     '<div class="plat-stat"><b>$0</b><span>' + t("الأرباح","Earnings") + '</span></div></div>' +
     '<div class="card" style="border-radius:18px"><h3 style="margin-top:0">' + t("اختصارات سريعة","Quick shortcuts") + '</h3>' +
@@ -3202,8 +3280,11 @@ function homeView(){
     '<div class="discovery-grid"><div class="discovery-stat"><b>' + memberMetric + '</b><span>' + memberLabel + '</span></div><div class="discovery-stat"><b>' + fmtN(posts.length) + '</b><span>منشور</span></div><div class="discovery-stat"><b>' + fmtN(reels.length) + '</b><span>ريلز</span></div></div>' +
     '<div class="discovery-actions"><button class="btn" data-t="explore">استكشف الآن</button><button class="btn alt" data-t="groups">المجتمعات</button></div></aside>';
   var rs = shelfReels();
+  sh += '<div class="shelf-head"><h3>🎬 ' + t("ريلز","Reels") + '</h3><button class="mini" data-t="reels">' + t("عرض الكل","See all") + ' ←</button></div>';
   if(rs.length){
-    sh += '<div class="shelf-head"><h3>🎬 ' + t("ريلز","Reels") + '</h3><button class="mini" data-t="reels">' + t("عرض الكل","See all") + ' ←</button></div><div class="reel-shelf">' + rs.slice(0, 8).map(reelTileHtml).join("") + '</div>';
+    sh += '<div class="reel-shelf">' + rs.slice(0, 8).map(reelTileHtml).join("") + '</div>';
+  } else {
+    sh += '<div class="card" style="margin-bottom:12px"><div class="note">' + t("لا ريلز بعد — كن أول من ينشر من تبويب الريلز.","No reels yet — be the first from the Reels tab.") + '</div></div>';
   }
 
   var mps = myPages();
@@ -3276,9 +3357,17 @@ function meView(){
     (!prof.verified ? '<button class="btn alt" data-a="requestverify" style="flex:1">✓ طلب توثيق</button>' : '') + '</div></div>' +
     (prof.verified ? '<div class="card"><span class="chip green">✓ حسابك موثّق</span></div>' : '');
 
-  h += '<div class="card"><h3>تعديل الملف الشخصي</h3>' +
-    '<input type="text" id="en" value="' + esc(prof.name) + '" maxlength="40">' +
-    '<textarea id="eb" maxlength="200" placeholder="نبذة عنك">' + esc(prof.bio || "") + '</textarea>' +
+  var editing = !!window.__editProf;
+  h += '<div class="card"><div class="row" style="justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h3 style="margin:0">' + t("الملف الشخصي","Profile") + '</h3>' +
+    (!editing ? '<button class="btn alt" data-a="toggle-edit-prof" style="padding:8px 12px;min-height:auto">✏️ ' + t("تعديل","Edit") + '</button>'
+              : '<button class="btn gray" data-a="toggle-edit-prof" style="padding:8px 12px;min-height:auto">' + t("إلغاء","Cancel") + '</button>') +
+    '</div>';
+  if(!editing){
+    h += '<div class="profile-ro" style="margin-top:10px"><div class="name" style="font-size:1.05rem">' + esc(prof.name) + '</div>' +
+      '<div class="note" style="margin-top:6px;white-space:pre-wrap">' + esc(prof.bio || t("لا توجد نبذة.","No bio.")) + '</div></div>';
+  } else {
+    h += '<label class="note">' + t("الاسم","Name") + '</label><input type="text" id="en" value="' + esc(prof.name) + '" maxlength="40">' +
+    '<label class="note">' + t("نبذة","Bio") + '</label><textarea id="eb" maxlength="200" placeholder="' + t("نبذة عنك","About you") + '">' + esc(prof.bio || "") + '</textarea>' +
     '<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--brand);font-weight:700">إضافة وسائل تواصل اختيارية</summary>' +
     '<input type="email" id="ce" value="'+esc(prof.contactEmail||'')+'" placeholder="البريد الإلكتروني" maxlength="120">' +
     '<input type="tel" id="phone" value="'+esc(prof.contactPhone||'')+'" placeholder="رقم هاتف (اختياري)" maxlength="24">' +'<input type="tel" id="wa" value="'+esc(prof.whatsapp||'')+'" placeholder="رقم واتساب مع مفتاح الدولة" maxlength="24">' +
@@ -3287,8 +3376,10 @@ function meView(){
     '<input type="url" id="fb" value="'+esc(prof.facebook||'')+'" placeholder="رابط فيسبوك" maxlength="300">' +
     '<label style="display:block;margin-top:10px">من يستطيع مراسلتك؟<select id="mp"><option value="everyone" '+((prof.messagePolicy||"everyone")==="everyone"?"selected":"")+'>الجميع (مع طلبات الرسائل)</option><option value="friends" '+(prof.messagePolicy==="friends"?"selected":"")+'>الأصدقاء فقط</option><option value="none" '+(prof.messagePolicy==="none"?"selected":"")+'>لا أستقبل رسائل جديدة</option></select></label>' +
     '<div class="note">لن تظهر هذه البيانات في ملفك العام إلا إذا أضفتها هنا. لا تضف معلومات لا ترغب بمشاركتها.</div></details>' +
-    '<div class="tools"><label>تغيير الصورة<input type="file" id="ep" accept="image/*" hidden></label>' +
-    '<button class="btn" data-a="saveprof" style="margin-inline-start:auto">حفظ</button></div></div>';
+    '<div class="tools"><label>' + t("تغيير الصورة","Change photo") + '<input type="file" id="ep" accept="image/*" hidden></label>' +
+    '<button class="btn" data-a="saveprof" style="margin-inline-start:auto">' + t("حفظ","Save") + '</button></div>';
+  }
+  h += '</div>';
 
   h += '<div class="card"><div class="row" style="flex-wrap:wrap">' +
     '<button class="btn alt" data-t="pages" style="flex:1">📄 صفحاتي</button>' +
@@ -4760,6 +4851,11 @@ getRedirectResult(auth).catch(function(e){ var x = document.getElementById("er")
 
 async function actions(b, er){
   var a = b.dataset.a;
+  if(a === "toggle-edit-prof"){
+    window.__editProf = !window.__editProf;
+    draw();
+    return;
+  }
   if(a === "logout" || b.id === "out"){
     try{ if(typeof callBusy !== "undefined" && callBusy) hangup(); }catch(e){}
     try{ await signOut(auth); }catch(e){ toast((e && e.message) || "Logout failed"); }
@@ -4876,11 +4972,13 @@ async function actions(b, er){
   if(a === "ai-mode"){ aiMode = b.dataset.v || "general"; draw(); return; }
   if(a === "ai-clear"){ window.__aiPrompt = ""; window.__aiOut = ""; draw(); return; }
   if(a === "ai-run"){
+    if(window.__aiBusy) return;
     var promptEl = document.getElementById("ai-prompt");
     var prompt = (promptEl && promptEl.value || "").trim();
     if(prompt.length < 2) return toast(t("اكتب طلبك أولاً","Write a prompt first"));
     window.__aiPrompt = prompt;
     window.__aiOut = t("جاري التوليد…","Generating…");
+    window.__aiBusy = true;
     draw();
     try{
       var r = await fetch("/api/ai", {
@@ -4905,6 +5003,9 @@ async function actions(b, er){
     }catch(err){
       window.__aiOut = t("تعذر الاتصال بـ /api/ai. تأكد أن الموقع على Vercel وأن api/ai.js منشور.","Cannot reach /api/ai. Ensure site is on Vercel with api/ai.js deployed.");
       toast(t("خطأ شبكة /api/ai","Network error /api/ai"), 4000);
+      draw();
+    }finally{
+      window.__aiBusy = false;
       draw();
     }
     return;
@@ -5162,6 +5263,7 @@ async function actions(b, er){
       website: (($('#ws')&&$('#ws').value)||'').trim(), instagram: (($('#ig')&&$('#ig').value)||'').trim(), facebook: (($('#fb')&&$('#fb').value)||'').trim(),
       messagePolicy: (($('#mp')&&$('#mp').value)||prof.messagePolicy||'everyone')});
     await updateDoc(doc(db, "users", me.uid), {name: prof.name, bio: prof.bio, photo: ph2, contactEmail: prof.contactEmail, whatsapp: prof.whatsapp, website: prof.website, instagram: prof.instagram, facebook: prof.facebook, messagePolicy: prof.messagePolicy});
+    window.__editProf = false;
     toast("تم الحفظ");
     draw();
     return;
