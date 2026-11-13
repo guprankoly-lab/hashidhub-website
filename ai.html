@@ -2,81 +2,170 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hashid AI - HashidHub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>Hashid AI — HashidHub</title>
+  <link rel="stylesheet" href="hh-shared.css" />
+  <link rel="icon" href="icon.svg" />
   <style>
-    :root { --bg:#f6faf8; --card:#fff; --ink:#12251e; --muted:#5d7269; --brand:#0d7a5f; --brand2:#149d78; --line:#e2efe9; }
-    * { box-sizing:border-box; }
-    body { margin:0; font-family:"Segoe UI",Tahoma,Arial,sans-serif; background:var(--bg); color:var(--ink); }
-    .topbar { background: linear-gradient(135deg,var(--brand),var(--brand2)); color:white; padding:16px 20px; }
-    .nav { display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
-    .nav a { color:white; text-decoration:none; background: rgba(255,255,255,.12); border-radius:999px; padding:8px 12px; font-weight:600; }
-    .container { max-width:800px; margin:24px auto; padding:0 16px 48px; }
-    .card { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:20px; margin-bottom:16px; }
-    textarea { width:100%; min-height:120px; padding:14px; border:1px solid var(--line); border-radius:12px; font:inherit; resize:vertical; }
-    .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
-    .btn { background: linear-gradient(135deg,var(--brand),var(--brand2)); color:white; border:none; border-radius:12px; padding:12px 18px; font-weight:700; cursor:pointer; }
-    .btn.alt { background:transparent; color:var(--brand); border:1.5px solid var(--brand); }
-    .out { white-space:pre-wrap; background:#f0f7f4; border-radius:12px; padding:14px; min-height:80px; color:var(--muted); }
+    .ai-layout { display:grid; gap:16px; }
+    @media(min-width:900px){ .ai-layout{ grid-template-columns: 1.1fr .9fr; align-items:start; } }
     .chips { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
-    .chip { background:#edf8f3; color:var(--brand); border-radius:999px; padding:8px 12px; font-weight:700; font-size:.85rem; cursor:pointer; border:none; }
+    .chip {
+      border:1px solid var(--line); background:var(--card); color:var(--ink);
+      border-radius:999px; padding:8px 12px; font-weight:700; font-size:.85rem;
+    }
+    .chip:hover { border-color: var(--brand); }
+    .chip.on { background: rgba(34,211,166,.15); border-color: var(--brand); color: var(--brand); }
+    .out-box {
+      min-height: 180px; white-space: pre-wrap; line-height: 1.7;
+      background: var(--bg2); border: 1px solid var(--line); border-radius: 16px; padding: 16px;
+      color: var(--ink);
+    }
+    .out-box.muted { color: var(--mute); }
+    .status-line { font-size: .85rem; color: var(--mute); margin-top: 8px; }
   </style>
 </head>
 <body>
-  <div class="topbar">
-    <h1 style="margin:0;">Hashid AI ✨</h1>
-    <nav class="nav">
-      <a href="index.html">الرئيسية</a>
-      <a href="marketplace.html">Marketplace</a>
-      <a href="jobs.html">Jobs</a>
-      <a href="academy.html">Academy</a>
-      <a href="creator-center.html">Creator Center</a>
-    </nav>
-  </div>
-
-  <div class="container">
-    <div class="card">
-      <h2 style="margin-top:0;">مساعد Hashid الذكي</h2>
-      <p style="color:var(--muted);">اكتب فكرتك أو الصق نصاً، واختر ما تريد من المساعد.</p>
-      <div class="chips">
-        <button class="chip" data-p="حسّن هذا المنشور ليكون أكثر جاذبية: ">تحسين منشور</button>
-        <button class="chip" data-p="اكتب سيرة ذاتية قصيرة احترافية بناءً على: ">إنشاء سيرة ذاتية</button>
-        <button class="chip" data-p="اقترح 5 أفكار لمشروع ريادي في مجال: ">أفكار مشاريع</button>
-        <button class="chip" data-p="ترجم إلى الإنجليزية بأسلوب طبيعي: ">ترجمة</button>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <a class="back-btn" href="index.html">← الرئيسية</a>
+        <span class="dot">✦</span>
+        <span>Hashid AI</span>
       </div>
-      <textarea id="prompt" placeholder="اكتب هنا… مثلاً: حسّن ملفي الشخصي أو اقترح وصف لريل عن ريادة الأعمال"></textarea>
-      <div class="actions">
-        <button class="btn" id="generate">توليد اقتراح</button>
-        <button class="btn alt" id="clear">مسح</button>
-      </div>
+      <nav class="nav-pills">
+        <a href="marketplace.html">🛍️ السوق</a>
+        <a href="jobs.html">💼 وظائف</a>
+        <a href="academy.html">🎓 أكاديمية</a>
+        <a class="on" href="ai.html">✨ AI</a>
+        <a href="creator-center.html">📊 المبدع</a>
+      </nav>
+      <div id="authBox" class="user-chip">ضيف</div>
     </div>
-    <div class="card">
-      <h3 style="margin-top:0;">النتيجة</h3>
-      <div class="out" id="output">سيظهر الاقتراح هنا. (نسخة أولية — سيتم ربطها بنموذج AI حقيقي لاحقاً)</div>
-    </div>
-  </div>
+  </header>
 
-  <script>
-    const promptEl = document.getElementById('prompt');
-    const output = document.getElementById('output');
-    document.querySelectorAll('.chip').forEach(btn => {
-      btn.addEventListener('click', () => {
-        promptEl.value = (btn.dataset.p || '') + promptEl.value;
-        promptEl.focus();
-      });
-    });
-    document.getElementById('clear').onclick = () => { promptEl.value = ''; output.textContent = 'سيظهر الاقتراح هنا.'; };
-    document.getElementById('generate').onclick = () => {
-      const text = promptEl.value.trim();
-      if (!text) {
-        output.textContent = 'اكتب فكرة أو نصاً أولاً.';
-        return;
+  <main class="container">
+    <section class="hero">
+      <h1>✨ Hashid AI</h1>
+      <p>مساعد ذكي لتحسين منشوراتك، بناء سيرة ذاتية، توليد أفكار مشاريع، والترجمة الفورية.</p>
+    </section>
+
+    <div class="ai-layout">
+      <section class="card">
+        <h2 style="margin-top:0">ماذا تريد؟</h2>
+        <div class="chips" id="modes">
+          <button type="button" class="chip on" data-mode="general">💬 عام</button>
+          <button type="button" class="chip" data-mode="improve">📝 تحسين منشور</button>
+          <button type="button" class="chip" data-mode="cv">📄 سيرة ذاتية</button>
+          <button type="button" class="chip" data-mode="ideas">💡 أفكار مشاريع</button>
+          <button type="button" class="chip" data-mode="translate">🌐 ترجمة</button>
+        </div>
+        <div class="field">
+          <label>اكتب طلبك</label>
+          <textarea id="prompt" maxlength="4000" placeholder="مثال: حسّن هذا المنشور عن ريادة الأعمال للشباب…"></textarea>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn" id="go">توليد ✨</button>
+          <button class="btn alt" id="clear">مسح</button>
+          <button class="btn ghost" id="copy" hidden>نسخ النتيجة</button>
+        </div>
+        <p class="status-line" id="status">جاهز — يتطلب إعداد OPENAI_API_KEY على Vercel</p>
+      </section>
+
+      <section class="card">
+        <h2 style="margin-top:0">النتيجة</h2>
+        <div class="out-box muted" id="output">سيظهر الرد هنا بعد التوليد.</div>
+      </section>
+    </div>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script type="module">
+    import { firebaseConfig } from "./firebase-config.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    let me = null, mode = "general";
+
+    const $ = (s) => document.querySelector(s);
+    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[c]));
+    function toast(m, ms = 2600) {
+      const el = $("#toast"); el.textContent = m; el.classList.add("show");
+      clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), ms);
+    }
+
+    onAuthStateChanged(auth, u => {
+      me = u;
+      const box = $("#authBox");
+      if (!u) {
+        box.innerHTML = `<button class="btn alt" id="loginBtn" style="padding:8px 12px;min-height:auto">دخول</button>`;
+        $("#loginBtn")?.addEventListener("click", () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => toast(e.message)));
+      } else {
+        box.innerHTML = `<img class="av" src="${esc(u.photoURL||"")}" alt=""><span>${esc(u.displayName||"عضو")}</span>`;
       }
-      // Placeholder response until real AI backend is connected
-      output.textContent =
-        'مسودة مقترحة:\n\n' +
-        text +
-        '\n\n—\nنصيحة: أضف مثالاً شخصياً أو رقم نتائج لزيادة التفاعل.\n\n(سيتم ربط Hashid AI بنموذج ذكي حقيقي في التحديث القادم)';
+    });
+
+    $("#modes").addEventListener("click", e => {
+      const b = e.target.closest("[data-mode]");
+      if (!b) return;
+      mode = b.dataset.mode;
+      $("#modes").querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c === b));
+    });
+
+    $("#clear").onclick = () => {
+      $("#prompt").value = "";
+      $("#output").classList.add("muted");
+      $("#output").textContent = "سيظهر الرد هنا بعد التوليد.";
+      $("#copy").hidden = true;
+      $("#status").textContent = "تم المسح";
+    };
+
+    $("#copy").onclick = async () => {
+      try {
+        await navigator.clipboard.writeText($("#output").textContent || "");
+        toast("تم النسخ");
+      } catch { toast("تعذر النسخ"); }
+    };
+
+    $("#go").onclick = async () => {
+      const prompt = ($("#prompt").value || "").trim();
+      if (prompt.length < 2) return toast("اكتب طلبك أولاً");
+      const btn = $("#go");
+      btn.disabled = true;
+      $("#status").textContent = "جاري التوليد…";
+      $("#output").classList.remove("muted");
+      $("#output").textContent = "…";
+
+      try {
+        const r = await fetch("/api/ai", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt, mode })
+        });
+        const data = await r.json().catch(() => ({}));
+        if (!r.ok) {
+          const msg = data.message || data.error || ("خطأ " + r.status);
+          $("#output").classList.add("muted");
+          $("#output").textContent = msg;
+          $("#status").textContent = "فشل التوليد";
+          toast(msg, 4000);
+          return;
+        }
+        $("#output").textContent = data.text || "(لا يوجد رد)";
+        $("#copy").hidden = false;
+        $("#status").textContent = "تم عبر " + (data.model || "AI") + " · وضع: " + (data.mode || mode);
+      } catch (e) {
+        $("#output").classList.add("muted");
+        $("#output").textContent = "تعذر الاتصال بخدمة AI. تأكد من نشر api/ai.js وإضافة OPENAI_API_KEY.";
+        $("#status").textContent = "خطأ شبكة";
+        toast("تعذر الاتصال بالخادم");
+      } finally {
+        btn.disabled = false;
+      }
     };
   </script>
 </body>

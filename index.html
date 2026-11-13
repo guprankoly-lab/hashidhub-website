@@ -625,10 +625,77 @@ textarea:focus,input:focus,select:focus{background:var(--card);border-color:var(
 #toast{bottom:94px;inset-inline:50%;width:min(420px,calc(100% - 32px));transform:translate(-50%,20px);box-shadow:var(--sh-float);backdrop-filter:blur(10px)}#toast.show{transform:translate(-50%,0)}
 :focus-visible{outline:3px solid color-mix(in srgb,var(--focus) 78%,white);outline-offset:3px}
 button,a,label{touch-action:manipulation}
-@media(min-width:900px){body{padding-bottom:24px}.wrap{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:22px;align-items:start}.wrap:has(.feed-toolbar){}.wrap>.feed-toolbar,.wrap>.stories,.wrap>.shelf-head,.wrap>.reel-shelf,.wrap>.mood-strip,.wrap>.chall-card,.wrap>.composer-card,.wrap>.guest-cta,.wrap>article.card,.wrap>.pcard,.wrap>.loading-soft,.wrap>.empty,.wrap>.invite-card{grid-column:1}.wrap>.bnav{display:none}.bnav{display:none}#main{min-height:calc(100vh - 100px)}header{padding-inline:max(28px,calc((100vw - 1120px)/2))}.desktop-rail{grid-column:2;grid-row:1 / span 20;position:sticky;top:96px}.post-card .body{font-size:1.02rem}}
+@media(min-width:900px){body{padding-bottom:24px}.wrap{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:22px;align-items:start}.wrap:has(.feed-toolbar){}.wrap>.feed-toolbar,.wrap>.stories,.wrap>.shelf-head,.wrap>.reel-shelf,.wrap>.mood-strip,.wrap>.chall-card,.wrap>.composer-card,.wrap>.guest-cta,.wrap>article.card,.wrap>.pcard,.wrap>.loading-soft,.wrap>.empty,.wrap>.invite-card,.wrap>.plat-hero,.wrap>.plat-toolbar,.wrap>.plat-grid,.wrap>.plat-empty,.wrap>.plat-card,.wrap>.plat-stat{grid-column:1}.wrap>.bnav{display:none}.bnav{display:none}#main{min-height:calc(100vh - 100px)}header{padding-inline:max(28px,calc((100vw - 1120px)/2))}.desktop-rail{grid-column:2;grid-row:1 / span 20;position:sticky;top:96px}.post-card .body{font-size:1.02rem}}
 @media(max-width:899px){.desktop-rail{display:none}.feed-toolbar{top:78px}}
 @media(max-width:560px){body{font-size:14px}.wrap{padding:12px 10px 30px}.card,.pcard{border-radius:15px;padding:12px}.feed-toolbar{align-items:flex-start;flex-direction:column;gap:8px}.feed-filters{width:100%}.discovery-card .discovery-grid{gap:6px}.discovery-stat{padding:8px 4px}.discovery-actions .btn{flex:1}.composer-card .tools{gap:6px}.composer-card .tools label,.composer-card .vlabel{padding:7px 9px;font-size:.8rem}.acts.fbacts .fbb{font-size:.84rem!important;gap:4px!important}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.card:hover,.pcard:hover,.reel-tile:hover,.story-bubble:hover{transform:none}}
+
+/* ===== Platform SPA: marketplace / jobs / academy / AI ===== */
+.plat-hero{
+  position:relative;overflow:hidden;border-radius:20px;padding:18px 16px;margin-bottom:12px;
+  background:
+    radial-gradient(700px 220px at 100% -20%, rgba(45,212,168,.28), transparent 55%),
+    radial-gradient(500px 180px at 0% 0%, rgba(56,189,248,.18), transparent 50%),
+    linear-gradient(145deg, var(--card), color-mix(in srgb, var(--brand) 8%, var(--card)));
+  border:1px solid var(--line); box-shadow:var(--sh);
+}
+.plat-hero h2{margin:0 0 4px;font-size:1.35rem;letter-spacing:-.02em}
+.plat-hero p{margin:0;color:var(--mute);max-width:48ch;font-size:.92rem}
+.plat-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.plat-toolbar input[type="search"]{
+  flex:1 1 160px;margin:0;border-radius:14px;padding:11px 14px;
+  background:var(--card);border:1px solid var(--line);
+}
+.plat-toolbar input:focus{outline:none;border-color:color-mix(in srgb,var(--brand) 50%, var(--line));box-shadow:0 0 0 3px rgba(45,212,168,.15)}
+.plat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.plat-card{
+  background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;
+  box-shadow:var(--sh);transition:transform .15s ease, border-color .15s ease;
+}
+.plat-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--brand) 40%, var(--line))}
+.plat-card h3{margin:8px 0 6px;font-size:1.05rem;line-height:1.35}
+.plat-card .plat-desc{color:var(--mute);font-size:.9rem;margin:0 0 10px;line-height:1.55}
+.plat-price{
+  font-weight:900;font-size:1.12rem;
+  background:linear-gradient(135deg,var(--brand),#38bdf8);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.plat-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.plat-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.chip.blue{background:rgba(56,189,248,.14);color:#38bdf8;border-color:transparent}
+.chip.purple{background:rgba(167,139,250,.14);color:#a78bfa;border-color:transparent}
+:root[data-theme="dark"] .chip.green, :root:not([data-theme="light"]) .chip.green{
+  background:rgba(45,212,168,.16);color:var(--brand);border-color:transparent;
+}
+:root[data-theme="dark"] .chip.gold, :root:not([data-theme="light"]) .chip.gold{
+  background:rgba(240,193,75,.16);color:var(--gold);border-color:transparent;
+}
+.ai-modes{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.ai-mode-btn{
+  border:1px solid var(--line);background:var(--bg);color:var(--ink);
+  border-radius:999px;padding:8px 12px;font-weight:700;font-size:.85rem;
+}
+.ai-mode-btn.on{background:rgba(45,212,168,.16);border-color:var(--brand);color:var(--brand)}
+.ai-out{
+  min-height:140px;white-space:pre-wrap;line-height:1.7;
+  background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px;
+}
+.plat-stat{
+  text-align:center;padding:16px 10px;border-radius:16px;
+  background:linear-gradient(160deg, color-mix(in srgb, var(--brand) 10%, var(--card)), var(--card));
+  border:1px solid var(--line);
+}
+.plat-stat b{display:block;font-size:1.5rem;background:linear-gradient(135deg,var(--brand),#38bdf8);-webkit-background-clip:text;background-clip:text;color:transparent}
+.plat-stat span{font-size:.8rem;color:var(--mute)}
+.plat-empty{
+  text-align:center;padding:36px 14px;color:var(--mute);
+  border:1.5px dashed var(--line);border-radius:18px;background:var(--card);
+}
+@media(max-width:640px){
+  .plat-hero{padding:14px 12px;border-radius:16px}
+  .plat-grid{grid-template-columns:1fr}
+}
+
 </style>
 </head>
 <body>
@@ -1073,7 +1140,12 @@ var unsubs = [];
 var posts = [], likes = [], comments = [], stories = [], reels = [], msgs = [], notifs = [];
 var follows = [], friends = [], reqs = [], pages = [], groups = [], pageFollows = [], groupMembers = [], msgReqs = [], savedItems = [], storyViews = [];
 var users = [], ads = [], adComments = [], reports = [], premiumReqs = [], promoteRequests = [], verifyRequests = [];
+var catalog = { marketplace: [], jobs: [], academy: [] };
+var catalogUnsub = { marketplace: null, jobs: null, academy: null };
+var aiMode = "general";
+
 var adminTab = "home";
+var adminVerifyFilter = "all";
 var banned = {}, premium = {}, blocks = new Set(), clicks = {};
 var pv = null, pd = null, single = null, feedMode = (function(){ var v = getPref("feed"); return /^(foryou|all|friends|following)$/.test(v) ? v : "all"; })();
 var draft = {file:null, text:""};
@@ -1090,6 +1162,195 @@ function reqState(u){
   return "none";
 }
 function isPremium(u){ var p = premium[u]; return !!(p && p.until > Date.now()); }
+var VERIFY_FOLLOWERS_NEED = 50, VERIFY_POSTS_NEED = 10, VERIFY_INSTANT_POINTS = 500;
+function countFollowers(uid){ return follows.filter(function(f){ return f.b === uid; }).length; }
+function countMyContent(uid){
+  var p = posts.filter(function(x){ return x.uid === uid; }).length;
+  var r = reels.filter(function(x){ return x.uid === uid; }).length;
+  return p + r;
+}
+function activityPoints(uid){
+  var p = posts.filter(function(x){ return x.uid === uid; }).length;
+  var r = reels.filter(function(x){ return x.uid === uid; }).length;
+  var f = countFollowers(uid);
+  return p * 5 + r * 8 + f * 2;
+}
+function userBonusPoints(uid){
+  if(me && uid === me.uid && prof) return Number(prof.bonusPoints || 0) || 0;
+  var u = users.filter(function(x){ return x.id === uid; })[0];
+  return u ? (Number(u.bonusPoints || 0) || 0) : 0;
+}
+function totalPoints(uid){ return activityPoints(uid) + userBonusPoints(uid); }
+function weekStartMs(d){
+  d = d ? new Date(d) : new Date();
+  var day = d.getDay(); // 0 Sun
+  var diff = (day + 6) % 7; // Monday-based week
+  var s = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  s.setDate(s.getDate() - diff);
+  s.setHours(0,0,0,0);
+  return s.getTime();
+}
+function weekKey(d){
+  var s = new Date(weekStartMs(d));
+  return s.getFullYear() + "-W" + ("0" + (Math.floor((s - new Date(s.getFullYear(),0,1)) / 604800000) + 1)).slice(-2) + "-" + dayKey(s);
+}
+function inCurrentWeek(ts){
+  var t = Number(ts) || 0;
+  if(!t) return false;
+  return t >= weekStartMs();
+}
+function weeklyPoints(uid){
+  var wp = posts.filter(function(x){ return x.uid === uid && inCurrentWeek(x.ts); }).length * 5;
+  var wr = reels.filter(function(x){ return x.uid === uid && inCurrentWeek(x.ts); }).length * 8;
+  var wl = likes.filter(function(x){ return x.uid === uid && inCurrentWeek(x.ts); }).length * 2;
+  // bonus claimed this week approx: if claimedQuests has keys in this week, estimate not exact - use user weeklyBonus if stored
+  var extra = 0;
+  if(me && uid === me.uid && prof && prof.weeklyBonus && prof.weeklyBonusWeek === weekKey()) extra = Number(prof.weeklyBonus) || 0;
+  else {
+    var u = users.filter(function(x){ return x.id === uid; })[0];
+    if(u && u.weeklyBonus && u.weeklyBonusWeek === weekKey()) extra = Number(u.weeklyBonus) || 0;
+  }
+  return wp + wr + wl + extra;
+}
+function buildWeeklyLeaderboard(limit){
+  limit = limit || 20;
+  var ids = {};
+  posts.forEach(function(p){ if(p.uid && inCurrentWeek(p.ts)) ids[p.uid] = 1; });
+  reels.forEach(function(r){ if(r.uid && inCurrentWeek(r.ts)) ids[r.uid] = 1; });
+  likes.forEach(function(l){ if(l.uid && inCurrentWeek(l.ts)) ids[l.uid] = 1; });
+  users.forEach(function(u){ if(u && u.id) ids[u.id] = 1; });
+  if(me) ids[me.uid] = 1;
+  var list = Object.keys(ids).map(function(uid){
+    var u = users.filter(function(x){ return x.id === uid; })[0] || {};
+    var name = (me && uid === me.uid && prof) ? (prof.name || u.name) : (u.name || "عضو");
+    var photo = (me && uid === me.uid && prof) ? (prof.photo || u.photo) : u.photo;
+    return { uid: uid, name: name || "عضو", photo: photo || "", points: weeklyPoints(uid), verified: !!(u.verified || (prof && uid === me.uid && prof.verified)) };
+  }).filter(function(x){ return x.points > 0; })
+    .sort(function(a,b){ return b.points - a.points || (a.name||"").localeCompare(b.name||""); })
+    .slice(0, limit);
+  return list;
+}
+function medalFor(i){ return i === 0 ? "🥇" : (i === 1 ? "🥈" : (i === 2 ? "🥉" : (i + 1))); }
+function hasWeekCrown(uid, data){
+  var wk = weekKey();
+  if(me && uid === me.uid && prof) return prof.weekCrownClaimed === wk;
+  var u = data || users.filter(function(x){ return x.id === uid; })[0] || {};
+  return u.weekCrownClaimed === wk;
+}
+function profileReputationHtml(uid, data){
+  data = data || {};
+  var pts = totalPoints(uid);
+  var wpts = weeklyPoints(uid);
+  var crown = hasWeekCrown(uid, data);
+  var board = buildWeeklyLeaderboard(20);
+  var rank = -1;
+  for(var i = 0; i < board.length; i++){ if(board[i].uid === uid){ rank = i; break; } }
+  var h = '<div class="row" style="flex-wrap:wrap;gap:6px;margin-top:8px">' +
+    '<span class="chip green">⭐ ' + pts + ' ' + t("نقطة","pts") + '</span>' +
+    '<span class="chip">📅 ' + wpts + ' ' + t("هذا الأسبوع","this week") + '</span>';
+  if(crown) h += '<span class="chip gold">👑 ' + t("تاج الأسبوع","Week crown") + '</span>';
+  else if(rank >= 0 && rank < 3) h += '<span class="chip gold">' + medalFor(rank) + ' ' + t("متصدر","Top") + '</span>';
+  else if(rank >= 0) h += '<span class="chip">#' + (rank + 1) + ' ' + t("هذا الأسبوع","this week") + '</span>';
+  h += '</div>';
+  return h;
+}
+
+
+function todayPostsCount(uid){
+  var today = dayKey();
+  return posts.filter(function(x){ return x.uid === uid && dayKey(new Date(x.ts || 0)) === today; }).length;
+}
+function todayReelsCount(uid){
+  var today = dayKey();
+  return reels.filter(function(x){ return x.uid === uid && dayKey(new Date(x.ts || 0)) === today; }).length;
+}
+function todayLikesCount(uid){
+  var today = dayKey();
+  return likes.filter(function(x){ return x.uid === uid && dayKey(new Date(x.ts || 0)) === today; }).length;
+}
+function todayChallengePostsCount(uid){
+  var today = dayKey(), tag = "#تحدي_اليوم";
+  return posts.filter(function(x){ return x.uid === uid && (x.t || "").indexOf(tag) > -1 && dayKey(new Date(x.ts || 0)) === today; }).length;
+}
+var DAILY_QUESTS = [
+  { id: "post3", title: "انشر 3 منشورات اليوم", titleEn: "Post 3 times today", target: 3, reward: 20, kind: "posts" },
+  { id: "reel1", title: "انشر ريلاً واحداً", titleEn: "Post 1 reel", target: 1, reward: 15, kind: "reels" },
+  { id: "react5", title: "تفاعل مع 5 منشورات", titleEn: "React to 5 posts", target: 5, reward: 10, kind: "likes" },
+  { id: "chall1", title: "شارك في تحدي اليوم", titleEn: "Join today's challenge", target: 1, reward: 15, kind: "challenge" }
+];
+function questProgress(q, uid){
+  if(q.kind === "posts") return todayPostsCount(uid);
+  if(q.kind === "reels") return todayReelsCount(uid);
+  if(q.kind === "likes") return todayLikesCount(uid);
+  if(q.kind === "challenge") return todayChallengePostsCount(uid);
+  return 0;
+}
+function claimedQuestsToday(){
+  var map = (prof && prof.claimedQuests) || {};
+  var arr = map[dayKey()] || [];
+  return Array.isArray(arr) ? arr : [];
+}
+function isQuestClaimed(id){ return claimedQuestsToday().indexOf(id) >= 0; }
+function pointsProgressCard(){
+  if(isGuest || !me) return "";
+  var pts = totalPoints(me.uid);
+  var need = VERIFY_INSTANT_POINTS;
+  var pct = Math.min(100, Math.round((pts / need) * 100));
+  var left = Math.max(0, need - pts);
+  return '<div class="card" style="border-radius:18px;background:linear-gradient(145deg,rgba(45,212,168,.12),rgba(240,193,75,.10));border:1px solid var(--line)">' +
+    '<div class="row" style="justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap">' +
+    '<div><div class="note" style="font-weight:700">⭐ ' + t("نقاطك","Your points") + '</div>' +
+    '<div style="font-size:2rem;font-weight:900;line-height:1.1;background:linear-gradient(135deg,var(--brand),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent">' + pts + '</div>' +
+    '<div class="note">' + t("أساسي","Base") + " " + activityPoints(me.uid) + " · " + t("مكافآت","Bonus") + " " + userBonusPoints(me.uid) + '</div></div>' +
+    '<div class="row" style="gap:6px"><button class="btn alt" data-t="verification" style="padding:8px 12px;min-height:auto">✓ ' + t("التوثيق","Verify") + '</button>' +
+    '<button class="btn alt" data-t="leaderboard" style="padding:8px 12px;min-height:auto">🏆 ' + t("المتصدرون","Board") + '</button></div></div>' +
+    '<div style="margin-top:12px"><div class="row" style="justify-content:space-between"><b style="font-size:.9rem">' + t("التقدم نحو التوثيق الفوري","Progress to instant verification") + '</b><span class="note">' + pts + " / " + need + '</span></div>' +
+    '<div style="height:10px;background:var(--bg);border-radius:999px;overflow:hidden;margin-top:6px"><i style="display:block;height:100%;width:' + pct + '%;background:linear-gradient(90deg,var(--brand),var(--gold));border-radius:999px"></i></div>' +
+    '<div class="note" style="margin-top:6px">' + (left > 0
+      ? (t("يتبقى","Remaining") + " " + left + " " + t("نقطة للتوثيق الفوري","pts for instant verification"))
+      : ("✨ " + t("يمكنك طلب التوثيق الفوري الآن!","You can request instant verification now!"))) + '</div></div></div>';
+}
+function dailyQuestsCard(){
+  if(isGuest || !me) return "";
+  var h = '<div class="card chall-card" style="border-radius:18px"><h3 style="margin:0 0 8px">🎯 ' + t("تحديات يومية","Daily challenges") + '</h3>' +
+    '<p class="note" style="margin:0 0 12px">' + t("أنجز التحديات واجمع نقاط مكافأة تُحسب نحو التوثيق الفوري.","Complete challenges to earn bonus points toward instant verification.") + '</p>';
+  DAILY_QUESTS.forEach(function(q){
+    var cur = questProgress(q, me.uid);
+    var done = cur >= q.target;
+    var claimed = isQuestClaimed(q.id);
+    var pct = Math.min(100, Math.round((cur / q.target) * 100));
+    var title = getLang() === "en" ? q.titleEn : q.title;
+    h += '<div style="padding:10px 0;border-top:1px solid var(--line)">' +
+      '<div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap">' +
+      '<div style="flex:1"><b>' + esc(title) + '</b><div class="note">' + Math.min(cur, q.target) + " / " + q.target + " · +" + q.reward + " " + t("نقطة","pts") + '</div></div>';
+    if(claimed) h += '<span class="chip green">✓ ' + t("تم","Claimed") + '</span>';
+    else if(done) h += '<button class="btn" data-a="claimquest" data-id="' + q.id + '" data-reward="' + q.reward + '" style="padding:8px 12px;min-height:auto">+' + q.reward + ' ⭐</button>';
+    else h += '<span class="chip">' + pct + '%</span>';
+    h += '</div><div style="height:6px;background:var(--bg);border-radius:999px;overflow:hidden;margin-top:8px"><i style="display:block;height:100%;width:' + pct + '%;background:linear-gradient(90deg,var(--brand),#38bdf8);border-radius:999px"></i></div></div>';
+  });
+  h += '</div>';
+  return h;
+}
+
+function verificationStats(uid){
+  var followers = countFollowers(uid);
+  var content = countMyContent(uid);
+  var points = totalPoints(uid);
+  var eligible = followers >= VERIFY_FOLLOWERS_NEED && content >= VERIFY_POSTS_NEED;
+  return { followers: followers, content: content, points: points, eligible: eligible };
+}
+async function syncVerificationEligible(){
+  if(!me || !prof || isGuest) return;
+  if(prof.verified) return;
+  var st = verificationStats(me.uid);
+  if(st.eligible && !prof.verificationEligible){
+    try{
+      await updateDoc(doc(db, "users", me.uid), { verificationEligible: true, verificationEligibleAt: Date.now() });
+      prof.verificationEligible = true;
+    }catch(e){ console.warn("eligible sync", e); }
+  }
+}
+
 function pBadge(u){ return isPremium(u) ? CROWN : ""; }
 function friendCountOf(u){ return friends.filter(function(f){ return f.u1 === u || f.u2 === u; }).length; }
 function myFriendCount(){ return friendCountOf(me.uid); }
@@ -1390,12 +1651,13 @@ function menuHtml(){
   var acc = function(id, label){ return '<button type="button" class="mi" data-acc="' + id + '" aria-expanded="false"><span>' + label + '</span>' + chev + '</button>'; };
   var opt = function(a, v, label, on){ return '<button type="button" class="mi" data-a="' + a + '" data-v="' + v + '" role="menuitemradio" aria-checked="' + (on ? "true" : "false") + '"><span>' + label + '</span>' + ck(on) + '</button>'; };
   return '' +
-    '<button type="button" class="mi" data-a="openext" data-href="ai.html"><span>✨ Hashid AI</span></button>' +
-    '<button type="button" class="mi" data-a="openext" data-href="marketplace.html"><span>🛍️ Marketplace</span></button>' +
-    '<button type="button" class="mi" data-a="openext" data-href="jobs.html"><span>💼 Jobs</span></button>' +
-    '<button type="button" class="mi" data-a="openext" data-href="academy.html"><span>🎓 Academy</span></button>' +
-    '<button type="button" class="mi" data-a="openext" data-href="creator-center.html"><span>📊 Creator Center</span></button>' +
-    '<button type="button" class="mi" data-a="openext" data-href="verification.html"><span>✅ ' + t("التحقق","Verification") + '</span></button>' +
+    '<button type="button" class="mi" data-t="ai"><span>✨ Hashid AI</span></button>' +
+    '<button type="button" class="mi" data-t="marketplace"><span>🛍️ Marketplace</span></button>' +
+    '<button type="button" class="mi" data-t="jobs"><span>💼 Jobs</span></button>' +
+    '<button type="button" class="mi" data-t="academy"><span>🎓 Academy</span></button>' +
+    '<button type="button" class="mi" data-t="creator"><span>📊 Creator Center</span></button>' +
+    '<button type="button" class="mi" data-t="verification"><span>✅ ' + t("التحقق","Verification") + '</span></button>' +
+    '<button type="button" class="mi" data-t="leaderboard"><span>🏆 ' + t("المتصدرون","Leaderboard") + '</span></button>' +
     '<div class="mi-sep"></div>' +
     acc("set", "⚙️ " + t("الإعدادات","Settings")) +
     '<div class="mi-sub" id="acc-set" hidden>' +
@@ -2269,9 +2531,11 @@ function bnavBtn(t, svg, label, badgeId){
   return '<button data-t="' + t + '" class="' + (tab === t ? "on" : "") + '"><svg viewBox="0 0 24 24">' + svg + '</svg>' + (badgeId ? '<b id="' + badgeId + '"></b>' : '') + '<span>' + label + '</span></button>';
 }
 function goTab(t){
-  if(isGuest && t !== "home" && t !== "reels"){ showAuthModal(); return; }
+  var guestOk = {home:1, reels:1, marketplace:1, jobs:1, academy:1, ai:1, creator:1, verification:1, explore:1, leaderboard:1};
+  if(isGuest && !guestOk[t]){ showAuthModal(); return; }
   tab = t;
   $$(".bnav button").forEach(function(x){ x.classList.toggle("on", x.dataset.t === tab); });
+  if(t === "marketplace" || t === "jobs" || t === "academy") ensureCatalog(t);
   draw();
   scrollTo(0, 0);
 }
@@ -2331,10 +2595,318 @@ function render(){
   if($("#bm")) $("#bm").textContent = msgs.filter(function(x){ return x.a !== me.uid && x.ts > seenM; }).length || "";
 }
 
+
+
+/* ============ منصة: سوق / وظائف / أكاديمية / AI / مبدع / تحقق (SPA) ============ */
+function ensureCatalog(kind){
+  var map = { marketplace: { col: "marketplace", key: "marketplace" }, jobs: { col: "jobPosts", key: "jobs" }, academy: { col: "courses", key: "academy" } };
+  var cfg = map[kind]; if(!cfg) return;
+  if(catalogUnsub[cfg.key]) return;
+  try{
+    catalogUnsub[cfg.key] = onSnapshot(
+      query(collection(db, cfg.col), where("status", "==", "published"), orderBy("createdAt", "desc"), limit(50)),
+      function(snap){
+        catalog[cfg.key] = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
+        if(tab === kind) draw();
+      },
+      function(err){ console.warn("catalog", cfg.col, err && err.code); }
+    );
+  }catch(e){ console.warn(e); }
+}
+function platformHead(emoji, title, sub){
+  return '<section class="plat-hero">' +
+    '<div class="row" style="justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">' +
+    '<div><h2>' + emoji + ' ' + title + '</h2><p>' + sub + '</p></div>' +
+    '<button class="btn alt" data-t="home">← ' + t("الرئيسية","Home") + '</button></div></section>';
+}
+function marketplaceView(){
+  ensureCatalog("marketplace");
+  var q = (window.__platQ || "");
+  var list = (catalog.marketplace || []).filter(function(x){
+    if(!q) return true;
+    return ((x.title||"")+" "+(x.description||"")+" "+(x.category||"")).toLowerCase().indexOf(q.toLowerCase()) >= 0;
+  });
+  var h = platformHead("🛍️", "Marketplace", t("منتجات وخدمات رقمية من المجتمع","Digital products & services from the community"));
+  h += '<div class="plat-toolbar">' +
+    '<input id="plat-q" type="search" placeholder="' + t("ابحث عن منتج أو خدمة…","Search products or services…") + '" value="' + esc(q) + '">' +
+    (me ? '<button class="btn" data-a="plat-add" data-kind="marketplace">+ ' + t("إضافة عرض","Add listing") + '</button>'
+        : '<button class="btn alt" data-a="needauth">' + t("سجّل للنشر","Sign in to post") + '</button>') +
+    '</div>';
+  if(!list.length){
+    h += '<div class="plat-empty">🚀 ' + t("لا توجد عروض بعد — كن أول من ينشر","No listings yet — be the first") + '</div>';
+    return h;
+  }
+  h += '<div class="plat-grid">';
+  list.forEach(function(x){
+    var own = me && x.ownerId === me.uid;
+    h += '<article class="plat-card">' +
+      '<div class="plat-meta"><span class="chip green">' + esc(x.category || t("عام","General")) + '</span>' +
+      (own ? '<span class="chip gold">' + t("عرضك","Yours") + '</span>' : '') + '</div>' +
+      '<h3>' + esc(x.title || "") + '</h3>' +
+      '<p class="plat-desc">' + esc((x.description || "").slice(0, 160)) + ((x.description||"").length > 160 ? "…" : "") + '</p>' +
+      '<div class="plat-actions" style="justify-content:space-between">' +
+      '<span class="plat-price">' + Number(x.price || 0).toLocaleString() + " " + esc(x.currency || "USD") + '</span>' +
+      (own
+        ? '<button class="mini" data-a="plat-del" data-kind="marketplace" data-id="' + esc(x.id) + '">' + t("حذف","Delete") + '</button>'
+        : '<button class="btn alt" style="padding:8px 12px;min-height:auto" data-a="needauth">' + t("تواصل","Contact") + '</button>') +
+      '</div></article>';
+  });
+  h += '</div>';
+  return h;
+}
+function jobsView(){
+  ensureCatalog("jobs");
+  var q = (window.__platQ || "");
+  var list = (catalog.jobs || []).filter(function(x){
+    if(!q) return true;
+    return ((x.title||"")+" "+(x.company||"")+" "+(x.location||"")+" "+(x.description||"")).toLowerCase().indexOf(q.toLowerCase()) >= 0;
+  });
+  var h = platformHead("💼", "Jobs", t("وظائف، تدريب، ومشاريع حرة","Jobs, internships & freelance gigs"));
+  h += '<div class="plat-toolbar">' +
+    '<input id="plat-q" type="search" placeholder="' + t("ابحث عن وظيفة أو شركة…","Search jobs or companies…") + '" value="' + esc(q) + '">' +
+    (me ? '<button class="btn" data-a="plat-add" data-kind="jobs">+ ' + t("نشر وظيفة","Post job") + '</button>'
+        : '<button class="btn alt" data-a="needauth">' + t("سجّل للنشر","Sign in") + '</button>') +
+    '</div>';
+  if(!list.length){
+    h += '<div class="plat-empty">💼 ' + t("لا وظائف حالياً — انشر أول فرصة","No jobs yet — post the first one") + '</div>';
+    return h;
+  }
+  list.forEach(function(x){
+    var own = me && x.ownerId === me.uid;
+    h += '<article class="plat-card" style="margin-bottom:12px">' +
+      '<div class="plat-meta">' +
+      '<span class="chip blue">' + esc(x.employmentType || "Job") + '</span>' +
+      (x.location ? '<span class="chip">' + esc(x.location) + '</span>' : '') +
+      (own ? '<span class="chip gold">' + t("إعلانك","Yours") + '</span>' : '') +
+      '</div>' +
+      '<h3>' + esc(x.title || "") + '</h3>' +
+      '<div class="note" style="margin-bottom:6px"><b>' + esc(x.company || t("شركة","Company")) + '</b>' +
+      (x.salaryRange ? ' · ' + esc(x.salaryRange) : '') + '</div>' +
+      '<p class="plat-desc">' + esc((x.description || "").slice(0, 220)) + ((x.description||"").length > 220 ? "…" : "") + '</p>' +
+      '<div class="plat-actions">' +
+      (own
+        ? '<button class="mini" data-a="plat-del" data-kind="jobs" data-id="' + esc(x.id) + '">' + t("حذف","Delete") + '</button>'
+        : (me
+          ? '<button class="btn" data-a="job-apply" data-id="' + esc(x.id) + '" data-owner="' + esc(x.ownerId || "") + '">' + t("تقديم الآن","Apply now") + '</button>'
+          : '<button class="btn alt" data-a="needauth">' + t("سجّل للتقديم","Sign in to apply") + '</button>')) +
+      '</div></article>';
+  });
+  return h;
+}
+function academyView(){
+  ensureCatalog("academy");
+  var q = (window.__platQ || "");
+  var list = (catalog.academy || []).filter(function(x){
+    if(!q) return true;
+    return ((x.title||"")+" "+(x.description||"")+" "+(x.category||"")).toLowerCase().indexOf(q.toLowerCase()) >= 0;
+  });
+  var h = platformHead("🎓", "Academy", t("مسارات تعليمية ودورات وشهادات","Learning paths, courses & certificates"));
+  h += '<div class="plat-toolbar">' +
+    '<input id="plat-q" type="search" placeholder="' + t("ابحث عن دورة أو مهارة…","Search courses or skills…") + '" value="' + esc(q) + '">' +
+    (me ? '<button class="btn" data-a="plat-add" data-kind="academy">+ ' + t("إنشاء دورة","Create course") + '</button>'
+        : '<button class="btn alt" data-a="needauth">' + t("سجّل للإنشاء","Sign in") + '</button>') +
+    '</div>';
+  if(!list.length){
+    h += '<div class="plat-empty">🎓 ' + t("لا دورات بعد — أنشئ أول مسار","No courses yet — create the first path") + '</div>';
+    return h;
+  }
+  h += '<div class="plat-grid">';
+  list.forEach(function(x){
+    var own = me && x.ownerId === me.uid;
+    h += '<article class="plat-card">' +
+      '<div class="plat-meta">' +
+      '<span class="chip purple">' + esc(x.level || t("عام","General")) + '</span>' +
+      (x.language ? '<span class="chip">' + esc(x.language) + '</span>' : '') +
+      (x.certificateEnabled ? '<span class="chip gold">' + t("شهادة","Certificate") + '</span>' : '') +
+      (own ? '<span class="chip gold">' + t("دورتك","Yours") + '</span>' : '') +
+      '</div>' +
+      '<h3>' + esc(x.title || "") + '</h3>' +
+      '<p class="plat-desc">' + esc((x.description || "").slice(0, 150)) + ((x.description||"").length > 150 ? "…" : "") + '</p>' +
+      '<div class="plat-actions">' +
+      (own
+        ? '<button class="mini" data-a="plat-del" data-kind="academy" data-id="' + esc(x.id) + '">' + t("حذف","Delete") + '</button>'
+        : '<button class="btn" style="padding:8px 14px;min-height:auto">' + t("ابدأ التعلم","Start learning") + '</button>') +
+      '</div></article>';
+  });
+  h += '</div>';
+  return h;
+}
+function aiView(){
+  var modes = [
+    {id:"general", label:"💬 " + t("عام","General")},
+    {id:"improve", label:"📝 " + t("تحسين منشور","Improve post")},
+    {id:"cv", label:"📄 " + t("سيرة ذاتية","CV")},
+    {id:"ideas", label:"💡 " + t("أفكار","Ideas")},
+    {id:"translate", label:"🌐 " + t("ترجمة","Translate")}
+  ];
+  var h = platformHead("✨", "Hashid AI", t("مساعد ذكي لتحسين المحتوى والملف المهني","Smart assistant for content & career"));
+  h += '<div class="card" style="border-radius:18px"><div class="ai-modes">';
+  modes.forEach(function(m){
+    h += '<button type="button" class="ai-mode-btn' + (aiMode === m.id ? ' on' : '') + '" data-a="ai-mode" data-v="' + m.id + '">' + m.label + '</button>';
+  });
+  h += '</div>' +
+    '<textarea id="ai-prompt" rows="5" placeholder="' + t("اكتب طلبك هنا… مثال: حسّن منشوراً عن ريادة الأعمال","Write your request… e.g. improve a post about entrepreneurship") + '">' + esc(window.__aiPrompt || "") + '</textarea>' +
+    '<div class="row" style="gap:8px;margin-top:10px;flex-wrap:wrap">' +
+    '<button class="btn" data-a="ai-run">✨ ' + t("توليد","Generate") + '</button>' +
+    '<button class="btn alt" data-a="ai-clear">' + t("مسح","Clear") + '</button></div>' +
+    '<p class="note" id="ai-status" style="margin-top:8px">' + t("يتطلب OPENAI_API_KEY على Vercel","Requires OPENAI_API_KEY on Vercel") + '</p></div>' +
+    '<div class="card" style="border-radius:18px"><h3 style="margin-top:0">' + t("النتيجة","Result") + '</h3>' +
+    '<div class="ai-out" id="ai-output">' + esc(window.__aiOut || t("سيظهر الرد هنا بعد التوليد","Output will appear here")) + '</div></div>';
+  return h;
+}
+function creatorView(){
+  var followers = me ? countFollowers(me.uid) : "—";
+  var h = platformHead("📊", "Creator Center", t("نمو الجمهور والأداء والأدوات","Audience growth, performance & tools"));
+  h += '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px">' +
+    '<div class="plat-stat"><b>—</b><span>' + t("المشاهدات","Views") + '</span></div>' +
+    '<div class="plat-stat"><b>—</b><span>' + t("التفاعل","Engagement") + '</span></div>' +
+    '<div class="plat-stat"><b>' + followers + '</b><span>' + t("المتابعون","Followers") + '</span></div>' +
+    '<div class="plat-stat"><b>$0</b><span>' + t("الأرباح","Earnings") + '</span></div></div>' +
+    '<div class="card" style="border-radius:18px"><h3 style="margin-top:0">' + t("اختصارات سريعة","Quick shortcuts") + '</h3>' +
+    '<div class="row" style="flex-wrap:wrap;gap:8px">' +
+    '<button class="btn" data-t="ai">✨ Hashid AI</button>' +
+    '<button class="btn alt" data-t="marketplace">🛍️ ' + t("السوق","Market") + '</button>' +
+    '<button class="btn alt" data-t="academy">🎓 ' + t("أكاديمية","Academy") + '</button>' +
+    '<button class="btn alt" data-t="verification">✅ ' + t("توثيق","Verify") + '</button></div></div>';
+  return h;
+}
+function verificationView(){
+  syncVerificationEligible();
+  var h = platformHead("✅", t("التحقق","Verification"), t("التوثيق كمكافأة على نشاطك — أو فوري عبر النقاط","Verification as a reward for activity — or instant via points"));
+  if(!me){
+    h += '<div class="plat-empty">' + t("سجّل الدخول لطلب التوثيق","Sign in to request verification") +
+      '<div style="margin-top:14px"><button class="btn" data-a="needauth">' + t("تسجيل الدخول","Sign in") + '</button></div></div>';
+    return h;
+  }
+  if(prof && prof.verified){
+    h += '<div class="card" style="border-radius:18px;border-color:var(--brand)"><span class="chip green">✓ ' + t("حسابك موثّق","Your account is verified") + '</span>' +
+      '<p class="note" style="margin:10px 0 0">' + t("ظهرت شارة التوثيق بجانب اسمك في المنصة.","The verification badge appears next to your name.") + '</p></div>';
+    return h;
+  }
+  var st = verificationStats(me.uid);
+  var pending = (verifyRequests||[]).some(function(r){ return r.uid === me.uid && r.status === "pending"; });
+  var fPct = Math.min(100, Math.round((st.followers / VERIFY_FOLLOWERS_NEED) * 100));
+  var cPct = Math.min(100, Math.round((st.content / VERIFY_POSTS_NEED) * 100));
+  var pPct = Math.min(100, Math.round((st.points / VERIFY_INSTANT_POINTS) * 100));
+
+  h += '<div class="card" style="border-radius:18px">' +
+    '<h3 style="margin:0 0 8px">🎮 ' + t("تقدمك نحو التوثيق","Your path to verification") + '</h3>' +
+    '<div class="note" style="margin-bottom:10px">' + t("انشر وتفاعل لفتح التوثيق المجاني كمكافأة.","Post and engage to unlock free verification as a reward.") + '</div>' +
+    '<div style="margin-bottom:10px"><div class="row" style="justify-content:space-between"><b>' + t("المتابعون","Followers") + '</b><span class="note">' + st.followers + " / " + VERIFY_FOLLOWERS_NEED + '</span></div>' +
+    '<div style="height:8px;background:var(--bg);border-radius:999px;overflow:hidden;margin-top:4px"><i style="display:block;height:100%;width:' + fPct + '%;background:linear-gradient(90deg,var(--brand),#38bdf8);border-radius:999px"></i></div></div>' +
+    '<div style="margin-bottom:10px"><div class="row" style="justify-content:space-between"><b>' + t("المنشورات + الريلز","Posts + Reels") + '</b><span class="note">' + st.content + " / " + VERIFY_POSTS_NEED + '</span></div>' +
+    '<div style="height:8px;background:var(--bg);border-radius:999px;overflow:hidden;margin-top:4px"><i style="display:block;height:100%;width:' + cPct + '%;background:linear-gradient(90deg,var(--brand),#a78bfa);border-radius:999px"></i></div></div>' +
+    '<div><div class="row" style="justify-content:space-between"><b>' + t("نقاط النشاط","Activity points") + '</b><span class="note">' + st.points + " / " + VERIFY_INSTANT_POINTS + '</span></div>' +
+    '<div style="height:8px;background:var(--bg);border-radius:999px;overflow:hidden;margin-top:4px"><i style="display:block;height:100%;width:' + pPct + '%;background:linear-gradient(90deg,var(--gold),#f97316);border-radius:999px"></i></div></div>' +
+    (st.eligible || prof.verificationEligible
+      ? '<p class="note" style="margin-top:12px;color:var(--brand);font-weight:700">✨ ' + t("أصبحت مؤهلاً للتوثيق المجاني!","You are eligible for free verification!") + '</p>'
+      : '<p class="note" style="margin-top:12px">' + t("واصل النشر وجمع المتابعين لفتح المكافأة.","Keep posting and growing to unlock the reward.") + '</p>') +
+    '</div>';
+
+  // Free vs Instant cards
+  h += '<div class="plat-grid" style="margin-bottom:12px">' +
+    '<article class="plat-card" style="border-color:' + (st.eligible || prof.verificationEligible ? "var(--brand)" : "var(--line)") + '">' +
+    '<div class="plat-meta"><span class="chip green">🎁 ' + t("مجاني","Free") + '</span><span class="chip">' + t("مكافأة","Reward") + '</span></div>' +
+    '<h3>' + t("طلب توثيق مجاني","Free verification request") + '</h3>' +
+    '<p class="plat-desc">' + t("يُفتح عند الوصول لـ","Unlocks at") + " " + VERIFY_FOLLOWERS_NEED + " " + t("متابع و","followers and") + " " + VERIFY_POSTS_NEED + " " + t("منشورات/ريلز. يراجعه الفريق.","posts/reels. Team reviews it.") + '</p>';
+  if(pending){
+    h += '<span class="chip gold">' + t("طلبك قيد المراجعة","Request pending review") + '</span>';
+  } else if(st.eligible || prof.verificationEligible){
+    h += '<button class="btn" data-a="verify-free">' + t("طلب التوثيق المجاني","Request free verification") + '</button>';
+  } else {
+    h += '<button class="btn gray" disabled>' + t("لم تحقق الشروط بعد","Requirements not met") + '</button>';
+  }
+  h += '</article>';
+
+  h += '<article class="plat-card" style="border-color:var(--gold)">' +
+    '<div class="plat-meta"><span class="chip gold">⚡ ' + t("فوري","Instant") + '</span><span class="chip">' + t("نقاط / لاحقاً دفع","Points / payment later") + '</span></div>' +
+    '<h3>' + t("توثيق فوري","Instant verification") + '</h3>' +
+    '<p class="plat-desc">' + t("للمستعجلين: يتطلب","For those in a hurry: needs") + " " + VERIFY_INSTANT_POINTS + " " + t("نقطة نشاط (أو عضوية مميزة). أولوية مراجعة أعلى. يمكن ربطه لاحقاً ببوابة دفع.","activity points (or Premium). Higher review priority. Can later connect to payments.") + '</p>';
+  if(pending){
+    h += '<span class="chip gold">' + t("طلبك قيد المراجعة","Request pending review") + '</span>';
+  } else if(st.points >= VERIFY_INSTANT_POINTS || isPremium(me.uid)){
+    h += '<button class="btn gold" data-a="verify-instant">⚡ ' + t("توثيق فوري","Instant verify") + '</button>';
+  } else {
+    h += '<button class="btn gray" disabled>' + t("نقاط غير كافية","Not enough points") + ' (' + st.points + "/" + VERIFY_INSTANT_POINTS + ')</button>' +
+      (isPremium(me.uid) ? "" : '<button class="btn alt" style="margin-top:8px" data-t="premium">👑 ' + t("أو اشترك في المميز","Or go Premium") + '</button>');
+  }
+  h += '</article></div>';
+
+  h += '<div class="card" style="border-radius:18px"><h3 style="margin-top:0">ℹ️ ' + t("الفرق باختصار","Difference at a glance") + '</h3>' +
+    '<div class="note" style="line-height:1.75">' +
+    '<b>🎁 ' + t("المجاني","Free") + ':</b> ' + t("مكافأة على نموك الحقيقي — مراجعة عادية.","Reward for real growth — standard review.") + '<br>' +
+    '<b>⚡ ' + t("الفوري","Instant") + ':</b> ' + t("أولوية أعلى عبر النقاط/المميز — جاهز لاحقاً للربط بالدفع.","Higher priority via points/Premium — ready later for payment.") + '<br>' +
+    '<b>🛡️</b> ' + t("لا تُمنح الشارة تلقائياً دون مراجعة لمنع الحسابات الوهمية.","Badge is never auto-granted without review to fight fake accounts.") +
+    '</div></div>';
+
+  var mine = (verifyRequests||[]).filter(function(r){ return r.uid === me.uid; }).slice(0, 6);
+  if(mine.length){
+    h += '<div class="card" style="border-radius:18px"><h3 style="margin-top:0">' + t("طلباتك","Your requests") + '</h3>';
+    mine.forEach(function(r){
+      var stt = r.status || "pending";
+      var chip = stt === "accepted" ? "green" : (stt === "rejected" ? "" : "gold");
+      h += '<div class="cm" style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;flex-wrap:wrap">' +
+        '<div><b>' + esc(r.track || r.kind || r.type || "request") + '</b>' +
+        (r.priority === "instant" ? ' <span class="chip gold">⚡</span>' : ' <span class="chip green">🎁</span>') +
+        '<div class="note">' + esc((r.reason || "").slice(0, 140)) + '</div></div>' +
+        '<span class="chip ' + chip + '">' + esc(stt) + '</span></div>';
+    });
+    h += '</div>';
+  }
+  return h;
+}
+
+
+function leaderboardView(){
+  var board = buildWeeklyLeaderboard(20);
+  var wk = weekKey();
+  var myRank = -1, myPts = me ? weeklyPoints(me.uid) : 0;
+  board.forEach(function(row, i){ if(me && row.uid === me.uid) myRank = i; });
+  var top1 = board[0];
+  var canClaimCrown = !!(me && top1 && top1.uid === me.uid && myPts > 0 && (!prof.weekCrownClaimed || prof.weekCrownClaimed !== wk));
+
+  var h = platformHead("🏆", t("لوحة المتصدرين","Leaderboard"), t("أعلى النقاط هذا الأسبوع — تنافس برفق!","Top points this week — compete kindly!"));
+  h += '<div class="card" style="border-radius:18px">' +
+    '<div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:8px">' +
+    '<div><b>' + t("الأسبوع الحالي","Current week") + '</b><div class="note">' + esc(wk) + '</div></div>' +
+    (me ? '<div class="note">' + t("ترتيبك","Your rank") + ': <b>' + (myRank >= 0 ? (myRank + 1) : "—") + '</b> · ' + myPts + ' ⭐</div>' : '') +
+    '</div></div>';
+
+  if(canClaimCrown){
+    h += '<div class="card" style="border-radius:18px;border-color:var(--gold);background:linear-gradient(145deg,rgba(240,193,75,.18),rgba(45,212,168,.08))">' +
+      '<b>👑 ' + t("أنت الأول هذا الأسبوع!","You're #1 this week!") + '</b>' +
+      '<p class="note" style="margin:6px 0 10px">' + t("استلم مكافأة المركز الأول: +50 نقطة وشارة تميز أسبوعية.","Claim #1 reward: +50 points and a weekly crown badge.") + '</p>' +
+      '<button class="btn gold" data-a="claimweekcrown">👑 ' + t("استلام مكافأة المركز الأول","Claim #1 reward") + '</button></div>';
+  } else if(me && prof && prof.weekCrownClaimed === wk){
+    h += '<div class="card" style="border-radius:18px"><span class="chip gold">👑 ' + t("حامل تاج هذا الأسبوع","This week's crown holder") + '</span></div>';
+  }
+
+  if(!board.length){
+    h += '<div class="plat-empty">🏁 ' + t("لا نشاط بعد هذا الأسبوع — انشر أو تفاعل لتظهر هنا","No weekly activity yet — post or engage to appear here") + '</div>';
+    return h;
+  }
+
+  h += '<div class="card" style="border-radius:18px;padding:8px 10px">';
+  board.forEach(function(row, i){
+    var isMe = me && row.uid === me.uid;
+    h += '<div class="row" style="padding:10px 6px;border-bottom:1px solid var(--line);' + (isMe ? "background:rgba(45,212,168,.08);border-radius:12px;" : "") + '">' +
+      '<div style="width:36px;text-align:center;font-size:1.2rem;font-weight:800">' + medalFor(i) + '</div>' +
+      '<img class="av" src="' + (esc(row.photo) || DEF) + '" alt="">' +
+      '<button class="name" data-a="prof" data-u="' + esc(row.uid) + '" style="flex:1;text-align:start">' + esc(row.name) + (row.verified ? VB : "") +
+      (isMe ? ' <span class="chip green">' + t("أنت","You") + '</span>' : '') + '</button>' +
+      '<b style="color:var(--brand)">' + row.points + ' ⭐</b></div>';
+  });
+  h += '</div>';
+  h += '<div class="card" style="border-radius:18px"><p class="note" style="margin:0">' +
+    t("النقاط الأسبوعية = منشورات×5 + ريلز×8 + تفاعلات×2 (+ مكافآت الأسبوع). يُحدَّث الترتيب مع نشاط الأعضاء.","Weekly points = posts×5 + reels×8 + reactions×2 (+ week bonuses). Rankings update with activity.") +
+    '</p></div>';
+  return h;
+}
+
 function view(){
-  if(isGuest && !/^(home|reels|post|hashtag)$/.test(tab)) return homeView();
+  if(isGuest && !/^(home|reels|post|hashtag|marketplace|jobs|academy|ai|creator|verification|explore|leaderboard)$/.test(tab)) return homeView();
   if(tab === "safe") return safeView();
-  if(banned[me.uid] && tab !== "me") return '<div class="card empty">تم إيقاف حسابك.</div>';
+  if(me && banned[me.uid] && tab !== "me") return '<div class="card empty">تم إيقاف حسابك.</div>';
   switch(tab){
     case "admin": return isAdmin ? adminView() : homeView();
     case "me": return meView();
@@ -2352,6 +2924,13 @@ function view(){
     case "explore": return exploreView();
     case "reels": return reelsView();
     case "hashtag": return hashtagView();
+    case "marketplace": return marketplaceView();
+    case "jobs": return jobsView();
+    case "academy": return academyView();
+    case "ai": return aiView();
+    case "creator": return creatorView();
+    case "verification": return verificationView();
+    case "leaderboard": return leaderboardView();
     default: return homeView();
   }
 }
@@ -2609,11 +3188,15 @@ function meView(){
     '<img class="av lg" src="' + (esc(prof.photo) || DEF) + '" alt="">' +
     '<div style="flex:1"><div class="name" style="font-size:1.2rem">' + esc(prof.name) + (prof.verified ? VB : "") + (prem ? CROWN : "") + '</div>' +
     (prem ? '<div class="chip gold">عضو مميز 👑</div>' : "") + moodBadge(prof) + ambBadge(me.uid) +
+    profileReputationHtml(me.uid, prof) +
     '<div class="note" style="margin-top:4px">' + esc(prof.bio || "لا توجد نبذة.") + '</div></div></div>' +
     '<div class="grid" style="margin-top:12px">' +
     '<div><b>' + fc + '</b>صديق' + (fc >= 5000 ? " (ممتلئ)" : "") + '</div>' +
     '<div><b>' + followers + '</b>متابِع</div>' +
     '<div><b>' + followingN + '</b>يتابع</div></div></div>';
+
+  h += pointsProgressCard();
+  h += dailyQuestsCard();
 
   h += '<div class="card"><div class="row" style="flex-wrap:wrap">' +
     '<button class="btn alt" data-t="premium" style="flex:1">👑 ' + (prem ? "عضويتك المميزة" : "كن مميزاً") + '</button>' +
@@ -2685,6 +3268,7 @@ function profileView(){
     '<img class="av lg" src="' + (esc(d.photo) || DEF) + '" alt="">' +
     '<div style="flex:1"><div class="name" style="font-size:1.2rem">' + esc(d.name) + (d.verified ? VB : "") + (prem ? CROWN : "") + '</div>' +
     (prem ? '<div class="chip gold">عضو مميز 👑</div>' : "") + moodBadge(d) + ambBadge(u) +
+    profileReputationHtml(u, d) +
     '<div class="note" style="margin-top:4px">' + esc(d.bio || "") + '</div></div></div>' +
     '<div class="grid" style="margin-top:12px">' +
     '<div><b>' + fc + '</b>صديق</div>' +
@@ -2820,7 +3404,7 @@ function exploreView(){
 
 /* ============ الإشعارات ============ */
 function notifView(){
-  var T = {like:"أعجب بمنشورك ❤", comment:"علق على منشورك 💬", follow:"بدأ بمتابعتك ➕", friendreq:"أرسل لك طلب صداقة 👋", friendacc:"قبل طلب صداقتك ✅", message:"أرسل لك رسالة ✉", mention:"أشار إليك @", call:"يتصل بك 📞", pagefollow:"تابع صفحتك 📄", groupjoin:"انضم لمجموعتك 👥", premium:"فعّلت لك العضوية المميزة 👑"};
+  var T = {like:"أعجب بمنشورك ❤", comment:"علق على منشورك 💬", follow:"بدأ بمتابعتك ➕", friendreq:"أرسل لك طلب صداقة 👋", friendacc:"قبل طلب صداقتك ✅", message:"أرسل لك رسالة ✉", mention:"أشار إليك @", call:"يتصل بك 📞", pagefollow:"تابع صفحتك 📄", groupjoin:"انضم لمجموعتك 👥", premium:"فعّلت لك العضوية المميزة 👑", verified:"قبل طلب توثيقك — حسابك موثّق الآن ✓", verifyreject:"رفض طلب التوثيق"};
   var pending = reqs.filter(function(r){ return r.to === me.uid; });
   var h = "";
   if(pending.length){
@@ -2841,7 +3425,7 @@ function notifView(){
   if(!notifs.length) h += '<div class="note">لا إشعارات.</div>';
   notifs.forEach(function(n){
     h += '<div class="sug-row">' +
-      '<button class="name" data-a="prof" data-u="' + n.from + '" style="flex:1">' + esc(n.name || "عضو") + ' <span style="color:var(--mute);font-weight:400">' + (T[n.type] || "") + '</span></button>' +
+      '<button class="name" data-a="prof" data-u="' + n.from + '" style="flex:1">' + esc(n.name || "عضو") + ' <span style="color:var(--mute);font-weight:400">' + esc(n.msg || T[n.type] || "") + '</span></button>' +
       '<small class="note">' + ago(n.ts) + '</small></div>';
   });
   h += '</div>';
@@ -3461,25 +4045,78 @@ function adminView(){
   }
 
   else if(adminTab === "verify"){
-    h += '<div class="card admin-sec"><h3>✓ طلبات التوثيق</h3>';
-    if(!pendingVerify.length) h += '<div class="note">لا طلبات معلّقة.</div>';
-    pendingVerify.forEach(function(r){
-      var u = users.find(function(x){ return x.id === r.uid; });
-      h += '<div class="vreq-card">' +
-        '<div class="row"><img class="av" src="'+(esc((u&&u.photo)||r.photo)||DEF)+'" alt=""><div style="flex:1"><b>'+esc(r.name||(u&&u.name)||"عضو")+'</b>' +
-        '<div class="note">'+(r.kind==="page"?"صفحة":"حساب شخصي")+' · '+ago(r.ts)+'</div></div></div>' +
-        '<div class="body" style="margin-top:8px">'+esc(r.reason||"")+'</div>' +
-        (r.evidence ? '<div class="note">دليل: '+esc(r.evidence)+'</div>' : '') +
-        '<div class="row" style="margin-top:10px">' +
-        '<button type="button" class="btn" data-a="verifyaccept" data-i="'+r.id+'" data-u="'+r.uid+'" data-k="'+esc(r.kind||"")+'" data-p="'+esc(r.pageId||"")+'" style="flex:1">قبول وتوثيق</button>' +
-        '<button type="button" class="btn red" data-a="verifyreject" data-i="'+r.id+'" style="flex:1">رفض</button></div></div>';
+    var vf = adminVerifyFilter || "all";
+    var sorted = pendingVerify.slice().sort(function(a,b){
+      var pa = (a.priority === "instant" || a.track === "instant") ? 0 : 1;
+      var pb = (b.priority === "instant" || b.track === "instant") ? 0 : 1;
+      if(pa !== pb) return pa - pb;
+      return (b.ts||0) - (a.ts||0);
     });
-    // also show recent decided
-    var done = (verifyRequests||[]).filter(function(r){ return r.status !== "pending"; }).slice(0, 10);
+    var nInst = pendingVerify.filter(function(r){ return r.priority === "instant" || r.track === "instant"; }).length;
+    var nPage = pendingVerify.filter(function(r){ return r.kind === "page" || !!r.pageId; }).length;
+    var nRew = pendingVerify.filter(function(r){
+      var inst = r.priority === "instant" || r.track === "instant";
+      var page = r.kind === "page" || !!r.pageId;
+      return !inst && !page;
+    }).length;
+    if(vf === "instant") sorted = sorted.filter(function(r){ return r.priority === "instant" || r.track === "instant"; });
+    else if(vf === "reward") sorted = sorted.filter(function(r){
+      var inst = r.priority === "instant" || r.track === "instant";
+      var page = r.kind === "page" || !!r.pageId;
+      return !inst && !page;
+    });
+    else if(vf === "pages") sorted = sorted.filter(function(r){ return r.kind === "page" || !!r.pageId; });
+
+    function vFilterBtn(id, label, count){
+      return '<button type="button" class="chip' + (vf === id ? " green" : "") + '" data-a="verifyfilter" data-v="' + id + '" style="cursor:pointer;font-size:.85rem;padding:6px 12px">' + label + " (" + count + ")</button>";
+    }
+    h += '<div class="card admin-sec"><h3>✓ طلبات التوثيق</h3>' +
+      '<div class="row" style="gap:8px;flex-wrap:wrap;margin-bottom:12px">' +
+      vFilterBtn("all", "الكل", pendingVerify.length) +
+      vFilterBtn("instant", "⚡ فوري فقط", nInst) +
+      vFilterBtn("reward", "🎁 مكافأة فقط", nRew) +
+      vFilterBtn("pages", "📄 صفحات فقط", nPage) +
+      '</div>';
+    if(!sorted.length) h += '<div class="note">' + (pendingVerify.length ? "لا نتائج لهذا الفلتر." : "لا طلبات معلّقة.") + '</div>';
+    sorted.forEach(function(r){
+      var u = users.find(function(x){ return x.id === r.uid; }) || {};
+      var live = r.uid ? verificationStats(r.uid) : {followers:0,content:0,points:0,eligible:false};
+      var stSnap = r.stats || {};
+      var followers = stSnap.followers != null ? stSnap.followers : live.followers;
+      var content = stSnap.content != null ? stSnap.content : live.content;
+      var points = stSnap.points != null ? stSnap.points : live.points;
+      var isInst = r.priority === "instant" || r.track === "instant";
+      var isPage = r.kind === "page" || !!r.pageId;
+      var trackLabel = isInst ? "⚡ توثيق فوري (نقاط)" : (isPage ? "📄 صفحة" : "🎁 مكافأة مجانية");
+      h += '<div class="vreq-card plat-card" style="margin-bottom:12px;border-color:' + (isInst ? "var(--gold)" : "var(--line)") + '">' +
+        '<div class="row" style="align-items:flex-start">' +
+        '<img class="av" src="' + (esc(u.photo || r.photo) || DEF) + '" alt="">' +
+        '<div style="flex:1"><div class="row" style="gap:6px;flex-wrap:wrap"><b>' + esc(r.name || u.name || "عضو") + '</b>' +
+        (u.verified ? '<span class="chip green">موثّق مسبقاً</span>' : '') +
+        '<span class="chip ' + (isInst ? "gold" : (isPage ? "blue" : "green")) + '">' + trackLabel + '</span></div>' +
+        '<div class="note">' + ago(r.ts) + (isPage && r.pageId ? " · صفحة " + esc(r.pageId) : "") + '</div>' +
+        '<div class="note" dir="ltr" style="font-size:.75rem;opacity:.75">' + esc(r.uid || "") + '</div></div></div>' +
+        '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0">' +
+        '<div class="plat-stat" style="padding:10px 6px"><b style="font-size:1.1rem">' + followers + '</b><span>متابع</span></div>' +
+        '<div class="plat-stat" style="padding:10px 6px"><b style="font-size:1.1rem">' + content + '</b><span>منشور/ريل</span></div>' +
+        '<div class="plat-stat" style="padding:10px 6px"><b style="font-size:1.1rem">' + points + '</b><span>نقاط</span></div></div>' +
+        (r.reason ? '<div class="body" style="margin:0 0 8px;font-size:.92rem">' + esc(r.reason) + '</div>' : '') +
+        (r.evidence ? '<div class="note">دليل: ' + esc(r.evidence) + '</div>' : '') +
+        '<div class="row" style="margin-top:10px;gap:8px;flex-wrap:wrap">' +
+        '<button type="button" class="btn" data-a="verifyaccept" data-i="' + r.id + '" data-u="' + esc(r.uid||"") + '" data-k="' + esc(r.kind||"") + '" data-p="' + esc(r.pageId||"") + '" style="flex:1">✓ موافقة</button>' +
+        '<button type="button" class="btn red" data-a="verifyreject" data-i="' + r.id + '" data-u="' + esc(r.uid||"") + '" style="flex:1">رفض</button>' +
+        '</div></div>';
+    });
+    var done = (verifyRequests||[]).filter(function(r){ return r.status !== "pending"; })
+      .sort(function(a,b){ return (b.reviewedAt||b.ts||0) - (a.reviewedAt||a.ts||0); }).slice(0, 12);
     if(done.length){
       h += '<h3 style="margin-top:16px">سجل حديث</h3>';
       done.forEach(function(r){
-        h += '<div class="note">'+esc(r.name||r.uid)+' — <b>'+esc(r.status)+'</b> · '+ago(r.ts)+'</div>';
+        var isInst = r.priority === "instant" || r.track === "instant";
+        h += '<div class="cm" style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap">' +
+          '<span>' + esc(r.name || r.uid) + ' ' + (isInst ? "⚡" : (r.kind === "page" ? "📄" : "🎁")) +
+          (r.rejectReason ? '<div class="note">سبب الرفض: ' + esc(r.rejectReason) + '</div>' : '') + '</span>' +
+          '<span class="chip ' + (r.status === "accepted" ? "green" : "") + '">' + esc(r.status) + '</span></div>';
       });
     }
     h += '</div>';
@@ -4103,9 +4740,187 @@ async function actions(b, er){
     return;
   }
 
-  if(a === "openext"){
-    var href = b.getAttribute("data-href");
-    if(href){ closeMenu(); location.href = href; }
+  if(a === "claimweekcrown"){
+    if(!me || isGuest) return showAuthModal();
+    var board = buildWeeklyLeaderboard(1);
+    var top = board[0];
+    if(!top || top.uid !== me.uid) return toast(t("لست الأول حالياً","You are not #1 right now"));
+    var wk = weekKey();
+    if(prof.weekCrownClaimed === wk) return toast(t("استلمت مكافأة هذا الأسبوع","Already claimed this week"));
+    try{
+      var bonus = (Number(prof.bonusPoints) || 0) + 50;
+      var wb = (Number(prof.weeklyBonus) || 0) + 50;
+      await updateDoc(doc(db, "users", me.uid), {
+        bonusPoints: bonus,
+        weeklyBonus: wb,
+        weeklyBonusWeek: wk,
+        weekCrownClaimed: wk,
+        weekCrownAt: Date.now()
+      });
+      prof.bonusPoints = bonus;
+      prof.weeklyBonus = wb;
+      prof.weeklyBonusWeek = wk;
+      prof.weekCrownClaimed = wk;
+      toast("👑 +50 " + t("نقطة — مبروك المركز الأول!","pts — congrats on #1!"));
+      draw();
+    }catch(e){ toast((e && e.message) || "Error"); }
+    return;
+  }
+  if(a === "claimquest"){
+    if(!me || isGuest) return showAuthModal();
+    var qid = b.dataset.id;
+    var reward = Math.max(0, Number(b.dataset.reward) || 0);
+    var q = DAILY_QUESTS.filter(function(x){ return x.id === qid; })[0];
+    if(!q) return;
+    if(isQuestClaimed(qid)) return toast(t("استلمت هذه المكافأة اليوم","Already claimed today"));
+    if(questProgress(q, me.uid) < q.target) return toast(t("لم تكمل التحدي بعد","Challenge not completed yet"));
+    try{
+      var today = dayKey();
+      var map = Object.assign({}, (prof && prof.claimedQuests) || {});
+      var arr = Array.isArray(map[today]) ? map[today].slice() : [];
+      if(arr.indexOf(qid) >= 0) return toast(t("استلمت هذه المكافأة اليوم","Already claimed today"));
+      arr.push(qid);
+      map[today] = arr;
+      var add = reward || q.reward;
+      var bonus = (Number(prof.bonusPoints) || 0) + add;
+      var wk = weekKey();
+      var wb = (prof.weeklyBonusWeek === wk ? (Number(prof.weeklyBonus) || 0) : 0) + add;
+      await updateDoc(doc(db, "users", me.uid), { bonusPoints: bonus, claimedQuests: map, weeklyBonus: wb, weeklyBonusWeek: wk });
+      prof.bonusPoints = bonus;
+      prof.claimedQuests = map;
+      prof.weeklyBonus = wb;
+      prof.weeklyBonusWeek = wk;
+      toast("+" + (reward || q.reward) + " ⭐ " + t("نقطة مكافأة!","bonus points!"));
+      draw();
+    }catch(e){ toast((e && e.message) || "Error"); }
+    return;
+  }
+  if(a === "needauth"){ showAuthModal(); return; }
+  if(a === "ai-mode"){ aiMode = b.dataset.v || "general"; draw(); return; }
+  if(a === "ai-clear"){ window.__aiPrompt = ""; window.__aiOut = ""; draw(); return; }
+  if(a === "ai-run"){
+    var promptEl = document.getElementById("ai-prompt");
+    var prompt = (promptEl && promptEl.value || "").trim();
+    if(prompt.length < 2) return toast(t("اكتب طلبك أولاً","Write a prompt first"));
+    window.__aiPrompt = prompt;
+    var st = document.getElementById("ai-status");
+    var out = document.getElementById("ai-output");
+    if(st) st.textContent = t("جاري التوليد…","Generating…");
+    if(out) out.textContent = "…";
+    try{
+      var r = await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt: prompt, mode: aiMode }) });
+      var data = await r.json().catch(function(){ return {}; });
+      if(!r.ok){
+        var msg = data.message || data.error || ("Error " + r.status);
+        window.__aiOut = msg; toast(msg, 4000);
+      } else {
+        window.__aiOut = data.text || "";
+        if(st) st.textContent = (data.model || "AI") + " · " + (data.mode || aiMode);
+      }
+      draw();
+    }catch(err){
+      window.__aiOut = t("تعذر الاتصال بخدمة AI. تأكد من نشر api/ai.js وOPENAI_API_KEY.","AI service unavailable. Deploy api/ai.js and set OPENAI_API_KEY.");
+      draw(); toast(t("خطأ شبكة","Network error"));
+    }
+    return;
+  }
+  if(a === "plat-del"){
+    if(!me) return showAuthModal();
+    var kind = b.dataset.kind, id = b.dataset.id;
+    var col = kind === "jobs" ? "jobPosts" : (kind === "academy" ? "courses" : "marketplace");
+    if(!confirm(t("حذف؟","Delete?"))) return;
+    try{ await deleteDoc(doc(db, col, id)); toast(t("تم الحذف","Deleted")); }catch(e){ toast(e.message||"Error"); }
+    return;
+  }
+  if(a === "job-apply"){
+    if(!me) return showAuthModal();
+    try{
+      await addDoc(collection(db, "applications"), { jobId: b.dataset.id, applicantId: me.uid, ownerId: b.dataset.owner || "", status: "submitted", createdAt: Date.now() });
+      toast(t("تم إرسال التقديم","Application sent"));
+    }catch(e){ toast(e.message||"Error"); }
+    return;
+  }
+  if(a === "verify-free" || a === "verify-instant"){
+    if(!me) return showAuthModal();
+    if(prof && prof.verified) return toast(t("حسابك موثّق بالفعل","Already verified"));
+    var pending = (verifyRequests||[]).some(function(r){ return r.uid === me.uid && r.status === "pending"; });
+    if(pending) return toast(t("لديك طلب قيد المراجعة","You already have a pending request"));
+    var st = verificationStats(me.uid);
+    var instant = a === "verify-instant";
+    if(!instant && !(st.eligible || prof.verificationEligible)){
+      return toast(t("لم تحقق شروط التوثيق المجاني بعد","Free verification requirements not met yet"));
+    }
+    if(instant && st.points < VERIFY_INSTANT_POINTS && !isPremium(me.uid)){
+      return toast(t("نقاط غير كافية للتوثيق الفوري","Not enough points for instant verification"));
+    }
+    var reason = instant
+      ? t("طلب توثيق فوري عبر نقاط النشاط / العضوية المميزة","Instant verification via activity points / Premium")
+      : t("طلب توثيق مجاني بعد تحقيق شروط المكافأة","Free verification after meeting reward criteria");
+    try{
+      if(st.eligible && !prof.verificationEligible){
+        try{ await updateDoc(doc(db, "users", me.uid), { verificationEligible: true, verificationEligibleAt: Date.now() }); prof.verificationEligible = true; }catch(e1){}
+      }
+      await addDoc(collection(db, "verifyRequests"), {
+        uid: me.uid,
+        name: (prof && prof.name) || "",
+        photo: (prof && prof.photo) || "",
+        kind: "person",
+        type: "creator",
+        track: instant ? "instant" : "reward",
+        priority: instant ? "instant" : "normal",
+        reason: reason,
+        evidence: "",
+        stats: { followers: st.followers, content: st.content, points: st.points },
+        status: "pending",
+        ts: Date.now(),
+        createdAt: Date.now()
+      });
+      toast(instant
+        ? t("تم إرسال طلب التوثيق الفوري بأولوية عالية ⚡","Instant verification request sent with high priority ⚡")
+        : t("تم إرسال طلب التوثيق المجاني 🎁","Free verification request sent 🎁"));
+      draw();
+    }catch(e){ toast(e.message || "Error"); }
+    return;
+  }
+  if(a === "plat-add"){
+    if(!me) return showAuthModal();
+    var kind = b.dataset.kind;
+    if(kind === "marketplace"){
+      var title = prompt(t("عنوان العرض","Listing title")); if(title === null) return;
+      title = title.trim(); if(title.length < 3) return toast(t("عنوان قصير","Title too short"));
+      var description = prompt(t("الوصف","Description")); if(description === null) return;
+      description = (description||"").trim(); if(description.length < 10) return toast(t("وصف أقصر من اللازم","Description too short"));
+      var price = Number(prompt(t("السعر","Price"), "0") || 0);
+      try{
+        await addDoc(collection(db, "marketplace"), { ownerId: me.uid, title: title.slice(0,160), description: description.slice(0,2000), category: "خدمات", price: Math.max(0,price), currency: "USD", status: "published", createdAt: Date.now(), updatedAt: Date.now() });
+        toast(t("تم النشر","Published"));
+      }catch(e){ toast(e.message||"Error"); }
+      return;
+    }
+    if(kind === "jobs"){
+      var jt = prompt(t("المسمى الوظيفي","Job title")); if(jt === null) return;
+      jt = jt.trim(); if(jt.length < 3) return toast(t("عنوان قصير","Title too short"));
+      var company = prompt(t("الشركة","Company"), "") || "";
+      var loc = prompt(t("الموقع","Location"), "Remote") || "Remote";
+      var jd = prompt(t("الوصف","Description")); if(jd === null) return;
+      jd = (jd||"").trim(); if(jd.length < 20) return toast(t("وصف أقصر من اللازم","Description too short"));
+      try{
+        await addDoc(collection(db, "jobPosts"), { ownerId: me.uid, title: jt.slice(0,160), description: jd.slice(0,4000), company: company.slice(0,120), location: loc.slice(0,120), employmentType: "Full-time", status: "published", createdAt: Date.now(), updatedAt: Date.now() });
+        toast(t("تم نشر الوظيفة","Job published"));
+      }catch(e){ toast(e.message||"Error"); }
+      return;
+    }
+    if(kind === "academy"){
+      var ct = prompt(t("عنوان الدورة","Course title")); if(ct === null) return;
+      ct = ct.trim(); if(ct.length < 3) return toast(t("عنوان قصير","Title too short"));
+      var cd = prompt(t("الوصف","Description")); if(cd === null) return;
+      cd = (cd||"").trim(); if(cd.length < 15) return toast(t("وصف أقصر من اللازم","Description too short"));
+      try{
+        await addDoc(collection(db, "courses"), { ownerId: me.uid, title: ct.slice(0,180), description: cd.slice(0,3000), category: "", level: "مبتدئ", language: "ar", certificateEnabled: true, status: "published", createdAt: Date.now(), updatedAt: Date.now() });
+        toast(t("تم نشر الدورة","Course published"));
+      }catch(e){ toast(e.message||"Error"); }
+      return;
+    }
     return;
   }
   if(a === "teststorage"){ await testStorage(true); return; }
@@ -4593,21 +5408,44 @@ if(a === "adlike"){
     }
     return;
   }
+  if(a === "verifyfilter"){
+    adminVerifyFilter = b.dataset.v || "all";
+    draw();
+    return;
+  }
   if(a === "verifyaccept"){
-    if(b.dataset.k === "page" && b.dataset.p) await updateDoc(doc(db, "pages", b.dataset.p), {verified: true});
-    else await updateDoc(doc(db, "users", b.dataset.u), {verified: true});
-    await updateDoc(doc(db, "verifyRequests", b.dataset.i), {status: "accepted", reviewedAt: Date.now(), reviewedBy: me.uid});
-    notify(b.dataset.u, "verified");
-    toast("تم قبول التوثيق");
+    try{
+      if(b.dataset.k === "page" && b.dataset.p) await updateDoc(doc(db, "pages", b.dataset.p), {verified: true});
+      else if(b.dataset.u) await updateDoc(doc(db, "users", b.dataset.u), {verified: true, verificationEligible: true});
+      await updateDoc(doc(db, "verifyRequests", b.dataset.i), {status: "accepted", reviewedAt: Date.now(), reviewedBy: me.uid});
+      if(b.dataset.u) notify(b.dataset.u, "verified", {msg: "تم قبول طلب التوثيق وظهرت الشارة بجانب اسمك ✓"});
+      toast("تم قبول التوثيق ✓");
+      draw();
+    }catch(e){ toast((e && e.message) || "تعذر القبول"); }
     return;
   }
   if(a === "verifyreject"){
-    await updateDoc(doc(db, "verifyRequests", b.dataset.i), {status: "rejected", reviewedAt: Date.now(), reviewedBy: me.uid});
-    toast("تم الرفض");
+    var reason = prompt(t("سبب الرفض (اختياري)","Reject reason (optional)"), "") || "";
+    reason = String(reason).trim().slice(0, 300);
+    try{
+      await updateDoc(doc(db, "verifyRequests", b.dataset.i), {
+        status: "rejected",
+        reviewedAt: Date.now(),
+        reviewedBy: me.uid,
+        rejectReason: reason
+      });
+      if(b.dataset.u) notify(b.dataset.u, "verifyreject", {
+        msg: reason
+          ? ("تم رفض طلب التوثيق: " + reason)
+          : "تم رفض طلب التوثيق. يمكنك المحاولة لاحقاً بعد تحسين نشاطك."
+      });
+      toast("تم الرفض");
+      draw();
+    }catch(e){ toast((e && e.message) || "تعذر الرفض"); }
     return;
   }
   if(a === "requestverify"){
-    openVerifyRequestSheet();
+    goTab("verification");
     return;
   }
 
@@ -5131,6 +5969,13 @@ document.addEventListener("click", function(e){
   }, true);
 })();
 document.addEventListener("input",function(e){
+  if(e.target && e.target.id==="plat-q"){
+    window.__platQ = e.target.value || "";
+    clearTimeout(window.__platQt);
+    window.__platQt = setTimeout(function(){ draw(); }, 160);
+    return;
+  }
+  if(e.target && e.target.id==="ai-prompt"){ window.__aiPrompt = e.target.value || ""; return; }
   if(e.target && e.target.id==="mi" && chatWith && me && e.target.value.trim()){
     if(Date.now()-typingLast>1200){typingLast=Date.now();setDoc(doc(db,"typing",me.uid+"_"+chatWith),{from:me.uid,to:chatWith,active:true,ts:Date.now()},{merge:true}).catch(function(){});}
     clearTimeout(typingTimer);typingTimer=setTimeout(function(){setDoc(doc(db,"typing",me.uid+"_"+chatWith),{from:me.uid,to:chatWith,active:false,ts:Date.now()},{merge:true}).catch(function(){});},2600);

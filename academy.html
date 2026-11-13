@@ -2,65 +2,200 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jobs - HashidHub</title>
-  <style>
-    :root { --bg:#f6faf8; --card:#fff; --ink:#12251e; --muted:#5d7269; --brand:#0d7a5f; --brand2:#149d78; --line:#e2efe9; --amber:#f5b942; }
-    * { box-sizing:border-box; }
-    body { margin:0; font-family:"Segoe UI",Tahoma,Arial,sans-serif; background:var(--bg); color:var(--ink); }
-    .topbar { background: linear-gradient(135deg,var(--brand),var(--brand2)); color:white; padding:16px 20px; }
-    .nav { display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
-    .nav a { color:white; text-decoration:none; background: rgba(255,255,255,.12); border-radius:999px; padding:8px 12px; font-weight:600; }
-    .container { max-width:1100px; margin:24px auto; padding:0 16px 42px; }
-    .toolbar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
-    input, select { width:100%; padding:12px; border:1px solid var(--line); border-radius:12px; }
-    .jobs { display:grid; gap:16px; }
-    .job { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px; }
-    .meta { display:flex; gap:8px; flex-wrap:wrap; color:var(--muted); font-size:.9rem; }
-    .apply { background: linear-gradient(135deg,var(--brand),var(--brand2)); color:white; border:none; border-radius:12px; padding:10px 16px; font-weight:700; cursor:pointer; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>Academy — HashidHub</title>
+  <link rel="stylesheet" href="hh-shared.css" />
+  <link rel="icon" href="icon.svg" />
 </head>
 <body>
-  <div class="topbar">
-    <h1 style="margin:0;">HashidHub</h1>
-    <nav class="nav">
-      <a href="index.html">الرئيسية</a>
-      <a href="marketplace.html">Marketplace</a>
-      <a href="ai.html">AI</a>
-      <a href="search.html">بحث</a>
-      <a href="academy.html">Academy</a>
-    </nav>
-  </div>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <a class="back-btn" href="index.html">← الرئيسية</a>
+        <span class="dot">H</span>
+        <span>Academy</span>
+      </div>
+      <nav class="nav-pills">
+        <a href="marketplace.html">🛍️ السوق</a>
+        <a href="jobs.html">💼 وظائف</a>
+        <a class="on" href="academy.html">🎓 أكاديمية</a>
+        <a href="ai.html">✨ AI</a>
+        <a href="creator-center.html">📊 المبدع</a>
+      </nav>
+      <div id="authBox" class="user-chip">…</div>
+    </div>
+  </header>
 
-  <div class="container">
-    <h2>Jobs</h2>
+  <main class="container">
+    <section class="hero">
+      <h1>🎓 أكاديمية HashidHub</h1>
+      <p>مسارات تعليمية، دورات قصيرة، وشهادات — تعلّم مهارات ترفع مستواك وتفتح فرصاً.</p>
+    </section>
+
     <div class="toolbar">
-      <div style="flex:1 1 320px;"><input type="text" value="محتوى" placeholder="ابحث عن وظيفة…" /></div>
-      <div style="flex:0 0 170px;"><select><option>الكل</option><option>Full-time</option><option>Contract</option><option>Remote</option></select></div>
-      <div style="flex:0 0 170px;"><button style="width:100%;height:46px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:white;font-weight:700;cursor:pointer;">تصفية</button></div>
+      <input id="q" type="search" placeholder="ابحث عن دورة أو مهارة…" />
+      <select id="level">
+        <option value="">كل المستويات</option>
+        <option>مبتدئ</option>
+        <option>متوسط</option>
+        <option>متقدم</option>
+      </select>
+      <button class="btn" id="btnAdd" hidden>+ إنشاء دورة</button>
     </div>
 
-    <div class="jobs">
-      <div class="job">
-        <h3>Senior Product Designer</h3>
-        <div class="meta"><span>Full-time</span><span>•</span><span>Remote</span><span>•</span><span>مستوى متوسط</span></div>
-        <p>تصميم تجارب مستخدم لجمهور عالمي، مع مهارات في أدوات تصميم المنتجات والهوية البصرية.</p>
-        <button class="apply">تقديم</button>
-      </div>
-      <div class="job">
-        <h3>Growth Strategist</h3>
-        <div class="meta"><span>Contract</span><span>•</span><span>Dubai</span><span>•</span><span>Marketing</span></div>
-        <p>تطوير خطط النمو والتفاعل عبر المحتوى الاجتماعي وأدوات تحليل الأداء.</p>
-        <button class="apply">تقديم</button>
-      </div>
-      <div class="job">
-        <h3>Frontend Engineer</h3>
-        <div class="meta"><span>Remote</span><span>•</span><span>React / JS</span><span>•</span><span>Hybrid</span></div>
-        <p>بناء واجهات مستخدم سريعة،  أولية للموبايل، وموجهة للمنصة العالمية.</p>
-        <button class="apply">تقديم</button>
-      </div>
+    <div id="list" class="grid">
+      <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
     </div>
-  </div>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script type="module">
+    import { firebaseConfig } from "./firebase-config.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, collection, query, where, orderBy, limit, onSnapshot, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    let me = null, items = [], unsub = null;
+
+    const $ = (s, r) => (r || document).querySelector(s);
+    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[c]));
+    function toast(m, ms = 2600) {
+      const el = $("#toast"); el.textContent = m; el.classList.add("show");
+      clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), ms);
+    }
+
+    function renderAuth() {
+      const box = $("#authBox");
+      if (!me) {
+        box.innerHTML = `<button class="btn alt" id="loginBtn" style="padding:8px 12px;min-height:auto">تسجيل الدخول</button>`;
+        $("#loginBtn")?.addEventListener("click", () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => toast(e.message)));
+        $("#btnAdd").hidden = true;
+      } else {
+        box.innerHTML = `<img class="av" src="${esc(me.photoURL || "")}" alt=""><span>${esc(me.displayName || "عضو")}</span>`;
+        $("#btnAdd").hidden = false;
+      }
+    }
+
+    function filtered() {
+      const q = ($("#q").value || "").trim().toLowerCase();
+      const level = $("#level").value;
+      return items.filter(x => {
+        if (level && x.level !== level) return false;
+        if (!q) return true;
+        return `${x.title||""} ${x.description||""} ${x.category||""}`.toLowerCase().includes(q);
+      });
+    }
+
+    function renderList() {
+      const data = filtered();
+      const root = $("#list");
+      if (!data.length) {
+        root.innerHTML = `<div class="empty" style="grid-column:1/-1">لا توجد دورات بعد. أنشئ أول مسار تعليمي 🎓</div>`;
+        return;
+      }
+      root.innerHTML = data.map(x => {
+        const own = me && x.ownerId === me.uid;
+        return `<article class="card">
+          <div class="meta">
+            <span class="tag purple">${esc(x.level || "عام")}</span>
+            ${x.language ? `<span class="tag">${esc(x.language)}</span>` : ""}
+            ${x.certificateEnabled ? `<span class="tag gold">شهادة</span>` : ""}
+            ${own ? `<span class="tag gold">دورتك</span>` : ""}
+          </div>
+          <h3>${esc(x.title)}</h3>
+          <p style="color:var(--mute);margin:0 0 12px;font-size:.92rem">${esc((x.description||"").slice(0,150))}${(x.description||"").length>150?"…":""}</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            ${own
+              ? `<button class="btn ghost" data-del="${esc(x.id)}" style="padding:8px 12px;min-height:auto">حذف</button>`
+              : `<button class="btn" style="padding:8px 12px;min-height:auto">ابدأ التعلم</button>`}
+          </div>
+        </article>`;
+      }).join("");
+    }
+
+    function listen() {
+      if (unsub) unsub();
+      const qy = query(collection(db, "courses"), where("status", "==", "published"), orderBy("createdAt", "desc"), limit(50));
+      unsub = onSnapshot(qy, snap => {
+        items = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
+        renderList();
+      }, err => {
+        $("#list").innerHTML = `<div class="empty" style="grid-column:1/-1">تعذر تحميل الدورات.<br><small>${esc(err.code||err.message)}</small></div>`;
+      });
+    }
+
+    function openCreate() {
+      if (!me) return toast("سجّل الدخول أولاً");
+      const wrap = document.createElement("div");
+      wrap.className = "sheet";
+      wrap.innerHTML = `<div class="sheet-panel">
+        <h2>إنشاء دورة</h2>
+        <div class="field"><label>عنوان الدورة</label><input id="f-title" maxlength="180" placeholder="مثال: أساسيات التسويق بالمحتوى" /></div>
+        <div class="field"><label>الوصف</label><textarea id="f-desc" maxlength="3000" placeholder="ماذا سيتعلم الطالب؟"></textarea></div>
+        <div class="field"><label>التصنيف</label><input id="f-cat" maxlength="80" placeholder="تسويق / برمجة / تصميم…" /></div>
+        <div class="field" style="display:flex;gap:10px">
+          <div style="flex:1"><label>المستوى</label>
+            <select id="f-level"><option>مبتدئ</option><option>متوسط</option><option>متقدم</option></select>
+          </div>
+          <div style="flex:1"><label>اللغة</label>
+            <select id="f-lang"><option value="ar">العربية</option><option value="en">English</option></select>
+          </div>
+        </div>
+        <div class="field">
+          <label><input type="checkbox" id="f-cert" checked /> تفعيل شهادة إتمام</label>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn" id="f-save">نشر الدورة</button>
+          <button class="btn alt" id="f-cancel">إلغاء</button>
+        </div>
+      </div>`;
+      document.body.appendChild(wrap);
+      const close = () => wrap.remove();
+      wrap.addEventListener("click", e => { if (e.target === wrap) close(); });
+      $("#f-cancel", wrap).onclick = close;
+      $("#f-save", wrap).onclick = async () => {
+        const title = $("#f-title", wrap).value.trim();
+        const description = $("#f-desc", wrap).value.trim();
+        if (title.length < 3) return toast("أدخل عنوان الدورة");
+        if (description.length < 15) return toast("الوصف قصير جداً");
+        try {
+          await addDoc(collection(db, "courses"), {
+            ownerId: me.uid,
+            title: title.slice(0, 180),
+            description: description.slice(0, 3000),
+            category: $("#f-cat", wrap).value.trim().slice(0, 80),
+            level: $("#f-level", wrap).value,
+            language: $("#f-lang", wrap).value,
+            certificateEnabled: !!$("#f-cert", wrap).checked,
+            status: "published",
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+          });
+          toast("تم نشر الدورة 🎓");
+          close();
+        } catch (e) { toast(e.message || "فشل النشر"); }
+      };
+    }
+
+    document.addEventListener("click", async e => {
+      const del = e.target.closest("[data-del]");
+      if (del) {
+        if (!confirm("حذف الدورة؟")) return;
+        try { await deleteDoc(doc(db, "courses", del.dataset.del)); toast("تم الحذف"); }
+        catch (err) { toast(err.message || "تعذر الحذف"); }
+      }
+    });
+
+    $("#btnAdd").onclick = openCreate;
+    $("#q").oninput = () => renderList();
+    $("#level").onchange = () => renderList();
+    onAuthStateChanged(auth, u => { me = u; renderAuth(); });
+    listen();
+  </script>
 </body>
 </html>
-

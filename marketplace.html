@@ -2,62 +2,201 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Creator Center</title>
-  <style>
-    :root { --bg:#f6faf8; --card:#fff; --ink:#12251e; --muted:#5f7269; --brand:#0d7a5f; --brand2:#149d78; --line:#e1efe8; --amber:#f4b942; }
-    * { box-sizing:border-box; }
-    body { margin:0; font-family:"Segoe UI",Tahoma,Arial,sans-serif; background:var(--bg); color:var(--ink); }
-    .topbar { background: linear-gradient(135deg,var(--brand),var(--brand2)); color:white; padding:16px 20px; }
-    .nav { display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
-    .nav a { color:white; text-decoration:none; background: rgba(255,255,255,.12); border-radius:999px; padding:8px 12px; font-weight:600; }
-    .container { max-width: 1100px; margin: 24px auto; padding:0 16px 48px; }
-    .grid { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 16px; }
-    .stat { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px; }
-    .stat .num { font-size:2rem; font-weight:800; color:var(--brand); }
-    .panel { background: var(--card); border:1px solid var(--line); border-radius:18px; padding:18px; margin-top:20px; }
-    table { width:100%; border-collapse:collapse; }
-    th, td { padding:12px; border-bottom:1px solid var(--line); text-align:right; }
-    @media (max-width: 720px) { .grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>Marketplace — HashidHub</title>
+  <link rel="stylesheet" href="hh-shared.css" />
+  <link rel="icon" href="icon.svg" />
 </head>
 <body>
-  <div class="topbar">
-    <h1 style="margin:0;">HashidHub</h1>
-    <nav class="nav">
-      <a href="index.html">الرئيسية</a>
-      <a href="ai.html">AI</a>
-      <a href="search.html">بحث</a>
-      <a href="marketplace.html">Marketplace</a>
-      <a href="jobs.html">Jobs</a>
-      <a href="academy.html">Academy</a>
-    </nav>
-  </div>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <a class="back-btn" href="index.html" title="رجوع">← الرئيسية</a>
+        <span class="dot">H</span>
+        <span>Marketplace</span>
+      </div>
+      <nav class="nav-pills">
+        <a class="on" href="marketplace.html">🛍️ السوق</a>
+        <a href="jobs.html">💼 وظائف</a>
+        <a href="academy.html">🎓 أكاديمية</a>
+        <a href="ai.html">✨ AI</a>
+        <a href="creator-center.html">📊 المبدع</a>
+      </nav>
+      <div id="authBox" class="user-chip">…</div>
+    </div>
+  </header>
 
-  <div class="container">
-    <h2>Creator Center</h2>
-    <div class="grid">
-      <div class="stat"><div>المشاهدات</div><div class="num">184.2K</div></div>
-      <div class="stat"><div>التفاعل</div><div class="num">8.7%</div></div>
-      <div class="stat"><div>المتابعين الجدد</div><div class="num">2.8K</div></div>
-      <div class="stat"><div>الأرباح المتوقعة</div><div class="num">$4.6K</div></div>
+  <main class="container">
+    <section class="hero">
+      <h1>🛍️ سوق HashidHub</h1>
+      <p>منتجات وخدمات رقمية من صناع المحتوى والشباب — بيع، اشتري، وابنِ حضورك.</p>
+    </section>
+
+    <div class="toolbar">
+      <input id="q" type="search" placeholder="ابحث عن منتج أو خدمة…" />
+      <select id="cat">
+        <option value="">كل التصنيفات</option>
+        <option>منتجات رقمية</option>
+        <option>خدمات</option>
+        <option>تصميم</option>
+        <option>برمجة</option>
+        <option>تسويق</option>
+        <option>محتوى</option>
+        <option>أخرى</option>
+      </select>
+      <button class="btn" id="btnAdd" hidden>+ إضافة عرض</button>
     </div>
 
-    <div class="panel">
-      <h3>أداء المحتوى</h3>
-      <table>
-        <thead>
-          <tr><th>المحتوى</th><th>المشاهدات</th><th>التفاعل</th><th>الدخل المتوقع</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>ريل تدريب</td><td>53,200</td><td>9.4%</td><td>$1,340</td></tr>
-          <tr><td>تمارين قصيرة</td><td>41,800</td><td>8.1%</td><td>$980</td></tr>
-          <tr><td>تدوينة تعليمية</td><td>37,970</td><td>7.3%</td><td>$860</td></tr>
-          <tr><td>ألبوم أعمال</td><td>29,100</td><td>6.8%</td><td>$710</td></tr>
-        </tbody>
-      </table>
+    <div id="list" class="grid">
+      <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
     </div>
-  </div>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script type="module">
+    import { firebaseConfig } from "./firebase-config.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, collection, query, where, orderBy, limit, onSnapshot, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    let me = null, items = [], unsub = null;
+
+    const $ = (s, r) => (r || document).querySelector(s);
+    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[c]));
+    function toast(m, ms = 2600) {
+      const el = $("#toast"); el.textContent = m; el.classList.add("show");
+      clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), ms);
+    }
+
+    function renderAuth() {
+      const box = $("#authBox");
+      if (!me) {
+        box.innerHTML = `<button class="btn alt" id="loginBtn" style="padding:8px 12px;min-height:auto">تسجيل الدخول</button>`;
+        $("#loginBtn")?.addEventListener("click", () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => toast(e.message)));
+        $("#btnAdd").hidden = true;
+      } else {
+        box.innerHTML = `<img class="av" src="${esc(me.photoURL || "")}" alt=""><span>${esc(me.displayName || "عضو")}</span>`;
+        $("#btnAdd").hidden = false;
+      }
+    }
+
+    function filtered() {
+      const q = ($("#q").value || "").trim().toLowerCase();
+      const cat = $("#cat").value;
+      return items.filter(x => {
+        if (cat && x.category !== cat) return false;
+        if (!q) return true;
+        return (x.title || "").toLowerCase().includes(q) || (x.description || "").toLowerCase().includes(q);
+      });
+    }
+
+    function renderList() {
+      const data = filtered();
+      const root = $("#list");
+      if (!data.length) {
+        root.innerHTML = `<div class="empty" style="grid-column:1/-1">لا توجد عروض بعد. كن أول من ينشر في السوق 🚀</div>`;
+        return;
+      }
+      root.innerHTML = data.map(x => {
+        const own = me && x.ownerId === me.uid;
+        return `<article class="card">
+          <div class="meta"><span class="tag">${esc(x.category || "عام")}</span>
+            ${own ? `<span class="tag gold">عرضك</span>` : ""}</div>
+          <h3>${esc(x.title)}</h3>
+          <p style="color:var(--mute);font-size:.92rem;margin:0 0 10px">${esc((x.description || "").slice(0, 140))}${(x.description||"").length>140?"…":""}</p>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+            <span class="price">${Number(x.price||0).toLocaleString()} ${esc(x.currency||"USD")}</span>
+            ${own ? `<button class="btn ghost" data-del="${esc(x.id)}" style="padding:8px 12px;min-height:auto">حذف</button>` : `<button class="btn alt" data-contact style="padding:8px 12px;min-height:auto">تواصل</button>`}
+          </div>
+        </article>`;
+      }).join("");
+    }
+
+    function listen() {
+      if (unsub) unsub();
+      const qy = query(collection(db, "marketplace"), where("status", "==", "published"), orderBy("createdAt", "desc"), limit(60));
+      unsub = onSnapshot(qy, snap => {
+        items = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
+        renderList();
+      }, err => {
+        console.error(err);
+        $("#list").innerHTML = `<div class="empty" style="grid-column:1/-1">تعذر تحميل السوق. تأكد من قواعد Firestore والفهارس.<br><small>${esc(err.code||err.message)}</small></div>`;
+      });
+    }
+
+    function openCreate() {
+      if (!me) return toast("سجّل الدخول أولاً");
+      const wrap = document.createElement("div");
+      wrap.className = "sheet";
+      wrap.innerHTML = `<div class="sheet-panel">
+        <h2>إضافة عرض جديد</h2>
+        <div class="field"><label>العنوان</label><input id="f-title" maxlength="160" placeholder="مثال: تصميم هوية بصرية" /></div>
+        <div class="field"><label>الوصف</label><textarea id="f-desc" maxlength="2000" placeholder="تفاصيل العرض…"></textarea></div>
+        <div class="field"><label>التصنيف</label>
+          <select id="f-cat"><option>منتجات رقمية</option><option>خدمات</option><option>تصميم</option><option>برمجة</option><option>تسويق</option><option>محتوى</option><option>أخرى</option></select>
+        </div>
+        <div class="field" style="display:flex;gap:10px">
+          <div style="flex:1"><label>السعر</label><input id="f-price" type="number" min="0" step="1" value="0" /></div>
+          <div style="flex:0 0 110px"><label>العملة</label><input id="f-cur" maxlength="3" value="USD" /></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button class="btn" id="f-save">نشر</button>
+          <button class="btn alt" id="f-cancel">إلغاء</button>
+        </div>
+      </div>`;
+      document.body.appendChild(wrap);
+      const close = () => wrap.remove();
+      wrap.addEventListener("click", e => { if (e.target === wrap) close(); });
+      $("#f-cancel", wrap).onclick = close;
+      $("#f-save", wrap).onclick = async () => {
+        const title = $("#f-title", wrap).value.trim();
+        const description = $("#f-desc", wrap).value.trim();
+        const price = Math.max(0, Number($("#f-price", wrap).value) || 0);
+        if (title.length < 3) return toast("اكتب عنواناً واضحاً");
+        if (description.length < 10) return toast("الوصف قصير جداً");
+        try {
+          await addDoc(collection(db, "marketplace"), {
+            ownerId: me.uid,
+            title: title.slice(0, 160),
+            description: description.slice(0, 2000),
+            category: $("#f-cat", wrap).value,
+            price,
+            currency: ($("#f-cur", wrap).value || "USD").toUpperCase().slice(0, 3),
+            status: "published",
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+          });
+          toast("تم نشر العرض ✨");
+          close();
+        } catch (e) {
+          toast(e.message || "فشل النشر");
+        }
+      };
+    }
+
+    document.addEventListener("click", async e => {
+      const del = e.target.closest("[data-del]");
+      if (del) {
+        if (!confirm("حذف هذا العرض؟")) return;
+        try { await deleteDoc(doc(db, "marketplace", del.dataset.del)); toast("تم الحذف"); }
+        catch (err) { toast(err.message || "تعذر الحذف"); }
+      }
+      if (e.target.closest("[data-contact]")) {
+        if (!me) return toast("سجّل الدخول للتواصل");
+        toast("افتح الملف الشخصي من الرئيسية للتواصل مع البائع");
+      }
+    });
+
+    $("#btnAdd").onclick = openCreate;
+    $("#q").oninput = () => renderList();
+    $("#cat").onchange = () => renderList();
+    onAuthStateChanged(auth, u => { me = u; renderAuth(); });
+    listen();
+  </script>
 </body>
 </html>
-
