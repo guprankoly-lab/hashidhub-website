@@ -1686,7 +1686,7 @@ function menuHtml(){
     '<button type="button" class="mi gold" data-t="premium"><span>👑 ' + t("العضوية المميزة","Premium") + '</span></button>' +
     (isAdmin ? '<button type="button" class="mi" data-t="admin"><span>🛠️ ' + t("الإدارة","Admin") + '</span></button>' : '') +
     '<div class="mi-sep"></div>' +
-    '<button type="button" class="mi danger" id="out"><span>🚪 ' + t("تسجيل الخروج","Log out") + '</span></button>';
+    '<button type="button" class="mi danger" id="out" data-a="logout"><span>🚪 ' + t("تسجيل الخروج","Log out") + '</span></button>';
 }
 function refreshMenu(){ var dd = document.getElementById("hdr-dd"); if(dd) dd.innerHTML = menuHtml(); }
 function closeMenu(){ var dd = document.getElementById("hdr-dd"); if(dd) dd.classList.remove("open"); }
@@ -2598,6 +2598,76 @@ function render(){
 
 
 /* ============ منصة: سوق / وظائف / أكاديمية / AI / مبدع / تحقق (SPA) ============ */
+
+function openPlatformComposer(kind){
+  kind = kind || "marketplace";
+  var titles = { marketplace: t("إضافة عرض","Add listing"), jobs: t("نشر وظيفة","Post a job"), academy: t("إنشاء دورة","Create a course") };
+  var d = document.createElement("div");
+  d.className = "sheet";
+  d.id = "plat-sheet";
+  var fields = "";
+  if(kind === "marketplace"){
+    fields = '<label class="note">' + t("العنوان","Title") + '</label><input id="pc-title" maxlength="160" placeholder="' + t("مثال: تصميم شعار","e.g. Logo design") + '">' +
+      '<label class="note">' + t("الوصف","Description") + '</label><textarea id="pc-desc" maxlength="2000" placeholder="' + t("تفاصيل العرض…","Details…") + '"></textarea>' +
+      '<label class="note">' + t("السعر","Price") + '</label><input id="pc-price" type="number" min="0" value="0">' +
+      '<label class="note">' + t("العملة","Currency") + '</label><input id="pc-cur" maxlength="3" value="USD">';
+  } else if(kind === "jobs"){
+    fields = '<label class="note">' + t("المسمى","Title") + '</label><input id="pc-title" maxlength="160" placeholder="Frontend Developer">' +
+      '<label class="note">' + t("الشركة","Company") + '</label><input id="pc-company" maxlength="120">' +
+      '<label class="note">' + t("الموقع","Location") + '</label><input id="pc-loc" maxlength="120" value="Remote">' +
+      '<label class="note">' + t("الوصف","Description") + '</label><textarea id="pc-desc" maxlength="4000"></textarea>';
+  } else {
+    fields = '<label class="note">' + t("عنوان الدورة","Course title") + '</label><input id="pc-title" maxlength="180">' +
+      '<label class="note">' + t("الوصف","Description") + '</label><textarea id="pc-desc" maxlength="3000"></textarea>';
+  }
+  d.innerHTML = '<div class="sheet-in" style="max-height:90vh">' +
+    '<div style="width:40px;height:4px;background:var(--line);border-radius:2px;margin:0 auto 10px"></div>' +
+    '<h3>' + (titles[kind] || titles.marketplace) + '</h3>' + fields +
+    '<div class="err" id="pc-err"></div>' +
+    '<button type="button" class="btn" id="pc-save" style="width:100%;margin-top:12px">' + t("نشر","Publish") + '</button>' +
+    '<button type="button" class="btn gray" data-si="close" style="width:100%;margin-top:8px">' + t("إلغاء","Cancel") + '</button></div>';
+  document.body.appendChild(d);
+  d.addEventListener("click", function(e){ if(e.target === d || e.target.closest("[data-si=close]")) d.remove(); });
+  var save = d.querySelector("#pc-save");
+  save.onclick = async function(){
+    var err = d.querySelector("#pc-err");
+    var title = (d.querySelector("#pc-title") && d.querySelector("#pc-title").value || "").trim();
+    var description = (d.querySelector("#pc-desc") && d.querySelector("#pc-desc").value || "").trim();
+    if(title.length < 3){ err.textContent = t("العنوان قصير","Title too short"); return; }
+    try{
+      save.disabled = true;
+      if(kind === "marketplace"){
+        if(description.length < 10){ err.textContent = t("الوصف قصير","Description too short"); save.disabled = false; return; }
+        var price = Math.max(0, Number(d.querySelector("#pc-price").value) || 0);
+        var currency = ((d.querySelector("#pc-cur") && d.querySelector("#pc-cur").value) || "USD").toUpperCase().slice(0,3);
+        await addDoc(collection(db, "marketplace"), { ownerId: me.uid, title: title.slice(0,160), description: description.slice(0,2000), category: "خدمات", price: price, currency: currency, status: "published", createdAt: Date.now(), updatedAt: Date.now() });
+        toast(t("تم نشر العرض","Listing published"));
+      } else if(kind === "jobs"){
+        if(description.length < 20){ err.textContent = t("الوصف قصير","Description too short"); save.disabled = false; return; }
+        await addDoc(collection(db, "jobPosts"), {
+          ownerId: me.uid, title: title.slice(0,160), description: description.slice(0,4000),
+          company: (d.querySelector("#pc-company") && d.querySelector("#pc-company").value || "").trim().slice(0,120),
+          location: (d.querySelector("#pc-loc") && d.querySelector("#pc-loc").value || "Remote").trim().slice(0,120),
+          employmentType: "Full-time", status: "published", createdAt: Date.now(), updatedAt: Date.now()
+        });
+        toast(t("تم نشر الوظيفة","Job published"));
+      } else {
+        if(description.length < 15){ err.textContent = t("الوصف قصير","Description too short"); save.disabled = false; return; }
+        await addDoc(collection(db, "courses"), {
+          ownerId: me.uid, title: title.slice(0,180), description: description.slice(0,3000),
+          category: "", level: "مبتدئ", language: "ar", certificateEnabled: true, status: "published", createdAt: Date.now(), updatedAt: Date.now()
+        });
+        toast(t("تم نشر الدورة","Course published"));
+      }
+      d.remove();
+      draw();
+    }catch(ex){
+      err.textContent = (ex && ex.message) || "Error";
+      save.disabled = false;
+    }
+  };
+}
+
 function ensureCatalog(kind){
   var map = { marketplace: { col: "marketplace", key: "marketplace" }, jobs: { col: "jobPosts", key: "jobs" }, academy: { col: "courses", key: "academy" } };
   var cfg = map[kind]; if(!cfg) return;
@@ -3223,6 +3293,7 @@ function meView(){
   h += '<div class="card"><div class="row" style="flex-wrap:wrap">' +
     '<button class="btn alt" data-t="pages" style="flex:1">📄 صفحاتي</button>' +
     '<button class="btn alt" data-t="groups" style="flex:1">👥 مجموعاتي</button></div></div>';
+  h += '<div class="card"><button type="button" class="btn red big" data-a="logout" style="width:100%">🚪 ' + t("تسجيل الخروج","Log out") + '</button></div>';
 
   if(isAdmin) h += '<div class="card"><div class="row">' +
     '<button class="btn alt" data-a="teststorage" style="flex:1">🔧 فحص الاتصال بالتخزين</button></div>' +
@@ -4689,6 +4760,12 @@ getRedirectResult(auth).catch(function(e){ var x = document.getElementById("er")
 
 async function actions(b, er){
   var a = b.dataset.a;
+  if(a === "logout" || b.id === "out"){
+    try{ if(typeof callBusy !== "undefined" && callBusy) hangup(); }catch(e){}
+    try{ await signOut(auth); }catch(e){ toast((e && e.message) || "Logout failed"); }
+    return;
+  }
+
   var art = b.closest("article");
   var pid = art && art.dataset.id;
   var i;
@@ -4803,24 +4880,32 @@ async function actions(b, er){
     var prompt = (promptEl && promptEl.value || "").trim();
     if(prompt.length < 2) return toast(t("اكتب طلبك أولاً","Write a prompt first"));
     window.__aiPrompt = prompt;
-    var st = document.getElementById("ai-status");
-    var out = document.getElementById("ai-output");
-    if(st) st.textContent = t("جاري التوليد…","Generating…");
-    if(out) out.textContent = "…";
+    window.__aiOut = t("جاري التوليد…","Generating…");
+    draw();
     try{
-      var r = await fetch("/api/ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt: prompt, mode: aiMode }) });
-      var data = await r.json().catch(function(){ return {}; });
+      var r = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({ prompt: prompt, mode: aiMode || "general" })
+      });
+      var raw = await r.text();
+      var data = {};
+      try{ data = JSON.parse(raw || "{}"); }catch(pe){ data = { message: raw.slice(0, 300) }; }
       if(!r.ok){
-        var msg = data.message || data.error || ("Error " + r.status);
-        window.__aiOut = msg; toast(msg, 4000);
+        var msg = data.message || data.error || ("HTTP " + r.status);
+        if(r.status === 404) msg = t("مسار /api/ai غير منشور على Vercel. ارفع مجلد api."," /api/ai not deployed. Upload the api folder.");
+        if(r.status === 503) msg = data.message || t("OPENAI_API_KEY غير مضبوط أو لم يُعد نشر المشروع بعد إضافة المفتاح.","OPENAI_API_KEY missing or redeploy required.");
+        window.__aiOut = msg;
+        toast(msg, 4500);
       } else {
-        window.__aiOut = data.text || "";
-        if(st) st.textContent = (data.model || "AI") + " · " + (data.mode || aiMode);
+        window.__aiOut = data.text || t("(لا يوجد رد)","(empty)");
+        toast(t("تم التوليد","Generated"));
       }
       draw();
     }catch(err){
-      window.__aiOut = t("تعذر الاتصال بخدمة AI. تأكد من نشر api/ai.js وOPENAI_API_KEY.","AI service unavailable. Deploy api/ai.js and set OPENAI_API_KEY.");
-      draw(); toast(t("خطأ شبكة","Network error"));
+      window.__aiOut = t("تعذر الاتصال بـ /api/ai. تأكد أن الموقع على Vercel وأن api/ai.js منشور.","Cannot reach /api/ai. Ensure site is on Vercel with api/ai.js deployed.");
+      toast(t("خطأ شبكة /api/ai","Network error /api/ai"), 4000);
+      draw();
     }
     return;
   }
@@ -4884,45 +4969,10 @@ async function actions(b, er){
   }
   if(a === "plat-add"){
     if(!me) return showAuthModal();
-    var kind = b.dataset.kind;
-    if(kind === "marketplace"){
-      var title = prompt(t("عنوان العرض","Listing title")); if(title === null) return;
-      title = title.trim(); if(title.length < 3) return toast(t("عنوان قصير","Title too short"));
-      var description = prompt(t("الوصف","Description")); if(description === null) return;
-      description = (description||"").trim(); if(description.length < 10) return toast(t("وصف أقصر من اللازم","Description too short"));
-      var price = Number(prompt(t("السعر","Price"), "0") || 0);
-      try{
-        await addDoc(collection(db, "marketplace"), { ownerId: me.uid, title: title.slice(0,160), description: description.slice(0,2000), category: "خدمات", price: Math.max(0,price), currency: "USD", status: "published", createdAt: Date.now(), updatedAt: Date.now() });
-        toast(t("تم النشر","Published"));
-      }catch(e){ toast(e.message||"Error"); }
-      return;
-    }
-    if(kind === "jobs"){
-      var jt = prompt(t("المسمى الوظيفي","Job title")); if(jt === null) return;
-      jt = jt.trim(); if(jt.length < 3) return toast(t("عنوان قصير","Title too short"));
-      var company = prompt(t("الشركة","Company"), "") || "";
-      var loc = prompt(t("الموقع","Location"), "Remote") || "Remote";
-      var jd = prompt(t("الوصف","Description")); if(jd === null) return;
-      jd = (jd||"").trim(); if(jd.length < 20) return toast(t("وصف أقصر من اللازم","Description too short"));
-      try{
-        await addDoc(collection(db, "jobPosts"), { ownerId: me.uid, title: jt.slice(0,160), description: jd.slice(0,4000), company: company.slice(0,120), location: loc.slice(0,120), employmentType: "Full-time", status: "published", createdAt: Date.now(), updatedAt: Date.now() });
-        toast(t("تم نشر الوظيفة","Job published"));
-      }catch(e){ toast(e.message||"Error"); }
-      return;
-    }
-    if(kind === "academy"){
-      var ct = prompt(t("عنوان الدورة","Course title")); if(ct === null) return;
-      ct = ct.trim(); if(ct.length < 3) return toast(t("عنوان قصير","Title too short"));
-      var cd = prompt(t("الوصف","Description")); if(cd === null) return;
-      cd = (cd||"").trim(); if(cd.length < 15) return toast(t("وصف أقصر من اللازم","Description too short"));
-      try{
-        await addDoc(collection(db, "courses"), { ownerId: me.uid, title: ct.slice(0,180), description: cd.slice(0,3000), category: "", level: "مبتدئ", language: "ar", certificateEnabled: true, status: "published", createdAt: Date.now(), updatedAt: Date.now() });
-        toast(t("تم نشر الدورة","Course published"));
-      }catch(e){ toast(e.message||"Error"); }
-      return;
-    }
+    openPlatformComposer(b.dataset.kind || "marketplace");
     return;
   }
+
   if(a === "teststorage"){ await testStorage(true); return; }
 
   /* ===== الصداقة والمتابعة ===== */
@@ -5416,10 +5466,23 @@ if(a === "adlike"){
   if(a === "verifyaccept"){
     try{
       if(b.dataset.k === "page" && b.dataset.p) await updateDoc(doc(db, "pages", b.dataset.p), {verified: true});
-      else if(b.dataset.u) await updateDoc(doc(db, "users", b.dataset.u), {verified: true, verificationEligible: true});
-      await updateDoc(doc(db, "verifyRequests", b.dataset.i), {status: "accepted", reviewedAt: Date.now(), reviewedBy: me.uid});
-      if(b.dataset.u) notify(b.dataset.u, "verified", {msg: "تم قبول طلب التوثيق وظهرت الشارة بجانب اسمك ✓"});
-      toast("تم قبول التوثيق ✓");
+      else if(b.dataset.u){
+        var targetUser = users.filter(function(x){ return x.id === b.dataset.u; })[0] || {};
+        var addPts = 100;
+        var newBonus = (Number(targetUser.bonusPoints) || 0) + addPts;
+        var wk = weekKey();
+        var wb = (targetUser.weeklyBonusWeek === wk ? (Number(targetUser.weeklyBonus) || 0) : 0) + addPts;
+        await updateDoc(doc(db, "users", b.dataset.u), {
+          verified: true,
+          verificationEligible: true,
+          bonusPoints: newBonus,
+          weeklyBonus: wb,
+          weeklyBonusWeek: wk
+        });
+      }
+      await updateDoc(doc(db, "verifyRequests", b.dataset.i), {status: "accepted", reviewedAt: Date.now(), reviewedBy: me.uid, rewardPoints: 100});
+      if(b.dataset.u) notify(b.dataset.u, "verified", {msg: "تم قبول توثيقك ✓ ومنحت +100 نقطة مكافأة ⭐"});
+      toast("تم قبول التوثيق ✓ (+100 نقطة)");
       draw();
     }catch(e){ toast((e && e.message) || "تعذر القبول"); }
     return;
