@@ -1590,18 +1590,24 @@ function listen(){
   L(query(collection(db, "blocks"), where("a", "==", me.uid)), function(s){
     blocks = new Set(s.docs.map(function(d){ return d.data().b; }));
   });
-  L(query(collection(db, "stories"), orderBy("ts", "desc"), limit(60)), function(s){
+  L(query(collection(db, "stories"), orderBy("ts", "desc"), limit(80)), function(s){
     var now = Date.now();
-    stories = s.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); })
-      .filter(function(x){
-        if(!x || (!x.media && !x.photo)) return false;
-        var exp = Number(x.exp) || 0;
-        var ts = Number(x.ts) || 0;
-        if(!exp && ts) exp = ts + 86400000;
-        if(!exp) return true; // keep if no expiry metadata
-        return exp > now - 60000; // 1 min grace
-      });
-  }, function(err){ console.warn("stories listen", err && err.message); });
+    var incoming = s.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+    var byId = {};
+    // keep optimistic local stories until server echoes them
+    (stories || []).forEach(function(x){ if(x && x.id && x._local) byId[x.id] = x; });
+    incoming.forEach(function(x){
+      if(!x || !x.id) return;
+      var exp = Number(x.exp) || 0;
+      var ts = Number(x.ts) || 0;
+      if(!exp && ts) exp = ts + 86400000;
+      if(exp && exp < now - 120000) return; // expired >2min ago
+      byId[x.id] = x;
+    });
+    stories = Object.keys(byId).map(function(k){ return byId[k]; })
+      .sort(function(a,b){ return (Number(b.ts)||0) - (Number(a.ts)||0); });
+    console.log("[stories] loaded", stories.length, stories.map(function(x){ return {id:x.id, uid:x.uid, media:(x.media||"").slice(0,40), exp:x.exp}; }));
+  }, function(err){ console.warn("[stories] listen error", err && err.code, err && err.message); });
   L(query(collection(db, "reels"), orderBy("ts", "desc"), limit(60)), function(s){
     reels = s.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
   });
@@ -3283,14 +3289,16 @@ function homeView(){
     if(blocks.has(st.uid)) return;
     var g = byUid[st.uid];
     if(!g){ g = byUid[st.uid] = {uid: st.uid, name: st.name, photo: st.photo, ts: 0, unseen: false}; order.push(g); }
-    if((st.ts || 0) >= g.ts){ g.ts = st.ts || 0; g.media = st.media || ""; }
+    if((st.ts || 0) >= g.ts){ g.ts = st.ts || 0; g.media = st.media || st.image || ""; g.photo = st.photo || g.photo; }
     if(!mySeen[st.id] && st.uid !== me.uid) g.unseen = true;
   });
   order.sort(function(x, y){ return (y.unseen ? 1 : 0) - (x.unseen ? 1 : 0) || y.ts - x.ts; });
   var sh = '<div class="stories">' + (isGuest ? "" :
     '<button type="button" class="story-bubble" data-a="addstory"><div class="story-ring mine"><img src="' + (esc(prof.photo) || DEF) + '" alt=""><i class="story-add">+</i></div><span>' + t("أضف قصة","Add story") + '</span></button>');
   order.forEach(function(g){
-    sh += '<button type="button" class="story-bubble" data-a="openstory" data-u="' + esc(g.uid) + '"><div class="story-ring' + (g.unseen ? "" : " seen") + '"><img src="' + (esc(g.media || g.photo) || DEF) + '" alt=""><span class="story-av"><img src="' + (esc(g.photo) || DEF) + '" alt=""></span></div><span>' + (g.uid === me.uid ? t("قصتك","Your story") : esc(g.name || "")) + '</span></button>';
+    var thumb = g.media || g.photo || "";
+    if(/\.(mp4|webm|mov)(\?|$)/i.test(String(thumb))) thumb = g.photo || "";
+    sh += '<button type="button" class="story-bubble" data-a="openstory" data-u="' + esc(g.uid) + '"><div class="story-ring' + (g.unseen ? "" : " seen") + '"><img src="' + (esc(thumb || g.photo) || DEF) + '" alt="" loading="lazy"><span class="story-av"><img src="' + (esc(g.photo) || DEF) + '" alt=""></span></div><span>' + (g.uid === me.uid ? t("قصتك","Your story") : esc(g.name || "")) + '</span></button>';
   });
   sh += '</div>';
   if(isGuest && !order.length) sh = "";
@@ -4763,6 +4771,8 @@ document.addEventListener("canplay",function(e){var v=e.target;if(v&&v.tagName==
 
 /* ============ الأحداث ============ */
 document.addEventListener("click", async function(e){
+  var aiBtn = e.target.closest && e.target.closest('[data-a="ai-run"]');
+  if(aiBtn){ console.log("[AI] click detected on Generate button"); }
   var tag = e.target.closest(".hashtag");
   if(tag){
     e.preventDefault();
@@ -5001,10 +5011,12 @@ async function actions(b, er){
   if(a === "ai-mode"){ aiMode = b.dataset.v || "general"; draw(); return; }
   if(a === "ai-clear"){ window.__aiPrompt = ""; window.__aiOut = ""; draw(); return; }
   if(a === "ai-run"){
-    if(window.__aiBusy) return;
+    console.log("[AI] handler entered, busy=", !!window.__aiBusy, "mode=", aiMode);
+    if(window.__aiBusy){ console.log("[AI] ignored: already busy"); return; }
     var promptEl = document.getElementById("ai-prompt");
-    var prompt = (promptEl && promptEl.value || "").trim();
-    if(prompt.length < 2) return toast(t("اكتب طلبك أولاً","Write a prompt first"));
+    var prompt = (promptEl && promptEl.value || window.__aiPrompt || "").trim();
+    console.log("[AI] prompt length=", prompt.length, "el=", !!promptEl);
+    if(prompt.length < 2){ toast(t("اكتب طلبك أولاً","Write a prompt first")); return; }
     window.__aiPrompt = prompt;
     window.__aiBusy = true;
     window.__aiOut = "⏳ " + t("جاري التوليد…","Generating…");
@@ -5012,29 +5024,38 @@ async function actions(b, er){
     var showAiErr = function(code, detail){
       var line = "[HTTP " + (code || "?") + "] " + (detail || "");
       window.__aiOut = line;
-      toast(line, 5000);
-      console.error("Hashid AI", code, detail);
+      toast(line, 6000);
+      console.error("[AI] error", code, detail);
     };
     try{
-      var r = await fetch("/api/ai", {
+      var apiUrl = (location.origin || "") + "/api/ai";
+      var body = { prompt: prompt, mode: aiMode || "general" };
+      console.log("[AI] POST", apiUrl, body);
+      var r = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify({ prompt: prompt, mode: aiMode || "general" })
+        body: JSON.stringify(body),
+        credentials: "same-origin"
       });
       var raw = await r.text();
+      console.log("[AI] response status=", r.status, "raw=", (raw || "").slice(0, 500));
       var data = {};
       try{ data = JSON.parse(raw || "{}"); }catch(pe){ data = { message: (raw || "").slice(0, 400) }; }
+      console.log("[AI] parsed", data);
       if(!r.ok){
         var detail = data.message || data.error || (raw || "").slice(0, 200) || r.statusText || "Error";
-        if(r.status === 404) detail = t("api/ai غير منشور على Vercel — ارفع مجلد api ثم Redeploy","api/ai not on Vercel — upload api folder then Redeploy");
-        if(r.status === 503) detail = data.message || t("OPENAI_API_KEY مفقود أو يحتاج Redeploy","OPENAI_API_KEY missing or needs Redeploy");
+        if(r.status === 404) detail = t("api/ai غير منشور","api/ai not found");
+        if(r.status === 503) detail = data.message || t("OPENAI_API_KEY مفقود","OPENAI_API_KEY missing");
         showAiErr(r.status, detail);
       } else {
-        window.__aiOut = (data.text && String(data.text).trim()) || t("(لا يوجد رد من النموذج)","(empty model response)");
+        var txt = (data.text != null ? String(data.text) : "").trim();
+        window.__aiOut = txt || t("(لا يوجد رد من النموذج)","(empty model response)");
+        console.log("[AI] success text length=", window.__aiOut.length);
         toast(t("تم التوليد","Generated"));
       }
     }catch(err){
-      showAiErr("NETWORK", (err && err.message) || t("فشل fetch إلى /api/ai","fetch to /api/ai failed"));
+      console.error("[AI] fetch exception", err);
+      showAiErr("NETWORK", (err && err.message) || "fetch failed");
     }
     window.__aiBusy = false;
     draw();
@@ -5725,15 +5746,26 @@ if(a === "adlike"){
       try{
         var url = await upUpload(sf, "stories");
         var cap = prompt("نص القصة (اختياري)") || "";
+        if(!url) throw new Error("رابط الوسائط فارغ بعد الرفع");
         var stPayload = {
-          uid: me.uid, name: prof.name, photo: prof.photo || "",
-          media: url, caption: cap, ts: Date.now(), exp: Date.now() + 24 * 3600 * 1000
+          uid: me.uid, name: prof.name || "", photo: prof.photo || "",
+          media: url, caption: String(cap || "").slice(0, 200),
+          ts: Date.now(), exp: Date.now() + 24 * 3600 * 1000,
+          _local: true
         };
-        var stRef = await addDoc(collection(db, "stories"), stPayload);
-        stories = [Object.assign({id: stRef.id}, stPayload)].concat(stories.filter(function(s){ return s.id !== stRef.id; }));
+        console.log("[stories] publishing", stPayload);
+        var stRef = await addDoc(collection(db, "stories"), {
+          uid: stPayload.uid, name: stPayload.name, photo: stPayload.photo,
+          media: stPayload.media, caption: stPayload.caption,
+          ts: stPayload.ts, exp: stPayload.exp
+        });
+        stPayload.id = stRef.id;
+        stories = [stPayload].concat((stories || []).filter(function(s){ return s.id !== stRef.id; }));
+        console.log("[stories] saved id=", stRef.id, "media=", url, "count=", stories.length);
         toast("تم نشر القصة");
-        if(tab === "home") draw();
-        else goTab("home");
+        tab = "home";
+        draw();
+        setTimeout(function(){ draw(); }, 400);
       }catch(x){ toast("فشل: " + x.message); }
     };
     inp3.click();
