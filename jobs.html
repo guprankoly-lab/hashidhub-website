@@ -2,215 +2,84 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0b1220" />
-  <title>Jobs — HashidHub</title>
-  <link rel="stylesheet" href="hh-shared.css" />
-  <link rel="icon" href="icon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marketplace - HashidHub</title>
+  <style>
+    :root { --bg:#f6faf8; --card:#fff; --ink:#12251e; --muted:#5d7269; --brand:#0d7a5f; --brand2:#149d78; --line:#e2efe9; --amber:#f5b942; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:"Segoe UI",Tahoma,Arial,sans-serif; background:var(--bg); color:var(--ink); }
+    .topbar { background: linear-gradient(135deg,var(--brand),var(--brand2)); color:white; padding:16px 20px; }
+    .nav { display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
+    .nav a { text-decoration:none; color:white; background: rgba(255,255,255,.12); border-radius:999px; padding:8px 12px; font-weight:600; }
+    .container { max-width: 1100px; margin:24px auto; padding:0 16px 42px; }
+    .toolbar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom: 18px; }
+    input, select { padding:12px; border:1px solid var(--line); border-radius:12px; width:100%; }
+    .grid { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:16px; }
+    .card { background: var(--card); border:1px solid var(--line); border-radius:18px; padding:16px; }
+    .tag { display:inline-block; background:#edf8f3; color:var(--brand); padding:6px 10px; border-radius:999px; font-size:.8rem; font-weight:700; }
+    @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+  </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">
-        <a class="back-btn" href="index.html">← الرئيسية</a>
-        <span class="dot">H</span>
-        <span>Jobs</span>
-      </div>
-      <nav class="nav-pills">
-        <a href="marketplace.html">🛍️ السوق</a>
-        <a class="on" href="jobs.html">💼 وظائف</a>
-        <a href="academy.html">🎓 أكاديمية</a>
-        <a href="ai.html">✨ AI</a>
-        <a href="creator-center.html">📊 المبدع</a>
-      </nav>
-      <div id="authBox" class="user-chip">…</div>
-    </div>
-  </header>
+  <div class="topbar">
+    <h1 style="margin:0;">HashidHub</h1>
+    <nav class="nav">
+      <a href="index.html">الرئيسية</a>
+      <a href="ai.html">AI</a>
+      <a href="search.html">بحث</a>
+      <a href="jobs.html">Jobs</a>
+      <a href="academy.html">Academy</a>
+      <a href="profile.html">Profile</a>
+    </nav>
+  </div>
 
-  <main class="container">
-    <section class="hero">
-      <h1>💼 فرص عمل وتدريب</h1>
-      <p>وظائف محلية وعالمية، تدريب، ومشاريع حرة — مطابقة بين المواهب والشركات.</p>
-    </section>
-
+  <div class="container">
+    <h2>Marketplace</h2>
     <div class="toolbar">
-      <input id="q" type="search" placeholder="ابحث عن وظيفة أو شركة…" />
-      <select id="type">
-        <option value="">كل الأنواع</option>
-        <option>Full-time</option>
-        <option>Part-time</option>
-        <option>Contract</option>
-        <option>Internship</option>
-        <option>Remote</option>
-        <option>Freelance</option>
-      </select>
-      <button class="btn" id="btnAdd" hidden>+ نشر وظيفة</button>
+      <div style="flex: 1 1 360px;"><input type="text" value="تصميم" placeholder="ابحث عن منتج أو خدمة…" /></div>
+      <div style="flex: 0 0 180px;"><select><option>كل التصنيفات</option><option>منتجات رقمية</option><option>خدمات</option><option>إعلانات</option><option>تطبيقات</option></select></div>
+      <div style="flex: 0 0 180px;"><button style="width:100%;height:46px;background:linear-gradient(135deg,var(--brand),var(--brand2));border:none;color:white;border-radius:12px;font-weight:700;cursor:pointer;">بحث</button></div>
     </div>
 
-    <div id="list" class="grid" style="grid-template-columns:1fr">
-      <div class="skeleton"></div><div class="skeleton"></div>
+    <div class="grid">
+      <div class="card">
+        <span class="tag">منتج</span>
+        <h3>قالب متجر إبداعي</h3>
+        <p>قالب جاهز لعرض المنتجات، مع ألوان مخصصة ودعم RTL.</p>
+        <strong>190$</strong>
+      </div>
+      <div class="card">
+        <span class="tag">خدمة</span>
+        <h3>تصميم هوية بصرية</h3>
+        <p>هوية كاملة للشركات الناشئة، شارات، ألوان، وأيقونات.</p>
+        <strong>320$</strong>
+      </div>
+      <div class="card">
+        <span class="tag">خدمة</span>
+        <h3>إعداد حملة تسويقية</h3>
+        <p>سير عمل كامل للتسويق عبر Reels والمنشورات.</p>
+        <strong>450$</strong>
+      </div>
+      <div class="card">
+        <span class="tag">منتج</span>
+        <h3>دورة تدريبية PDF</h3>
+        <p>محتوى تعليمي متكامل يساعد المبدعين على التوسع.</p>
+        <strong>69$</strong>
+      </div>
+      <div class="card">
+        <span class="tag">خدمة</span>
+        <h3>تطوير Landing Page</h3>
+        <p>واجهة عالية التحويل مع تجربة مستخدم احترافية.</p>
+        <strong>540$</strong>
+      </div>
+      <div class="card">
+        <span class="tag">منتج</span>
+        <h3>أدوات تسويق ذكية</h3>
+        <p>أدوات لتحليل المحتوى، الأداء، ومؤشرات النمو.</p>
+        <strong>220$</strong>
+      </div>
     </div>
-  </main>
-
-  <div id="toast" class="toast"></div>
-
-  <script type="module">
-    import { firebaseConfig } from "./firebase-config.js";
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, collection, query, where, orderBy, limit, onSnapshot, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    let me = null, items = [], unsub = null;
-
-    const $ = (s, r) => (r || document).querySelector(s);
-    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[c]));
-    function toast(m, ms = 2600) {
-      const el = $("#toast"); el.textContent = m; el.classList.add("show");
-      clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), ms);
-    }
-
-    function renderAuth() {
-      const box = $("#authBox");
-      if (!me) {
-        box.innerHTML = `<button class="btn alt" id="loginBtn" style="padding:8px 12px;min-height:auto">تسجيل الدخول</button>`;
-        $("#loginBtn")?.addEventListener("click", () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => toast(e.message)));
-        $("#btnAdd").hidden = true;
-      } else {
-        box.innerHTML = `<img class="av" src="${esc(me.photoURL || "")}" alt=""><span>${esc(me.displayName || "عضو")}</span>`;
-        $("#btnAdd").hidden = false;
-      }
-    }
-
-    function filtered() {
-      const q = ($("#q").value || "").trim().toLowerCase();
-      const type = $("#type").value;
-      return items.filter(x => {
-        if (type && x.employmentType !== type) return false;
-        if (!q) return true;
-        const blob = `${x.title||""} ${x.company||""} ${x.location||""} ${x.description||""}`.toLowerCase();
-        return blob.includes(q);
-      });
-    }
-
-    function renderList() {
-      const data = filtered();
-      const root = $("#list");
-      if (!data.length) {
-        root.innerHTML = `<div class="empty">لا توجد وظائف منشورة حالياً. انشر أول فرصة 💼</div>`;
-        return;
-      }
-      root.innerHTML = data.map(x => {
-        const own = me && x.ownerId === me.uid;
-        return `<article class="card">
-          <div class="meta">
-            <span class="tag blue">${esc(x.employmentType || "وظيفة")}</span>
-            ${x.location ? `<span class="tag">${esc(x.location)}</span>` : ""}
-            ${own ? `<span class="tag gold">إعلانك</span>` : ""}
-          </div>
-          <h3>${esc(x.title)}</h3>
-          <div class="meta" style="margin-bottom:8px">
-            <strong>${esc(x.company || "شركة")}</strong>
-            ${x.salaryRange ? `<span>• ${esc(x.salaryRange)}</span>` : ""}
-          </div>
-          <p style="color:var(--mute);margin:0 0 12px">${esc((x.description||"").slice(0,220))}${(x.description||"").length>220?"…":""}</p>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            ${own
-              ? `<button class="btn ghost" data-del="${esc(x.id)}" style="padding:8px 14px;min-height:auto">حذف</button>`
-              : `<button class="btn" data-apply="${esc(x.id)}" data-owner="${esc(x.ownerId||"")}" style="padding:8px 14px;min-height:auto">تقديم الآن</button>`}
-          </div>
-        </article>`;
-      }).join("");
-    }
-
-    function listen() {
-      if (unsub) unsub();
-      const qy = query(collection(db, "jobPosts"), where("status", "==", "published"), orderBy("createdAt", "desc"), limit(50));
-      unsub = onSnapshot(qy, snap => {
-        items = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
-        renderList();
-      }, err => {
-        $("#list").innerHTML = `<div class="empty">تعذر تحميل الوظائف.<br><small>${esc(err.code||err.message)}</small></div>`;
-      });
-    }
-
-    function openCreate() {
-      if (!me) return toast("سجّل الدخول أولاً");
-      const wrap = document.createElement("div");
-      wrap.className = "sheet";
-      wrap.innerHTML = `<div class="sheet-panel">
-        <h2>نشر وظيفة</h2>
-        <div class="field"><label>المسمى الوظيفي</label><input id="f-title" maxlength="160" placeholder="مثال: Frontend Developer" /></div>
-        <div class="field"><label>الشركة</label><input id="f-company" maxlength="120" placeholder="اسم الشركة أو المشروع" /></div>
-        <div class="field"><label>الموقع</label><input id="f-loc" maxlength="120" placeholder="Remote / صنعاء / دبي…" /></div>
-        <div class="field"><label>النوع</label>
-          <select id="f-type"><option>Full-time</option><option>Part-time</option><option>Contract</option><option>Internship</option><option>Remote</option><option>Freelance</option></select>
-        </div>
-        <div class="field"><label>الراتب (اختياري)</label><input id="f-salary" maxlength="80" placeholder="مثال: $800–1200" /></div>
-        <div class="field"><label>الوصف</label><textarea id="f-desc" maxlength="4000" placeholder="المهام والمتطلبات…"></textarea></div>
-        <div style="display:flex;gap:10px">
-          <button class="btn" id="f-save">نشر</button>
-          <button class="btn alt" id="f-cancel">إلغاء</button>
-        </div>
-      </div>`;
-      document.body.appendChild(wrap);
-      const close = () => wrap.remove();
-      wrap.addEventListener("click", e => { if (e.target === wrap) close(); });
-      $("#f-cancel", wrap).onclick = close;
-      $("#f-save", wrap).onclick = async () => {
-        const title = $("#f-title", wrap).value.trim();
-        const description = $("#f-desc", wrap).value.trim();
-        if (title.length < 3) return toast("أدخل المسمى الوظيفي");
-        if (description.length < 20) return toast("الوصف قصير جداً");
-        try {
-          await addDoc(collection(db, "jobPosts"), {
-            ownerId: me.uid,
-            title: title.slice(0, 160),
-            description: description.slice(0, 4000),
-            company: $("#f-company", wrap).value.trim().slice(0, 120),
-            location: $("#f-loc", wrap).value.trim().slice(0, 120),
-            employmentType: $("#f-type", wrap).value,
-            salaryRange: $("#f-salary", wrap).value.trim().slice(0, 80),
-            status: "published",
-            createdAt: Date.now(),
-            updatedAt: Date.now()
-          });
-          toast("تم نشر الوظيفة ✨");
-          close();
-        } catch (e) { toast(e.message || "فشل النشر"); }
-      };
-    }
-
-    document.addEventListener("click", async e => {
-      const del = e.target.closest("[data-del]");
-      if (del) {
-        if (!confirm("حذف الإعلان؟")) return;
-        try { await deleteDoc(doc(db, "jobPosts", del.dataset.del)); toast("تم الحذف"); }
-        catch (err) { toast(err.message || "تعذر الحذف"); }
-      }
-      const apply = e.target.closest("[data-apply]");
-      if (apply) {
-        if (!me) return toast("سجّل الدخول للتقديم");
-        try {
-          await addDoc(collection(db, "applications"), {
-            jobId: apply.dataset.apply,
-            applicantId: me.uid,
-            ownerId: apply.dataset.owner || "",
-            status: "submitted",
-            createdAt: Date.now()
-          });
-          toast("تم إرسال التقديم ✅");
-        } catch (err) { toast(err.message || "تعذر التقديم"); }
-      }
-    });
-
-    $("#btnAdd").onclick = openCreate;
-    $("#q").oninput = () => renderList();
-    $("#type").onchange = () => renderList();
-    onAuthStateChanged(auth, u => { me = u; renderAuth(); });
-    listen();
-  </script>
+  </div>
 </body>
 </html>
+

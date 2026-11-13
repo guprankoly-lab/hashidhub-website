@@ -2,49 +2,98 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0b1220" />
-  <title>Creator Center — HashidHub</title>
-  <link rel="stylesheet" href="hh-shared.css" />
-  <link rel="icon" href="icon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>بحث عالمي - HashidHub</title>
+  <style>
+    :root {
+      --bg: #f5faf8; --card:#fff; --ink:#12251e; --muted:#5d7068; --brand:#0d7a5f; --brand2:#149d78; --line:#e3efe9; --accent:#f5b942;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: "Segoe UI", Tahoma, Arial, sans-serif; background: var(--bg); color: var(--ink); }
+    .topbar { background: linear-gradient(135deg, var(--brand), var(--brand2)); color:white; padding:16px 20px; }
+    .nav { display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
+    .nav a { color:white; text-decoration:none; background: rgba(255,255,255,.12); border-radius:999px; padding:8px 12px; font-weight:600; }
+    .container { max-width: 1100px; margin: 24px auto; padding: 0 16px 40px; }
+    .panel { background: var(--card); border:1px solid var(--line); border-radius:18px; padding:18px; }
+    .search-box { display:flex; gap:10px; flex-wrap:wrap; }
+    input, select { padding: 12px 14px; border-radius:12px; border:1px solid var(--line); width:100%; }
+    .pill { display:inline-flex; align-items:center; justify-content:center; border-radius:999px; padding:8px 12px; background:#ecf9f3; color:var(--brand); font-weight:700; }
+    .results { display:grid; gap:14px; margin-top:18px; }
+    .result { display:flex; justify-content:space-between; gap:12px; border:1px solid var(--line); border-radius:14px; padding:14px; background:#fcfffd; }
+    .badge { background:#f5fbf7; color:var(--brand); border:1px solid var(--line); padding:6px 10px; border-radius:999px; font-weight:700; font-size:.8rem; }
+    @media (max-width: 700px) { .result { flex-direction:column; } }
+  </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">
-        <a class="back-btn" href="index.html">← الرئيسية</a>
-        <span class="dot">H</span>
-        <span>Creator Center</span>
+  <div class="topbar">
+    <h1 style="margin:0;">HashidHub</h1>
+    <nav class="nav">
+      <a href="index.html">الرئيسية</a>
+      <a href="ai.html">Hashid AI</a>
+      <a href="creator-center.html">Creator Center</a>
+      <a href="marketplace.html">Marketplace</a>
+      <a href="jobs.html">Jobs</a>
+      <a href="academy.html">Academy</a>
+    </nav>
+  </div>
+
+  <div class="container">
+    <div class="panel">
+      <h2>بحث عالمي</h2>
+      <div class="search-box">
+        <div style="flex:1 1 380px;">
+          <input id="query" type="text" value="مبدعون" placeholder="ابحث عن مستخدم، منشور، ريل، صفحة أو مجموعة…" />
+        </div>
+        <div style="flex: 0 0 180px;">
+          <select id="category">
+            <option value="all">الكل</option>
+            <option value="users">المستخدمون</option>
+            <option value="posts">المنشورات</option>
+            <option value="reels">الريلز</option>
+            <option value="pages">الصفحات</option>
+            <option value="groups">المجموعات</option>
+          </select>
+        </div>
+        <div style="flex: 0 0 160px;">
+          <button class="btn" style="height: 46px; width: 100%; border-radius:12px; background:linear-gradient(135deg,var(--brand),var(--brand2)); color:white; border:none; font-weight:700;" onclick="runSearch()">بحث</button>
+        </div>
       </div>
-      <nav class="nav-pills">
-        <a href="marketplace.html">🛍️ السوق</a>
-        <a href="jobs.html">💼 وظائف</a>
-        <a href="academy.html">🎓 أكاديمية</a>
-        <a href="ai.html">✨ AI</a>
-        <a class="on" href="creator-center.html">📊 المبدع</a>
-      </nav>
+
+      <div class="results" id="results"></div>
     </div>
-  </header>
-  <main class="container">
-    <section class="hero">
-      <h1>📊 مركز المبدعين</h1>
-      <p>تابع أداء محتواك، نمِّ جمهورك، واستعد لتفعيل الأرباح والصناديق الإبداعية.</p>
-    </section>
-    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">
-      <div class="card"><div class="meta">المشاهدات</div><div class="price" style="font-size:1.8rem">—</div><p style="color:var(--mute);margin:0;font-size:.85rem">ستظهر بعد ربط التحليلات</p></div>
-      <div class="card"><div class="meta">التفاعل</div><div class="price" style="font-size:1.8rem">—</div><p style="color:var(--mute);margin:0;font-size:.85rem">نسبة الإعجابات والتعليقات</p></div>
-      <div class="card"><div class="meta">المتابعون</div><div class="price" style="font-size:1.8rem">—</div><p style="color:var(--mute);margin:0;font-size:.85rem">من ملفك على الرئيسية</p></div>
-      <div class="card"><div class="meta">الأرباح المتوقعة</div><div class="price" style="font-size:1.8rem">$0</div><p style="color:var(--mute);margin:0;font-size:.85rem">قريباً مع Creator Fund</p></div>
-    </div>
-    <section class="card" style="margin-top:16px">
-      <h3 style="margin-top:0">اختصارات سريعة</h3>
-      <div style="display:flex;flex-wrap:wrap;gap:10px">
-        <a class="btn" href="ai.html">✨ Hashid AI</a>
-        <a class="btn alt" href="marketplace.html">نشر في السوق</a>
-        <a class="btn alt" href="academy.html">إنشاء دورة</a>
-        <a class="btn ghost" href="verification.html">طلب توثيق</a>
-      </div>
-    </section>
-  </main>
+  </div>
+
+  <script>
+    const demoResults = [
+      { type: 'users', title: 'سارة المبدعة', text: 'متخصصة في Branding و Growth', meta: '2.4K متابع' },
+      { type: 'posts', title: 'منشور: استراتيجيات المحتوى', text: 'أفضل طرق بناء حضور مميز في العام الجديد', meta: '2,330 تفاعل' },
+      { type: 'reels', title: 'ريل: فكرة تسويق متجدد', text: 'حلول سريعة لزيادة التفاعل خلال 7 أيام', meta: '8.1K مشاهدات' },
+      { type: 'pages', title: 'صفحة: Startup Growth Lab', text: 'تعلم بناء مشاريع تنافسية', meta: '12.7K متابع' },
+      { type: 'groups', title: 'مجموعة: Makers Circle', text: 'فرق ومبدعون متواصلون', meta: '1.8K عضو' }
+    ];
+
+    function runSearch() {
+      const query = document.getElementById('query').value.trim() || 'مبدعون';
+      const category = document.getElementById('category').value;
+      const filtered = category === 'all'
+        ? demoResults
+        : demoResults.filter(item => item.type === category);
+
+      const results = filtered.length ? filtered : demoResults;
+      document.getElementById('results').innerHTML = results.map(item => `
+        <div class="result">
+          <div>
+            <div class="badge">${item.type}</div>
+            <h3 style="margin:10px 0 6px;">${item.title}</h3>
+            <div>${item.text}</div>
+          </div>
+          <div style="color: var(--muted); font-weight:700; white-space: nowrap;">${item.meta}</div>
+        </div>
+      `).join('');
+    }
+
+    runSearch();
+  </script>
 </body>
 </html>
+
