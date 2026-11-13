@@ -1594,11 +1594,14 @@ function listen(){
     var now = Date.now();
     stories = s.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); })
       .filter(function(x){
+        if(!x || (!x.media && !x.photo)) return false;
         var exp = Number(x.exp) || 0;
-        if(!exp && x.ts) exp = Number(x.ts) + 86400000; // 24h default if exp missing
-        return exp > now;
+        var ts = Number(x.ts) || 0;
+        if(!exp && ts) exp = ts + 86400000;
+        if(!exp) return true; // keep if no expiry metadata
+        return exp > now - 60000; // 1 min grace
       });
-  });
+  }, function(err){ console.warn("stories listen", err && err.message); });
   L(query(collection(db, "reels"), orderBy("ts", "desc"), limit(60)), function(s){
     reels = s.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
   });
@@ -2706,27 +2709,33 @@ function openPlatformComposer(kind){
         var currency = ((d.querySelector("#pc-cur") && d.querySelector("#pc-cur").value) || "USD").toUpperCase().slice(0,3);
         var category = (d.querySelector("#pc-cat") && d.querySelector("#pc-cat").value) || "خدمة";
         var delivery = (d.querySelector("#pc-delivery") && d.querySelector("#pc-delivery").value || "").trim().slice(0,80);
-        await addDoc(collection(db, "marketplace"), {
+        var payload = {
           ownerId: me.uid, title: title.slice(0,160), description: description.slice(0,2000),
           category: category, price: price, currency: currency, delivery: delivery,
           images: images, status: "published", createdAt: Date.now(), updatedAt: Date.now()
-        });
+        };
+        var refM = await addDoc(collection(db, "marketplace"), payload);
+        catalogPush("marketplace", refM.id, payload);
         toast(t("تم نشر العرض","Listing published"));
       } else if(kind === "jobs"){
         if(description.length < 20){ err.textContent = t("الوصف قصير","Description too short"); save.disabled = false; return; }
-        await addDoc(collection(db, "jobPosts"), {
+        var payloadJ = {
           ownerId: me.uid, title: title.slice(0,160), description: description.slice(0,4000),
           company: (d.querySelector("#pc-company") && d.querySelector("#pc-company").value || "").trim().slice(0,120),
           location: (d.querySelector("#pc-loc") && d.querySelector("#pc-loc").value || "Remote").trim().slice(0,120),
           employmentType: "Full-time", status: "published", createdAt: Date.now(), updatedAt: Date.now()
-        });
+        };
+        var refJ = await addDoc(collection(db, "jobPosts"), payloadJ);
+        catalogPush("jobs", refJ.id, payloadJ);
         toast(t("تم نشر الوظيفة","Job published"));
       } else {
         if(description.length < 15){ err.textContent = t("الوصف قصير","Description too short"); save.disabled = false; return; }
-        await addDoc(collection(db, "courses"), {
+        var payloadC = {
           ownerId: me.uid, title: title.slice(0,180), description: description.slice(0,3000),
           category: "", level: "مبتدئ", language: "ar", certificateEnabled: true, status: "published", createdAt: Date.now(), updatedAt: Date.now()
-        });
+        };
+        var refC = await addDoc(collection(db, "courses"), payloadC);
+        catalogPush("academy", refC.id, payloadC);
         toast(t("تم نشر الدورة","Course published"));
       }
       d.remove();
@@ -2743,16 +2752,35 @@ function ensureCatalog(kind){
   var map = { marketplace: { col: "marketplace", key: "marketplace" }, jobs: { col: "jobPosts", key: "jobs" }, academy: { col: "courses", key: "academy" } };
   var cfg = map[kind]; if(!cfg) return;
   if(catalogUnsub[cfg.key]) return;
+  function applySnap(snap){
+    catalog[cfg.key] = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
+    catalog[cfg.key].sort(function(a,b){ return (Number(b.createdAt)||0) - (Number(a.createdAt)||0); });
+    if(tab === kind || tab === "marketplace" || tab === "jobs" || tab === "academy") draw();
+  }
   try{
     catalogUnsub[cfg.key] = onSnapshot(
       query(collection(db, cfg.col), where("status", "==", "published"), orderBy("createdAt", "desc"), limit(50)),
-      function(snap){
-        catalog[cfg.key] = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
-        if(tab === kind) draw();
-      },
-      function(err){ console.warn("catalog", cfg.col, err && err.code); }
+      applySnap,
+      function(err){
+        console.warn("catalog index/query", cfg.col, err && err.code, err && err.message);
+        // Fallback without orderBy if composite index missing
+        try{
+          if(catalogUnsub[cfg.key]) { try{ catalogUnsub[cfg.key](); }catch(e){} }
+          catalogUnsub[cfg.key] = onSnapshot(
+            query(collection(db, cfg.col), where("status", "==", "published"), limit(50)),
+            applySnap,
+            function(err2){ console.warn("catalog fallback", cfg.col, err2 && err2.message); toast(t("تعذر تحميل القائمة","Failed to load list") + ": " + (err2.code||"")); }
+          );
+        }catch(e2){ console.warn(e2); }
+      }
     );
   }catch(e){ console.warn(e); }
+}
+function catalogPush(kind, id, data){
+  var key = kind === "jobs" ? "jobs" : (kind === "academy" ? "academy" : "marketplace");
+  var row = Object.assign({ id: id }, data);
+  catalog[key] = [row].concat((catalog[key] || []).filter(function(x){ return x.id !== id; }));
+  draw();
 }
 function platEmptyCard(ico, title, sub, btnLabel, btnAttrs){
   return '<div class="plat-empty-card"><div class="big-ico">' + ico + '</div><h3>' + title + '</h3><p>' + sub + '</p>' +
@@ -2897,7 +2925,8 @@ function aiView(){
     '<div class="row" style="gap:8px;margin-top:10px;flex-wrap:wrap">' +
     '<button class="btn" data-a="ai-run" id="ai-run-btn">' + (window.__aiBusy ? ("⏳ " + t("جاري التوليد…","Generating…")) : ("✨ " + t("توليد","Generate"))) + '</button>' +
     '<button class="btn alt" data-a="ai-clear">' + t("مسح","Clear") + '</button></div>' +
-    '<p class="note" id="ai-status" style="margin-top:8px">' + t("يتطلب OPENAI_API_KEY على Vercel","Requires OPENAI_API_KEY on Vercel") + '</p></div>' +
+    '<p class="note" id="ai-status" style="margin-top:8px">' + t("يتطلب OPENAI_API_KEY على Vercel + نشر api/ai.js ثم Redeploy","Needs OPENAI_API_KEY on Vercel + deploy api/ai.js then Redeploy") + '</p>' +
+    '<p class="note" style="direction:ltr;text-align:left;font-size:.75rem;opacity:.8">POST /api/ai</p></div>' +
     '<div class="card" style="border-radius:18px"><h3 style="margin-top:0">' + t("النتيجة","Result") + '</h3>' +
     '<div class="ai-out" id="ai-output">' + esc(window.__aiOut || t("سيظهر الرد هنا بعد التوليد","Output will appear here")) + '</div></div>';
   return h;
@@ -4977,9 +5006,15 @@ async function actions(b, er){
     var prompt = (promptEl && promptEl.value || "").trim();
     if(prompt.length < 2) return toast(t("اكتب طلبك أولاً","Write a prompt first"));
     window.__aiPrompt = prompt;
-    window.__aiOut = t("جاري التوليد…","Generating…");
     window.__aiBusy = true;
+    window.__aiOut = "⏳ " + t("جاري التوليد…","Generating…");
     draw();
+    var showAiErr = function(code, detail){
+      var line = "[HTTP " + (code || "?") + "] " + (detail || "");
+      window.__aiOut = line;
+      toast(line, 5000);
+      console.error("Hashid AI", code, detail);
+    };
     try{
       var r = await fetch("/api/ai", {
         method: "POST",
@@ -4988,26 +5023,21 @@ async function actions(b, er){
       });
       var raw = await r.text();
       var data = {};
-      try{ data = JSON.parse(raw || "{}"); }catch(pe){ data = { message: raw.slice(0, 300) }; }
+      try{ data = JSON.parse(raw || "{}"); }catch(pe){ data = { message: (raw || "").slice(0, 400) }; }
       if(!r.ok){
-        var msg = data.message || data.error || ("HTTP " + r.status);
-        if(r.status === 404) msg = t("مسار /api/ai غير منشور على Vercel. ارفع مجلد api."," /api/ai not deployed. Upload the api folder.");
-        if(r.status === 503) msg = data.message || t("OPENAI_API_KEY غير مضبوط أو لم يُعد نشر المشروع بعد إضافة المفتاح.","OPENAI_API_KEY missing or redeploy required.");
-        window.__aiOut = msg;
-        toast(msg, 4500);
+        var detail = data.message || data.error || (raw || "").slice(0, 200) || r.statusText || "Error";
+        if(r.status === 404) detail = t("api/ai غير منشور على Vercel — ارفع مجلد api ثم Redeploy","api/ai not on Vercel — upload api folder then Redeploy");
+        if(r.status === 503) detail = data.message || t("OPENAI_API_KEY مفقود أو يحتاج Redeploy","OPENAI_API_KEY missing or needs Redeploy");
+        showAiErr(r.status, detail);
       } else {
-        window.__aiOut = data.text || t("(لا يوجد رد)","(empty)");
+        window.__aiOut = (data.text && String(data.text).trim()) || t("(لا يوجد رد من النموذج)","(empty model response)");
         toast(t("تم التوليد","Generated"));
       }
-      draw();
     }catch(err){
-      window.__aiOut = t("تعذر الاتصال بـ /api/ai. تأكد أن الموقع على Vercel وأن api/ai.js منشور.","Cannot reach /api/ai. Ensure site is on Vercel with api/ai.js deployed.");
-      toast(t("خطأ شبكة /api/ai","Network error /api/ai"), 4000);
-      draw();
-    }finally{
-      window.__aiBusy = false;
-      draw();
+      showAiErr("NETWORK", (err && err.message) || t("فشل fetch إلى /api/ai","fetch to /api/ai failed"));
     }
+    window.__aiBusy = false;
+    draw();
     return;
   }
   if(a === "plat-del"){
@@ -5695,11 +5725,15 @@ if(a === "adlike"){
       try{
         var url = await upUpload(sf, "stories");
         var cap = prompt("نص القصة (اختياري)") || "";
-        await addDoc(collection(db, "stories"), {
+        var stPayload = {
           uid: me.uid, name: prof.name, photo: prof.photo || "",
           media: url, caption: cap, ts: Date.now(), exp: Date.now() + 24 * 3600 * 1000
-        });
+        };
+        var stRef = await addDoc(collection(db, "stories"), stPayload);
+        stories = [Object.assign({id: stRef.id}, stPayload)].concat(stories.filter(function(s){ return s.id !== stRef.id; }));
         toast("تم نشر القصة");
+        if(tab === "home") draw();
+        else goTab("home");
       }catch(x){ toast("فشل: " + x.message); }
     };
     inp3.click();
