@@ -6,7 +6,7 @@ import { listenReels, reelShelfHtml, reelsPageHtml, publishReel, openReelPlayer 
 import { profileHtml, loadProfile, setCreatorType, listenFollows } from "./profile.js";
 import { exploreHtml, trendsRailHtml, searchHtml } from "./explore.js";
 import { aiPageHtml, runAI } from "./ai.js";
-import { marketplacePageHtml, openMarketComposer, deleteListing, listenMarketplace, openSellerContact } from "./marketplace.js";
+import { marketplacePageHtml, openMarketComposer, deleteListing, listenMarketplace } from "./marketplace.js";
 import {
   listenMessages, inboxHtml, chatHtml, openChat, sendText, sendVoice,
   startVoiceNote, afterChatRender, unreadCount
@@ -385,7 +385,7 @@ document.addEventListener("click", async (e) => {
       return;
     }
     if (act === "market-contact") {
-      await openSellerContact(b.dataset.u);
+      await (await import("./marketplace.js")).openSellerContact(b.dataset.u);
       return;
     }
     if (act === "page-create") {

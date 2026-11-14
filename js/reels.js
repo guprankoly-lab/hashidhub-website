@@ -268,6 +268,7 @@ export function openReelPlayer(startId) {
       slide.dataset.i = String(globalI);
       slide.dataset.id = r.id;
       slide.innerHTML = `
+        <div class="rp-loading" data-load><div class="spinner"></div><div>${t("جاري تحميل الفيديو…","Loading video…")}</div></div>
         <video playsinline loop muted data-src="${esc(src)}" preload="none" poster="${esc(r.poster || "")}"></video>
         <div class="double-tap-heart">❤️</div>
         <div class="rp-overlay">
@@ -284,6 +285,14 @@ export function openReelPlayer(startId) {
           </div>
         </div>`;
       const video = slide.querySelector("video");
+      const loadEl = slide.querySelector("[data-load]");
+      const hideLoad = () => { if (loadEl) loadEl.style.display = "none"; };
+      video.addEventListener("loadstart", () => { if (loadEl) loadEl.style.display = "grid"; });
+      video.addEventListener("canplay", hideLoad);
+      video.addEventListener("playing", hideLoad);
+      video.addEventListener("error", () => {
+        if (loadEl) loadEl.innerHTML = "<div>" + t("تعذّر تشغيل الفيديو","Could not play video") + "</div>";
+      });
       video.addEventListener(
         "play",
         () => {

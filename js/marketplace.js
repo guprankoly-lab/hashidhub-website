@@ -272,9 +272,70 @@ export function openMarketComposer() {
 
 export async function deleteListing(id) {
   if (!id) return;
-  if (!confirm(t("حذف هذا العرض؟", "Delete this listing?"))) return;
+  try {
+    const { confirmDialog } = await import("./ui.js");
+    if (!(await confirmDialog(
+      (await import("./state.js")).t("حذف هذا العرض؟", "Delete this listing?")
+    ))) return;
+  } catch (_) {
+    if (!window.confirm("Delete?")) return;
+  }
   await deleteDoc(doc(db, "marketplace", id));
   state.catalog.marketplace = (state.catalog.marketplace || []).filter((x) => x.id !== id);
   toast(t("تم الحذف", "Deleted"));
   window.dispatchEvent(new CustomEvent("hh:data", { detail: "marketplace" }));
+}
+
+export async function openSellerContact(ownerId, listing) {
+  const { showSheet } = await import("./ui.js");
+  const u = (state.users || []).find((x) => x.id === ownerId) || {};
+  const nList = (state.catalog.marketplace || []).filter((x) => x.ownerId === ownerId).length;
+  const wa = u.whatsapp || u.phone || "";
+  const tel = u.phone || "";
+  const tg = u.telegram || "";
+  const title = (u.name || (listing && listing.title) || "").toString();
+  const html =
+    '<h3 style="margin:0 0 8px">' +
+    t("تواصل مع البائع", "Contact seller") +
+    "</h3><p><b>" +
+    esc(title) +
+    '</b></p><p class="note">' +
+    nList +
+    " " +
+    t("إعلان", "listings") +
+    '</p><div class="col" style="margin-top:12px;gap:8px">' +
+    '<button class="btn" data-act-c="msg" style="width:100%">💬 ' +
+    t("رسائل داخلية", "In-app message") +
+    "</button>" +
+    (wa
+      ? '<a class="btn secondary" style="width:100%;text-align:center" href="https://wa.me/' +
+        esc(String(wa).replace(/\D/g, "")) +
+        '" target="_blank" rel="noopener">WhatsApp</a>'
+      : '<button class="btn alt" style="width:100%" disabled>WhatsApp</button>') +
+    (tel
+      ? '<a class="btn alt" style="width:100%;text-align:center" href="tel:' +
+        esc(tel) +
+        '">📞 ' +
+        t("اتصال", "Call") +
+        "</a>"
+      : "") +
+    (tg
+      ? '<a class="btn alt" style="width:100%;text-align:center" href="https://t.me/' +
+        esc(String(tg).replace("@", "")) +
+        '" target="_blank" rel="noopener">Telegram</a>'
+      : "") +
+    '<button class="btn ghost" data-close style="width:100%">' +
+    t("إغلاق", "Close") +
+    "</button></div>";
+  const { el, close } = showSheet(html);
+  const msgBtn = el.querySelector('[data-act-c="msg"]');
+  if (msgBtn) {
+    msgBtn.addEventListener("click", () => {
+      close();
+      if (!ownerId) return;
+      window.dispatchEvent(
+        new CustomEvent("hh:open-chat", { detail: { uid: ownerId, name: u.name || "" } })
+      );
+    });
+  }
 }
