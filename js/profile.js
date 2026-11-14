@@ -91,7 +91,6 @@ export function profileHtml(uid, data) {
     <button class="${tab === "about" ? "on" : ""}" data-act="prof-tab" data-v="about">${t("حول", "About")}</button>
     <button class="${tab === "portfolio" ? "on" : ""}" data-act="prof-tab" data-v="portfolio">${t("أعمال", "Portfolio")}</button>
     <button class="${tab === "achievements" ? "on" : ""}" data-act="prof-tab" data-v="achievements">${t("إنجازات", "Achievements")}</button>
-    <button class="${tab === "pages" ? "on" : ""}" data-act="prof-tab" data-v="pages">📄 ${t("صفحات", "Pages")}</button>
   </div>`;
 
   if (tab === "achievements") {
@@ -119,8 +118,6 @@ export function profileHtml(uid, data) {
       : `<div class="empty"><p>${t("لا ريلز", "No reels")}</p></div>`;
   } else if (tab === "portfolio") {
     h += `<div class="empty"><div class="ico">📁</div><p>${t("أضف أعمالك قريباً", "Portfolio coming soon")}</p></div>`;
-  } else if (tab === "pages") {
-    h += `<div data-pages-slot></div>`;
   } else {
     const ps = state.posts.filter((p) => p.uid === uid);
     h += ps.length
