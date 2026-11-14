@@ -6,8 +6,7 @@ import {
   collection
 } from "./firebase.js";
 import { state, t, toast, esc, ago } from "./state.js";
-import { weekKey } from "./gamification.js";
-import { verificationStats } from "./verify.js";
+import { verificationStats, weekKey } from "./gamification.js";
 
 state.adminTab = state.adminTab || "home";
 state.adminVerifyFilter = state.adminVerifyFilter || "all";
