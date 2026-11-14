@@ -1,7 +1,7 @@
 import { state, t, toast, esc, applyTheme, DEF_AV } from "./state.js";
 import { startAuth, onAuthReady, authView, setupView, bindAuthDom, doLogout } from "./auth.js";
 import { listenStories, storiesStripHtml, publishStory, openStoryViewer } from "./stories.js";
-import { listenPosts, composerHtml, feedHtml, bindComposer, toggleLike, openPostMenu } from "./posts.js";
+import { listenPosts, composerHtml, feedHtml, bindComposer, toggleLike } from "./posts.js";
 import { listenReels, reelShelfHtml, reelsPageHtml, publishReel, openReelPlayer } from "./reels.js";
 import { profileHtml, loadProfile, setCreatorType, listenFollows } from "./profile.js";
 import { exploreHtml, trendsRailHtml, searchHtml } from "./explore.js";
@@ -370,7 +370,7 @@ document.addEventListener("click", async (e) => {
       return;
     }
     if (act === "post-menu") {
-      await openPostMenu(b.dataset.id, b.dataset.uid);
+      await (await import("./posts.js")).openPostMenu(b.dataset.id, b.dataset.uid);
       return;
     }
     if (act === "share-post") {
