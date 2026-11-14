@@ -20,7 +20,6 @@ import { adminHtml, adminAcceptVerify, adminRejectVerify } from "./admin.js";
 import { creatorDashboardHtml } from "./creator.js";
 import { loadingOverlay } from "./ui.js";
 import { pagesBlockHtml, pageViewHtml, createPage, listenPages } from "./pages.js";
-import { openSellerContact } from "./marketplace.js";
 import {
   db,
   collection,
