@@ -24,7 +24,14 @@ import {
   limit,
   where
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { firebaseConfig } from "../firebase-config.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyAUlBb4PTSSFTAds01-ZlozcM5Lc1Wt0hY",
+  authDomain: "hashid-net.firebaseapp.com",
+  projectId: "hashid-net",
+  storageBucket: "hashid-net.firebasestorage.app",
+  messagingSenderId: "461441652861",
+  appId: "1:461441652861:web:d73f46fc672104be8fb914"
+};
 
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);

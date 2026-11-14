@@ -12,17 +12,54 @@
   <link rel="stylesheet" href="./css/profile.css">
   <link rel="stylesheet" href="./css/reels.css">
   <link rel="stylesheet" href="./css/chat.css">
+  <style>
+    .boot-err{max-width:520px;margin:40px auto;padding:20px;background:#1a1212;color:#fecaca;
+      border:1px solid #7f1d1d;border-radius:16px;font-family:system-ui,sans-serif;direction:rtl;text-align:right}
+    .boot-err code{display:block;margin-top:10px;padding:10px;background:#0b0f14;border-radius:8px;
+      color:#fdba74;font-size:12px;white-space:pre-wrap;direction:ltr;text-align:left}
+  </style>
 </head>
 <body>
   <div id="app">
-    <div class="auth-wrap"><div class="note">Loading HashidHub 3.0…</div></div>
+    <div class="auth-wrap"><div class="note" id="boot-msg">… Loading HashidHub 3.0</div></div>
   </div>
   <script src="./media-config.js"></script>
-  <script type="module" src="./js/app.js"></script>
   <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function () {
-        navigator.serviceWorker.register('./sw.js').catch(function () {});
+    window.__hhShowErr = function (err) {
+      var msg = (err && (err.message || err.stack || String(err))) || "Unknown error";
+      console.error("[HashidHub boot]", err);
+      var app = document.getElementById("app");
+      if (app) {
+        app.innerHTML = '<div class="boot-err"><b>تعذّر تشغيل HashidHub 3.0</b><p>انسخ الرسالة التالية وأرسلها للدعم.</p><code>' +
+          String(msg).replace(/</g, "&lt;").slice(0, 1500) + "</code></div>";
+      }
+    };
+    window.addEventListener("error", function (e) {
+      if (e && e.message && e.message.indexOf("Script error") === 0) return;
+      window.__hhShowErr(e.error || e.message || e);
+    });
+    window.addEventListener("unhandledrejection", function (e) {
+      window.__hhShowErr(e.reason || e);
+    });
+    setTimeout(function () {
+      var m = document.getElementById("boot-msg");
+      if (m && document.body.innerHTML.indexOf("Loading HashidHub") !== -1) {
+        m.textContent = "لا يزال التحميل… إذا استمر، افتح Console (F12) وابحث عن أخطاء JS";
+      }
+    }, 8000);
+  </script>
+  <script type="module">
+    import("./js/app.js").catch(function (err) {
+      window.__hhShowErr(err);
+    });
+  </script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.getRegistrations().then(function (regs) {
+          // optional: leave SW; new cache name invalidates old
+        });
+        navigator.serviceWorker.register("./sw.js").catch(function () {});
       });
     }
   </script>

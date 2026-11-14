@@ -17,6 +17,7 @@ import {
 } from "./gamification.js";
 import { verificationHtml, requestVerify, listenVerifyRequests } from "./verify.js";
 import { adminHtml, adminAcceptVerify, adminRejectVerify } from "./admin.js";
+import { creatorDashboardHtml } from "./creator.js";
 import {
   db,
   collection,
@@ -38,6 +39,7 @@ function navItems() {
     ["msgs", "💬", t("رسائل", "Messages")],
     ["verification", "✅", t("توثيق", "Verify")],
     ["leaderboard", "🏆", t("متصدرون", "Leaders")],
+    ["creator", "📊", t("إحصائيات", "Analytics")],
     ["marketplace", "🛍️", t("السوق", "Market")],
     ["jobs", "💼", t("وظائف", "Jobs")],
     ["academy", "🎓", t("أكاديمية", "Academy")],
@@ -125,6 +127,7 @@ function mePageHtml() {
     profileHtml(state.me.uid, state.prof) +
     pointsCardHtml() +
     dailyQuestsHtml() +
+    `<div class="card"><button class="btn secondary" style="width:100%" data-act="tab" data-t="creator">📊 ${t("لوحة المبدع", "Creator dashboard")}</button></div>` +
     `<div class="card"><button class="btn danger" style="width:100%" data-act="logout">🚪 ${t("تسجيل الخروج", "Log out")}</button></div>`
   );
 }
@@ -132,6 +135,7 @@ function mePageHtml() {
 function mainHtml() {
   if (state.tab === "verification") return verificationHtml();
   if (state.tab === "leaderboard") return leaderboardHtml();
+  if (state.tab === "creator") return creatorDashboardHtml();
   if (state.tab === "admin") return adminHtml();
   if (state.tab === "msgs") return inboxHtml();
   if (state.tab === "chat") return chatHtml();
@@ -487,8 +491,13 @@ onAuthReady((mode) => {
   render();
 });
 
-applyTheme();
-startAuth();
-state._authScreen = "login";
-render();
-console.log("[HashidHub 3.0] boot");
+try {
+  applyTheme();
+  startAuth();
+  state._authScreen = "login";
+  render();
+  console.log("[HashidHub 3.0] boot");
+} catch (err) {
+  console.error(err);
+  if (window.__hhShowErr) window.__hhShowErr(err);
+}

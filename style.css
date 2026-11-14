@@ -217,3 +217,20 @@ textarea{min-height:90px;resize:vertical}
 /* Loading */
 .skeleton{background:linear-gradient(90deg,var(--card2),var(--card),var(--card2));background-size:200% 100%;animation:sk 1.2s infinite}
 @keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+
+/* Creator analytics */
+.creator-kpis{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px
+}
+@media(min-width:720px){
+  .creator-kpis{grid-template-columns:repeat(6,1fr)}
+}
+.creator-kpis .kpi{
+  background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:12px 10px;text-align:center;box-shadow:var(--sh)
+}
+.creator-kpis .kpi b{display:block;font-size:1.15rem}
+.creator-kpis .kpi span{font-size:.72rem;color:var(--mute)}
+.creator-kpis .kpi.accent b{color:var(--secondary)}
+.chart-svg{color:var(--mute);margin-top:4px}
