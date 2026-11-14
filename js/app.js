@@ -1,12 +1,12 @@
 import { state, t, toast, esc, applyTheme, DEF_AV } from "./state.js";
 import { startAuth, onAuthReady, authView, setupView, bindAuthDom, doLogout } from "./auth.js";
 import { listenStories, storiesStripHtml, publishStory, openStoryViewer } from "./stories.js";
-import { listenPosts, composerHtml, feedHtml, bindComposer, toggleLike } from "./posts.js";
+import { listenPosts, composerHtml, feedHtml, bindComposer, toggleLike, openPostMenu } from "./posts.js";
 import { listenReels, reelShelfHtml, reelsPageHtml, publishReel, openReelPlayer } from "./reels.js";
 import { profileHtml, loadProfile, setCreatorType, listenFollows } from "./profile.js";
 import { exploreHtml, trendsRailHtml, searchHtml } from "./explore.js";
 import { aiPageHtml, runAI } from "./ai.js";
-import { marketplacePageHtml, openMarketComposer, deleteListing, listenMarketplace } from "./marketplace.js";
+import { marketplacePageHtml, openMarketComposer, deleteListing, listenMarketplace, openSellerContact } from "./marketplace.js";
 import {
   listenMessages, inboxHtml, chatHtml, openChat, sendText, sendVoice,
   startVoiceNote, afterChatRender, unreadCount
@@ -18,6 +18,8 @@ import {
 import { verificationHtml, requestVerify, listenVerifyRequests } from "./verify.js";
 import { adminHtml, adminAcceptVerify, adminRejectVerify } from "./admin.js";
 import { creatorDashboardHtml } from "./creator.js";
+import { loadingOverlay } from "./ui.js";
+import { pagesBlockHtml, pageViewHtml, createPage, listenPages } from "./pages.js";
 import {
   db,
   collection,
@@ -29,6 +31,30 @@ import {
 } from "./firebase.js";
 
 const appEl = () => document.getElementById("app");
+
+function mobileMenuHtml() {
+  const items = [
+    ["home", "🏠", t("الرئيسية", "Home")],
+    ["explore", "🔍", t("استكشاف", "Explore")],
+    ["reels", "🎬", t("ريلز", "Reels")],
+    ["ai", "🤖", "AI"],
+    ["msgs", "💬", t("رسائل", "Chats")],
+    ["verification", "✅", t("توثيق", "Verify")],
+    ["leaderboard", "🏆", t("متصدرون", "Leaders")],
+    ["creator", "📊", t("إحصائيات", "Stats")],
+    ["marketplace", "🛍️", t("السوق", "Market")],
+    ["jobs", "💼", t("وظائف", "Jobs")],
+    ["academy", "🎓", t("أكاديمية", "Academy")],
+    ["me", "👤", t("حسابي", "Me")]
+  ];
+  if (state.isAdmin) items.push(["admin", "🛠️", t("إدارة", "Admin")]);
+  return `<nav class="mobile-menu">${items
+    .map(
+      ([id, ico, label]) =>
+        `<button type="button" class="${state.tab === id ? "on" : ""}" data-act="tab" data-t="${id}">${ico} ${label}</button>`
+    )
+    .join("")}</nav>`;
+}
 
 function navItems() {
   const items = [
@@ -59,8 +85,8 @@ function headerHtml() {
   return `<header class="hh-header">
     <div class="logo">Hashid<b>Hub</b></div>
     <div class="search-bar">
-      <span>🔎</span>
-      <input id="global-search" type="search" placeholder="${t("بحث: أشخاص، منشورات، ريلز، سوق…", "Search people, posts, reels, market…")}" value="${esc(state.searchQ || "")}">
+      <input id="global-search" type="search" placeholder="${t("بحث: أشخاص، منشورات، ريلز، سوق..", "Search: people, posts, reels..")}" value="${esc(state.searchQ || "")}">
+      <span>🔍</span>
     </div>
     <div class="hdr-actions">
       <button class="hbtn" data-act="toggle-theme" title="Theme">🌓</button>
@@ -126,6 +152,7 @@ function mePageHtml() {
   return (
     profileHtml(state.me.uid, state.prof) +
     pointsCardHtml() +
+    pagesBlockHtml() +
     dailyQuestsHtml() +
     `<div class="card"><button class="btn secondary" style="width:100%" data-act="tab" data-t="creator">📊 ${t("لوحة المبدع", "Creator dashboard")}</button></div>` +
     `<div class="card"><button class="btn danger" style="width:100%" data-act="logout">🚪 ${t("تسجيل الخروج", "Log out")}</button></div>`
@@ -136,6 +163,7 @@ function mainHtml() {
   if (state.tab === "verification") return verificationHtml();
   if (state.tab === "leaderboard") return leaderboardHtml();
   if (state.tab === "creator") return creatorDashboardHtml();
+  if (state.tab === "page") return pageViewHtml(state.activePageId);
   if (state.tab === "admin") return adminHtml();
   if (state.tab === "msgs") return inboxHtml();
   if (state.tab === "chat") return chatHtml();
@@ -158,6 +186,21 @@ function mainHtml() {
   );
 }
 
+function pushNav(tab) {
+  try {
+    const url = tab === "home" ? "/" : "/?tab=" + encodeURIComponent(tab);
+    if (location.search.indexOf("tab=" + tab) >= 0 || (tab === "home" && !location.search)) return;
+    history.pushState({ tab }, "", url);
+  } catch (_) {}
+}
+
+window.addEventListener("popstate", (e) => {
+  const tab = (e.state && e.state.tab) || new URLSearchParams(location.search).get("tab") || "home";
+  if (state._authScreen) return;
+  state.tab = tab;
+  render();
+});
+
 export function render() {
   applyTheme();
   if (state._authScreen === "login") {
@@ -173,6 +216,7 @@ export function render() {
 
   appEl().innerHTML = `
     ${headerHtml()}
+    ${mobileMenuHtml()}
     <div class="layout">
       <aside class="rail"><div class="card" style="padding:10px">${navItems()}</div></aside>
       <main class="main" id="main">${mainHtml()}</main>
@@ -182,6 +226,12 @@ export function render() {
 
   bindComposer();
   if (state.tab === "chat") afterChatRender();
+  const slot = document.querySelector("[data-pages-slot]");
+  if (slot) {
+    import("./pages.js").then((m) => {
+      slot.outerHTML = m.pagesBlockHtml(state.profileUid || state.me?.uid);
+    });
+  }
   const mq = document.getElementById("market-q");
   if (mq) {
     mq.addEventListener("keydown", (e) => {
@@ -262,6 +312,7 @@ document.addEventListener("click", async (e) => {
   try {
     if (act === "tab") {
       state.tab = b.dataset.t || "home";
+      pushNav(state.tab);
       render();
       return;
     }
@@ -313,10 +364,48 @@ document.addEventListener("click", async (e) => {
       openReelPlayer(b.dataset.id);
       return;
     }
+    
     if (act === "like-post") {
-      await toggleLike(b.dataset.id);
+      await toggleLike(b.dataset.id, b);
       return;
     }
+    if (act === "post-menu") {
+      await openPostMenu(b.dataset.id, b.dataset.uid);
+      return;
+    }
+    if (act === "share-post") {
+      const url = location.origin + "/?post=" + encodeURIComponent(b.dataset.id);
+      try { await navigator.clipboard.writeText(url); } catch (_) {}
+      toast(t("تم نسخ الرابط", "Link copied"));
+      b.classList.add("tap-pop");
+      return;
+    }
+    if (act === "comment-post") {
+      toast(t("التعليقات تُفتح في التحديث التالي من المنشور", "Comments expand in next post update"));
+      return;
+    }
+    if (act === "market-contact") {
+      await openSellerContact(b.dataset.u);
+      return;
+    }
+    if (act === "page-create") {
+      await createPage();
+      render();
+      return;
+    }
+    if (act === "page-open") {
+      state.activePageId = b.dataset.id;
+      state.tab = "page";
+      pushNav("page");
+      render();
+      return;
+    }
+    if (act === "page-switch") {
+      state.activePageId = b.dataset.id;
+      toast(t("تم التبديل — المنشورات باسم الصفحة قريباً بالكامل", "Switched — page-as-author posts coming fully next"));
+      return;
+    }
+
     if (act === "open-profile") {
       await loadProfile(b.dataset.u);
       state.tab = "profile";
@@ -460,6 +549,13 @@ document.addEventListener("click", async (e) => {
   } catch (err) {
     console.error(err);
     toast(err.message || "Error");
+  }
+});
+
+window.addEventListener("hh:open-chat", (e) => {
+  if (e.detail?.uid) {
+    openChat(e.detail.uid, e.detail.name || "");
+    render();
   }
 });
 
